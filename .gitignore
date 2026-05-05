@@ -70,6 +70,8 @@ playground.xcworkspace
 .env.*
 !.env.example
 *.local
+Config/Project.xcconfig
+!Config/Project.xcconfig.example
 
 # Logs
 *.log

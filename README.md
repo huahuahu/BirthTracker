@@ -23,7 +23,13 @@ make check
 make fix
 ```
 
-Placeholder bundle identifiers, CloudKit container, App Group, and team id live in `Config/Project.xcconfig`.
+Create a local Xcode configuration before generating the project:
+
+```bash
+cp Config/Project.xcconfig.example Config/Project.xcconfig
+```
+
+Replace the placeholder bundle identifiers, CloudKit container, App Group, and team id in `Config/Project.xcconfig`. This file is ignored by git so local signing and app identifiers are not committed.
 
 Debug builds default to local SwiftData storage so unsigned simulator tests run reliably. Set `BIRTHTRACKER_STORAGE_MODE=memory`, `local`, or `cloud` to exercise the alternate storage modes.
 
