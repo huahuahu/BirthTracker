@@ -1,0 +1,5 @@
+APP_BUNDLE_ID = com.example.BirthTracker
+WIDGET_BUNDLE_ID = com.example.BirthTracker.widget
+DEVELOPMENT_TEAM = ABCDE12345
+CLOUDKIT_CONTAINER_ID = iCloud.com.example.BirthTracker
+APP_GROUP_ID = group.com.example.BirthTracker

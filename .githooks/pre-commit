@@ -1,0 +1,28 @@
+#!/bin/sh
+set -eu
+
+ROOT="$(git rev-parse --show-toplevel)"
+cd "$ROOT"
+
+STAGED_SWIFT_FILES="$(git diff --cached --name-only --diff-filter=ACMR | grep -E '^(Sources|Tests)/.*\.swift$' || true)"
+
+if [ -z "$STAGED_SWIFT_FILES" ]; then
+  exit 0
+fi
+
+if ! command -v swift-format >/dev/null 2>&1; then
+  echo "error: swift-format is not installed. Install it with: brew install swift-format" >&2
+  exit 127
+fi
+
+if ! command -v swiftlint >/dev/null 2>&1; then
+  echo "error: swiftlint is not installed. Install it with: brew install swiftlint" >&2
+  exit 127
+fi
+
+echo "Formatting staged Swift files..."
+printf '%s\n' "$STAGED_SWIFT_FILES" | xargs swift-format format --in-place --configuration "$ROOT/.swift-format"
+printf '%s\n' "$STAGED_SWIFT_FILES" | xargs git add
+
+echo "Running Swift format/lint checks..."
+"$ROOT/scripts/lint.sh"

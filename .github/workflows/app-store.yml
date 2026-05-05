@@ -1,0 +1,30 @@
+name: App Store Connect
+
+on:
+  workflow_dispatch:
+    inputs:
+      lane:
+        description: fastlane lane to run
+        required: true
+        default: beta
+        type: choice
+        options:
+          - beta
+          - release
+
+jobs:
+  publish:
+    runs-on: macos-26
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install dependencies
+        run: |
+          brew install xcodegen
+          bundle install
+      - name: Publish
+        env:
+          APP_STORE_CONNECT_KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
+          APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+          APP_STORE_CONNECT_API_KEY_P8: ${{ secrets.APP_STORE_CONNECT_API_KEY_P8 }}
+          MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+        run: bundle exec fastlane ios ${{ inputs.lane }}

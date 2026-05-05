@@ -1,0 +1,78 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon?
+._*
+.Spotlight-V100
+.Trashes
+
+# Xcode user data
+*.xcuserstate
+*.xcscmblueprint
+xcuserdata/
+*.xcodeproj/xcuserdata/
+*.xcworkspace/xcuserdata/
+
+# Xcode build output
+DerivedData/
+build/
+Build/
+*.moved-aside
+*.xccheckout
+*.xcactivitylog
+*.xcresult
+*.resultbundle
+*.ipa
+*.dSYM.zip
+*.dSYM
+
+# Swift Package Manager
+.build/
+.swiftpm/
+Packages/
+Package.resolved
+
+# CocoaPods
+Pods/
+
+# Carthage
+Carthage/Build/
+
+# SwiftPM and Xcode generated project files
+# This project uses XcodeGen, so the Xcode project can be regenerated from project.yml.
+# Remove this ignore rule if the project intentionally commits the generated project.
+*.xcodeproj/
+*.xcworkspace/
+
+# Dependency managers and Ruby tooling
+vendor/bundle/
+.bundle/
+Gemfile.lock
+
+# fastlane
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/screenshots/
+fastlane/test_output/
+
+# Code coverage
+coverage/
+*.profdata
+*.profraw
+
+# Playgrounds
+timeline.xctimeline
+playground.xcworkspace
+
+# Environment and local configuration
+.env
+.env.*
+!.env.example
+*.local
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*

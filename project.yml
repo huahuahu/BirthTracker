@@ -1,0 +1,86 @@
+name: BirthTracker
+options:
+  bundleIdPrefix: com.example
+  deploymentTarget:
+    iOS: "26.0"
+  developmentLanguage: en
+settings:
+  base:
+    SWIFT_VERSION: "6.2"
+    CURRENT_PROJECT_VERSION: 1
+    MARKETING_VERSION: 1.0.0
+    DEVELOPMENT_TEAM: $(DEVELOPMENT_TEAM)
+configs:
+  Debug: debug
+  Release: release
+packages: {}
+targets:
+  BirthTracker:
+    type: application
+    platform: iOS
+    sources:
+      - path: Sources/BirthTrackerApp
+      - path: Sources/BirthTrackerShared
+    dependencies:
+      - target: BirthTrackerWidget
+        embed: true
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: $(APP_BUNDLE_ID)
+        INFOPLIST_FILE: Sources/BirthTrackerApp/Info.plist
+        INFOPLIST_KEY_CFBundleDisplayName: BirthTracker
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        CODE_SIGN_ENTITLEMENTS: Config/BirthTracker.entitlements
+      configs:
+        Debug:
+          SWIFT_ACTIVE_COMPILATION_CONDITIONS: DEBUG
+    configFiles:
+      Debug: Config/Project.xcconfig
+      Release: Config/Project.xcconfig
+  BirthTrackerWidget:
+    type: app-extension
+    platform: iOS
+    sources:
+      - path: Sources/BirthTrackerWidget
+      - path: Sources/BirthTrackerShared
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: $(WIDGET_BUNDLE_ID)
+        INFOPLIST_FILE: Sources/BirthTrackerWidget/Info.plist
+        CODE_SIGN_ENTITLEMENTS: Config/BirthTrackerWidget.entitlements
+        SKIP_INSTALL: YES
+      configs:
+        Debug:
+          SWIFT_ACTIVE_COMPILATION_CONDITIONS: DEBUG
+    configFiles:
+      Debug: Config/Project.xcconfig
+      Release: Config/Project.xcconfig
+  BirthTrackerTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - path: Tests/BirthTrackerTests
+      - path: Sources/BirthTrackerShared
+    dependencies:
+      - target: BirthTracker
+    settings:
+      base:
+        GENERATE_INFOPLIST_FILE: YES
+        PRODUCT_BUNDLE_IDENTIFIER: $(APP_BUNDLE_ID).tests
+    configFiles:
+      Debug: Config/Project.xcconfig
+      Release: Config/Project.xcconfig
+schemes:
+  BirthTracker:
+    build:
+      targets:
+        BirthTracker: all
+        BirthTrackerWidget: all
+    test:
+      targets:
+        - BirthTrackerTests
+      gatherCoverageData: true
+    run:
+      config: Debug
+    archive:
+      config: Release
