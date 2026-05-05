@@ -1,14 +1,16 @@
+import DesignSystem
 import Foundation
+import Models
 import SwiftData
 
-enum DebugStorageMode: String, CaseIterable, Identifiable {
+public enum DebugStorageMode: String, CaseIterable, Identifiable {
   case memory
   case local
   case cloud
 
-  var id: String { rawValue }
+  public var id: String { rawValue }
 
-  var title: String {
+  public var title: String {
     switch self {
     case .memory: "Memory"
     case .local: "Local"
@@ -16,7 +18,7 @@ enum DebugStorageMode: String, CaseIterable, Identifiable {
     }
   }
 
-  static var current: DebugStorageMode {
+  public static var current: DebugStorageMode {
     #if DEBUG
       let value = UserDefaults.standard.string(forKey: AppSettingsKey.storageMode)
       return value.flatMap(DebugStorageMode.init(rawValue:)) ?? .local
@@ -26,14 +28,14 @@ enum DebugStorageMode: String, CaseIterable, Identifiable {
   }
 }
 
-enum BirthTrackerModelContainer {
-  static let schema = Schema([TrackedPerson.self])
+public enum BirthTrackerModelContainer {
+  public static let schema = Schema([TrackedPerson.self])
 
-  static func make() throws -> ModelContainer {
+  public static func make() throws -> ModelContainer {
     try make(storageMode: DebugStorageMode.current)
   }
 
-  static func make(storageMode: DebugStorageMode) throws -> ModelContainer {
+  public static func make(storageMode: DebugStorageMode) throws -> ModelContainer {
     let configuration: ModelConfiguration
 
     switch storageMode {

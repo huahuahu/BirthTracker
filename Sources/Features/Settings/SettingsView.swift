@@ -1,7 +1,10 @@
+import DesignSystem
+import Models
+import Persistence
 import SwiftData
 import SwiftUI
 
-struct SettingsView: View {
+public struct SettingsView: View {
   @Environment(\.modelContext) private var modelContext
   @AppStorage(AppSettingsKey.appearanceMode) private var appearanceMode = AppearanceMode.system.rawValue
   @AppStorage(AppSettingsKey.enabledCalendarKinds) private var enabledCalendarKinds =
@@ -15,7 +18,9 @@ struct SettingsView: View {
     BirthdayCalendarKind.selectionKinds(from: enabledCalendarKinds)
   }
 
-  var body: some View {
+  public init() {}
+
+  public var body: some View {
     Form {
       Section("Appearance") {
         Picker("Mode", selection: $appearanceMode) {

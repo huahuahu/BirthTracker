@@ -13,15 +13,20 @@ settings:
 configs:
   Debug: debug
   Release: release
-packages: {}
+packages:
+  BirthTrackerPackage:
+    path: .
 targets:
   BirthTracker:
     type: application
     platform: iOS
     sources:
       - path: Sources/BirthTrackerApp
-      - path: Sources/BirthTrackerShared
     dependencies:
+      - package: BirthTrackerPackage
+        product: App
+      - package: BirthTrackerPackage
+        product: DesignSystem
       - target: BirthTrackerWidget
         embed: true
     settings:
@@ -42,7 +47,11 @@ targets:
     platform: iOS
     sources:
       - path: Sources/BirthTrackerWidget
-      - path: Sources/BirthTrackerShared
+    dependencies:
+      - package: BirthTrackerPackage
+        product: Models
+      - package: BirthTrackerPackage
+        product: Persistence
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: $(WIDGET_BUNDLE_ID)
@@ -60,9 +69,14 @@ targets:
     platform: iOS
     sources:
       - path: Tests/BirthTrackerTests
-      - path: Sources/BirthTrackerShared
     dependencies:
       - target: BirthTracker
+      - package: BirthTrackerPackage
+        product: Models
+      - package: BirthTrackerPackage
+        product: Persistence
+      - package: BirthTrackerPackage
+        product: TestingSupport
     settings:
       base:
         GENERATE_INFOPLIST_FILE: YES

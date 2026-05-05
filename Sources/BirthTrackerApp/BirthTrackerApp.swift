@@ -1,3 +1,5 @@
+import App
+import DesignSystem
 import SwiftUI
 
 @main

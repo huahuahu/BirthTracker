@@ -2,19 +2,19 @@ import Foundation
 import SwiftData
 
 @Model
-final class TrackedPerson {
-  var id: UUID = UUID()
-  var name: String = ""
-  var notes: String = ""
-  var calendarKindRawValue: String = BirthdayCalendarKind.gregorian.rawValue
-  var birthEra: Int?
-  var birthYear: Int?
-  var birthMonth: Int = 1
-  var birthDay: Int = 1
-  var createdAt: Date = Date()
-  var updatedAt: Date = Date()
+public final class TrackedPerson {
+  public var id: UUID = UUID()
+  public var name: String = ""
+  public var notes: String = ""
+  public var calendarKindRawValue: String = BirthdayCalendarKind.gregorian.rawValue
+  public var birthEra: Int?
+  public var birthYear: Int?
+  public var birthMonth: Int = 1
+  public var birthDay: Int = 1
+  public var createdAt: Date = Date()
+  public var updatedAt: Date = Date()
 
-  init(id: UUID = UUID(), name: String, birthday: Birthday, notes: String = "") {
+  public init(id: UUID = UUID(), name: String, birthday: Birthday, notes: String = "") {
     self.id = id
     self.name = name
     self.notes = notes
@@ -27,16 +27,16 @@ final class TrackedPerson {
 }
 
 extension TrackedPerson {
-  var calendarKind: BirthdayCalendarKind {
+  public var calendarKind: BirthdayCalendarKind {
     get { BirthdayCalendarKind(rawValue: calendarKindRawValue) ?? .gregorian }
     set { calendarKindRawValue = newValue.rawValue }
   }
 
-  var birthday: Birthday {
+  public var birthday: Birthday {
     Birthday(calendarKind: calendarKind, era: birthEra, year: birthYear, month: birthMonth, day: birthDay)
   }
 
-  func upcomingBirthday(after referenceDate: Date = .now) -> UpcomingBirthday? {
+  public func upcomingBirthday(after referenceDate: Date = .now) -> UpcomingBirthday? {
     guard let nextDate = BirthdayCalculator.nextOccurrence(for: birthday, after: referenceDate) else { return nil }
 
     return UpcomingBirthday(

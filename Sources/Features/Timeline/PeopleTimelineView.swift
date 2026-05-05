@@ -1,8 +1,11 @@
+import DesignSystem
+import Models
+import Persistence
 import SwiftData
 import SwiftUI
 import WidgetKit
 
-struct PeopleTimelineView: View {
+public struct PeopleTimelineView: View {
   @Environment(\.modelContext) private var modelContext
   @Query(sort: \TrackedPerson.name) private var people: [TrackedPerson]
   @AppStorage(AppSettingsKey.enabledCalendarKinds) private var enabledCalendarKinds =
@@ -16,7 +19,9 @@ struct PeopleTimelineView: View {
       .sorted { $0.date < $1.date }
   }
 
-  var body: some View {
+  public init() {}
+
+  public var body: some View {
     NavigationStack {
       List {
         if upcomingBirthdays.isEmpty {
@@ -50,13 +55,13 @@ struct PeopleTimelineView: View {
       }
       .navigationTitle("Birthdays")
       .toolbar {
-        ToolbarItem(placement: .topBarTrailing) {
+        ToolbarItem(placement: .primaryAction) {
           Button("Add Person", systemImage: "plus") {
             isAddingPerson = true
           }
         }
 
-        ToolbarItem(placement: .topBarLeading) {
+        ToolbarItem(placement: .navigation) {
           NavigationLink {
             SettingsView()
           } label: {

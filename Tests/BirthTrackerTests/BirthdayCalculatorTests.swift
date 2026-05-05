@@ -1,5 +1,9 @@
 import Foundation
+import Models
+import Persistence
+import SwiftData
 import Testing
+import TestingSupport
 
 @Suite("Birthday calculation")
 struct BirthdayCalculatorTests {
@@ -61,5 +65,20 @@ struct BirthdayCalculatorTests {
     let decoded = try JSONDecoder.birthTracker.decode(WidgetSnapshot.self, from: data)
 
     #expect(decoded == snapshot)
+  }
+
+  @Test("In-memory persistence stores template fixture data")
+  func inMemoryPersistenceStoresFixtureData() throws {
+    let container = try PersistenceFixtures.makeInMemoryContainer()
+    let context = ModelContext(container)
+
+    for person in PersistenceFixtures.makePeople() {
+      context.insert(person)
+    }
+
+    try context.save()
+
+    let people = try context.fetch(FetchDescriptor<TrackedPerson>())
+    #expect(people.count == 3)
   }
 }

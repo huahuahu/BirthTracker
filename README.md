@@ -2,6 +2,19 @@
 
 BirthTracker is a SwiftUI iOS app for tracking birthdays of people you care about. It uses SwiftData with private CloudKit sync, plus WidgetKit snapshots for upcoming birthdays.
 
+## Project Structure
+
+Reusable code is organized with Swift Package Manager modules:
+
+- `Sources/App`: app scene composition and dependency wiring.
+- `Sources/Features`: SwiftUI screens and user flows.
+- `Sources/Models`: SwiftData models and shared domain types.
+- `Sources/Persistence`: SwiftData container setup, App Group access, and widget persistence constants.
+- `Sources/DesignSystem`: reusable UI-adjacent settings and selection helpers.
+- `Sources/TestingSupport`: fixtures and in-memory persistence helpers for tests and debug data.
+
+The `BirthTrackerApp` and `BirthTrackerWidget` folders contain only target-specific entry points and plist files.
+
 ## Development
 
 ```bash

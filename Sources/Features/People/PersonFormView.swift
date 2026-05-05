@@ -1,17 +1,19 @@
+import DesignSystem
+import Models
 import SwiftUI
 
-struct PersonFormView: View {
+public struct PersonFormView: View {
   @Environment(\.dismiss) private var dismiss
 
-  let calendarKinds: [BirthdayCalendarKind]
-  let onSave: (TrackedPerson) -> Void
+  public let calendarKinds: [BirthdayCalendarKind]
+  public let onSave: (TrackedPerson) -> Void
 
   @State private var name = ""
   @State private var notes = ""
   @State private var calendarKind: BirthdayCalendarKind
   @State private var birthDate = Date.now
 
-  init(
+  public init(
     calendarKinds: [BirthdayCalendarKind] = BirthdayCalendarKind.defaultSelectionKinds,
     onSave: @escaping (TrackedPerson) -> Void
   ) {
@@ -22,7 +24,7 @@ struct PersonFormView: View {
     _calendarKind = State(initialValue: calendarKinds.first ?? .gregorian)
   }
 
-  var body: some View {
+  public var body: some View {
     NavigationStack {
       Form {
         Section("Person") {

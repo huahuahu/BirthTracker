@@ -1,14 +1,19 @@
+import DesignSystem
+import Features
+import Persistence
 import SwiftData
 import SwiftUI
 
-struct BirthTrackerRootView: View {
+public struct BirthTrackerRootView: View {
   @State private var modelContainer = makeModelContainer()
   @State private var modelContainerID = UUID()
   #if DEBUG
     @AppStorage(AppSettingsKey.storageMode) private var storageMode = DebugStorageMode.local.rawValue
   #endif
 
-  var body: some View {
+  public init() {}
+
+  public var body: some View {
     PeopleTimelineView()
       .id(modelContainerID)
       .modelContainer(modelContainer)
