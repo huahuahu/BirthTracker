@@ -14,4 +14,5 @@ swift-format format \
   --parallel \
   --configuration "$ROOT/.swift-format" \
   "$ROOT/Sources" \
-  "$ROOT/Tests"
+  "$ROOT/BirthTrackerPackage/Sources" \
+  "$ROOT/BirthTrackerPackage/Tests"

@@ -19,7 +19,8 @@ swift-format lint \
   --strict \
   --configuration "$ROOT/.swift-format" \
   "$ROOT/Sources" \
-  "$ROOT/Tests"
+  "$ROOT/BirthTrackerPackage/Sources" \
+  "$ROOT/BirthTrackerPackage/Tests"
 
 swiftlint lint \
   --config "$ROOT/.swiftlint.yml" \

@@ -1,6 +1,7 @@
 included:
   - Sources
-  - Tests
+  - BirthTrackerPackage/Sources
+  - BirthTrackerPackage/Tests
 
 excluded:
   - .build
