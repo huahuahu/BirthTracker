@@ -3,12 +3,24 @@ import SwiftUI
 struct PersonFormView: View {
   @Environment(\.dismiss) private var dismiss
 
+  let calendarKinds: [BirthdayCalendarKind]
   let onSave: (TrackedPerson) -> Void
 
   @State private var name = ""
   @State private var notes = ""
-  @State private var calendarKind = BirthdayCalendarKind.gregorian
+  @State private var calendarKind: BirthdayCalendarKind
   @State private var birthDate = Date.now
+
+  init(
+    calendarKinds: [BirthdayCalendarKind] = BirthdayCalendarKind.defaultSelectionKinds,
+    onSave: @escaping (TrackedPerson) -> Void
+  ) {
+    let calendarKinds = calendarKinds.isEmpty ? BirthdayCalendarKind.defaultSelectionKinds : calendarKinds
+
+    self.calendarKinds = calendarKinds
+    self.onSave = onSave
+    _calendarKind = State(initialValue: calendarKinds.first ?? .gregorian)
+  }
 
   var body: some View {
     NavigationStack {
@@ -22,7 +34,7 @@ struct PersonFormView: View {
 
         Section("Birthday") {
           Picker("Calendar", selection: $calendarKind) {
-            ForEach(BirthdayCalendarKind.allCases) { kind in
+            ForEach(calendarKinds) { kind in
               Text(kind.title).tag(kind)
             }
           }

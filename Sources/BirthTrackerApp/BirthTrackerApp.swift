@@ -1,22 +1,13 @@
-import SwiftData
 import SwiftUI
 
 @main
 struct BirthTrackerApp: App {
-  private let modelContainer: ModelContainer
-
-  init() {
-    do {
-      modelContainer = try BirthTrackerModelContainer.make()
-    } catch {
-      fatalError("Unable to create model container: \(error)")
-    }
-  }
+  @AppStorage(AppSettingsKey.appearanceMode) private var appearanceMode = AppearanceMode.system.rawValue
 
   var body: some Scene {
     WindowGroup {
-      PeopleTimelineView()
+      BirthTrackerRootView()
+        .preferredColorScheme(AppearanceMode(rawValue: appearanceMode)?.colorScheme)
     }
-    .modelContainer(modelContainer)
   }
 }

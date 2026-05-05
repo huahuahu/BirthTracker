@@ -5,6 +5,9 @@ import WidgetKit
 struct PeopleTimelineView: View {
   @Environment(\.modelContext) private var modelContext
   @Query(sort: \TrackedPerson.name) private var people: [TrackedPerson]
+  @AppStorage(AppSettingsKey.enabledCalendarKinds) private var enabledCalendarKinds =
+    BirthdayCalendarKind.rawSelectionKinds(
+      BirthdayCalendarKind.defaultSelectionKinds)
   @State private var isAddingPerson = false
 
   private var upcomingBirthdays: [UpcomingBirthday] {
@@ -52,9 +55,17 @@ struct PeopleTimelineView: View {
             isAddingPerson = true
           }
         }
+
+        ToolbarItem(placement: .topBarLeading) {
+          NavigationLink {
+            SettingsView()
+          } label: {
+            Label("Settings", systemImage: "gearshape")
+          }
+        }
       }
       .sheet(isPresented: $isAddingPerson) {
-        PersonFormView { person in
+        PersonFormView(calendarKinds: BirthdayCalendarKind.selectionKinds(from: enabledCalendarKinds)) { person in
           modelContext.insert(person)
           try? modelContext.save()
           persistWidgetSnapshot(for: people + [person])
