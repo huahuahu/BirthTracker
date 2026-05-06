@@ -15,7 +15,7 @@ configs:
   Release: release
 packages:
   BirthTrackerPackage:
-    path: .
+    path: BirthTrackerPackage
 targets:
   BirthTracker:
     type: application
@@ -68,7 +68,7 @@ targets:
     type: bundle.unit-test
     platform: iOS
     sources:
-      - path: Tests/BirthTrackerTests
+      - path: BirthTrackerPackage/Tests/BirthTrackerTests
     dependencies:
       - target: BirthTracker
       - package: BirthTrackerPackage
