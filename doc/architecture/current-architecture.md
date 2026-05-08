@@ -1,0 +1,52 @@
+# 当前架构
+
+本文档记录 App 当前真实的工作方式。这里应该写已经验证的事实，不写未来计划。
+
+## 平台
+
+- 原生 iOS App，由 `project.yml` 通过 XcodeGen 生成工程。
+- 主要技术选择是 Swift 6.2 和 SwiftUI。
+- 生成的 `BirthTracker.xcodeproj` 属于派生产物。
+
+## Targets
+
+- `BirthTracker` 是 iOS 应用 target。
+- `BirthTrackerWidget` 是 WidgetKit 扩展 target。
+- `BirthTrackerTests` 是 `project.yml` 中配置的单元测试 target。
+
+## Package 模块
+
+- `App` 负责 root view 和 App 依赖装配。
+- `Features` 负责 SwiftUI 页面，例如时间线、人物编辑和设置页。
+- `Models` 负责领域模型，包括生日、被记录的人、日历类型、Widget 快照和生日计算。
+- `Persistence` 负责 SwiftData 容器、App Group 访问和 Widget 持久化常量。
+- `DesignSystem` 负责共享的 UI 相邻设置，例如外观模式和已选日历类型。
+- `TestingSupport` 负责测试 fixture、内存持久化辅助逻辑和 debug 数据。
+
+## 持久化
+
+- SwiftData 是主要持久化层。
+- Release 构建预期使用私有 CloudKit 同步。
+- Debug 构建可以通过 `BIRTHTRACKER_STORAGE_MODE` 和 debug 设置使用 memory、local 或 cloud 存储。
+- 测试和 preview 优先使用内存存储。
+
+## Widgets
+
+- Widget 代码位于 `Sources/BirthTrackerWidget`。
+- 面向 Widget 共享的模型和持久化常量放在 package 模块里，而不是 App-only 代码里。
+- App 和 Widget 配置使用 `Config/Project.xcconfig` 里的占位符，以及已提交的 entitlement 模板。
+
+## 检查命令
+
+```bash
+make check
+make fix
+```
+
+代码变更后运行 `make check`。需要格式化和 SwiftLint 自动修复时运行 `make fix`。
+
+## 待确认架构问题
+
+- 当 SwiftData 模型演进变复杂后，长期迁移说明应该放在哪里？
+- 后续重要产品或技术决策是否需要记录为 `doc/decisions/` 下的 ADR？
+- 除了当前 package 和单元测试覆盖外，哪些 App 流程需要 UI 测试？
