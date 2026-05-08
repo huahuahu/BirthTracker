@@ -10,14 +10,6 @@ public enum DebugStorageMode: String, CaseIterable, Identifiable {
 
   public var id: String { rawValue }
 
-  public var title: String {
-    switch self {
-    case .memory: "Memory"
-    case .local: "Local"
-    case .cloud: "iCloud"
-    }
-  }
-
   public static var current: DebugStorageMode {
     #if DEBUG
       let value = UserDefaults.standard.string(forKey: AppSettingsKey.storageMode)

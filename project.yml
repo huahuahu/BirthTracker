@@ -52,6 +52,8 @@ targets:
         product: Models
       - package: BirthTrackerPackage
         product: Persistence
+      - package: BirthTrackerPackage
+        product: Localization
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: $(WIDGET_BUNDLE_ID)

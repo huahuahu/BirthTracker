@@ -1,4 +1,5 @@
 import DesignSystem
+import Localization
 import Models
 import SwiftUI
 
@@ -27,32 +28,34 @@ public struct PersonFormView: View {
   public var body: some View {
     NavigationStack {
       Form {
-        Section("Person") {
-          TextField("Name", text: $name)
+        Section(L10n.PersonForm.person) {
+          TextField(L10n.PersonForm.name, text: $name)
             .textContentType(.name)
-          TextField("Notes", text: $notes, axis: .vertical)
+          TextField(L10n.PersonForm.notes, text: $notes, axis: .vertical)
             .lineLimit(2...5)
         }
 
-        Section("Birthday") {
-          Picker("Calendar", selection: $calendarKind) {
+        Section(L10n.PersonForm.birthday) {
+          Picker(L10n.Common.calendar, selection: $calendarKind) {
             ForEach(calendarKinds) { kind in
-              Text(kind.title).tag(kind)
+              Text(kind.localizedTitle).tag(kind)
             }
           }
 
-          DatePicker("Birth date", selection: $birthDate, displayedComponents: .date)
-            .environment(\.calendar, calendarKind.calendar)
+          DatePicker(
+            L10n.PersonForm.birthDate, selection: $birthDate, displayedComponents: .date
+          )
+          .environment(\.calendar, calendarKind.calendar)
         }
       }
-      .navigationTitle("Add Birthday")
+      .navigationTitle(L10n.PersonForm.addBirthday)
       .toolbar {
         ToolbarItem(placement: .cancellationAction) {
-          Button("Cancel") { dismiss() }
+          Button(L10n.Common.cancel) { dismiss() }
         }
 
         ToolbarItem(placement: .confirmationAction) {
-          Button("Save") {
+          Button(L10n.Common.save) {
             let person = TrackedPerson(
               name: name.trimmingCharacters(in: .whitespacesAndNewlines),
               birthday: Birthday(date: birthDate, calendarKind: calendarKind),

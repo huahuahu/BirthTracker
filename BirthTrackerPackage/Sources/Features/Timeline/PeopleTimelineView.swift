@@ -1,4 +1,5 @@
 import DesignSystem
+import Localization
 import Models
 import Persistence
 import SwiftData
@@ -26,12 +27,12 @@ public struct PeopleTimelineView: View {
       List {
         if upcomingBirthdays.isEmpty {
           ContentUnavailableView(
-            "No Birthdays",
+            L10n.Timeline.noBirthdays,
             systemImage: "calendar.badge.plus",
-            description: Text("Add a person to start the timeline.")
+            description: Text(L10n.Timeline.emptyDescription)
           )
         } else {
-          Section("Upcoming") {
+          Section(L10n.Timeline.upcoming) {
             ForEach(upcomingBirthdays) { birthday in
               BirthdayTimelineRow(birthday: birthday)
             }
@@ -39,12 +40,12 @@ public struct PeopleTimelineView: View {
         }
 
         if !people.isEmpty {
-          Section("People") {
+          Section(L10n.Timeline.people) {
             ForEach(people) { person in
               VStack(alignment: .leading, spacing: 4) {
                 Text(person.name)
                   .font(.headline)
-                Text(person.calendarKind.title)
+                Text(person.calendarKind.localizedTitle)
                   .font(.subheadline)
                   .foregroundStyle(.secondary)
               }
@@ -53,10 +54,10 @@ public struct PeopleTimelineView: View {
           }
         }
       }
-      .navigationTitle("Birthdays")
+      .navigationTitle(L10n.Common.birthdays)
       .toolbar {
         ToolbarItem(placement: .primaryAction) {
-          Button("Add Person", systemImage: "plus") {
+          Button(L10n.Timeline.addPerson, systemImage: "plus") {
             isAddingPerson = true
           }
         }
@@ -65,7 +66,7 @@ public struct PeopleTimelineView: View {
           NavigationLink {
             SettingsView()
           } label: {
-            Label("Settings", systemImage: "gearshape")
+            Label(L10n.Common.settings, systemImage: "gearshape")
           }
         }
       }
@@ -135,9 +136,11 @@ private struct BirthdayTimelineRow: View {
       Spacer()
 
       if let age = birthday.age {
+        let ageLabel = L10n.Timeline.ageAccessibilityLabel(age)
+
         Text("\(age)")
           .font(.headline.monospacedDigit())
-          .accessibilityLabel("Turns \(age)")
+          .accessibilityLabel(Text(ageLabel))
       }
     }
   }

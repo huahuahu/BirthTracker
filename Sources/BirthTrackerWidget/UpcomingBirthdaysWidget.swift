@@ -1,3 +1,4 @@
+import Localization
 import Models
 import Persistence
 import SwiftUI
@@ -53,8 +54,8 @@ struct UpcomingBirthdaysWidget: Widget {
       UpcomingBirthdaysWidgetView(entry: entry)
         .containerBackground(.background, for: .widget)
     }
-    .configurationDisplayName("Upcoming Birthdays")
-    .description("See the next birthdays at a glance.")
+    .configurationDisplayName(L10n.Widget.upcomingBirthdays)
+    .description(L10n.Widget.description)
     .supportedFamilies([.systemSmall, .systemMedium])
   }
 }
@@ -64,11 +65,11 @@ private struct UpcomingBirthdaysWidgetView: View {
 
   var body: some View {
     VStack(alignment: .leading, spacing: 8) {
-      Label("Birthdays", systemImage: "gift")
+      Label(L10n.Widget.title, systemImage: "gift")
         .font(.headline)
 
       if entry.birthdays.isEmpty {
-        Text("No upcoming birthdays")
+        Text(L10n.Widget.noUpcomingBirthdays)
           .font(.caption)
           .foregroundStyle(.secondary)
       } else {

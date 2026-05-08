@@ -8,14 +8,6 @@ public enum AppearanceMode: String, CaseIterable, Identifiable {
 
   public var id: String { rawValue }
 
-  public var title: String {
-    switch self {
-    case .system: "Follow System"
-    case .light: "Light"
-    case .dark: "Dark"
-    }
-  }
-
   public var colorScheme: ColorScheme? {
     switch self {
     case .system: nil
