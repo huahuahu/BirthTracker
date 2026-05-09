@@ -13,12 +13,7 @@ public struct SettingsView: View {
       BirthdayCalendarKind.defaultSelectionKinds)
   #if DEBUG
     @AppStorage(AppSettingsKey.storageMode) private var storageMode = DebugStorageMode.local.rawValue
-    @State private var isGeneratingTestData = false
-    @State private var isShowingTestDataHUD = false
-    @State private var isViewVisible = false
-    @State private var generateTestDataTask: Task<Void, Never>?
-    @State private var generateTestDataHUDDelayTask: Task<Void, Never>?
-    @State private var testDataAlert: TestDataAlert?
+    @StateObject private var testDataGeneration = TestDataGenerationController()
   #endif
 
   private var selectedCalendarKinds: [BirthdayCalendarKind] {
@@ -53,9 +48,9 @@ public struct SettingsView: View {
 
           if storageMode == DebugStorageMode.memory.rawValue {
             Button(L10n.Settings.generateTestData, systemImage: "sparkles") {
-              startGenerateTestData()
+              testDataGeneration.start(modelContext: modelContext)
             }
-            .disabled(isGeneratingTestData)
+            .disabled(testDataGeneration.isGenerating)
           }
         }
       #endif
@@ -63,13 +58,19 @@ public struct SettingsView: View {
     .navigationTitle(L10n.Settings.title)
     #if DEBUG
       .overlay {
-        if isShowingTestDataHUD {
+        if testDataGeneration.isShowingHUD {
           TestDataGenerationHUD(title: L10n.Settings.creatingTestData) {
-            cancelGenerateTestData()
+            testDataGeneration.cancel()
           }
         }
       }
-      .alert(item: $testDataAlert) { alert in
+      .onAppear {
+        testDataGeneration.onAppear()
+      }
+      .onDisappear {
+        testDataGeneration.onDisappear()
+      }
+      .alert(item: testDataAlertBinding) { alert in
         switch alert {
         case .success:
           return Alert(
@@ -81,18 +82,11 @@ public struct SettingsView: View {
             title: Text(L10n.Settings.testDataCreationFailedTitle),
             message: Text(message),
             primaryButton: .default(Text(L10n.Common.retry)) {
-              startGenerateTestData()
+              testDataGeneration.start(modelContext: modelContext)
             },
             secondaryButton: .cancel()
           )
         }
-      }
-      .onAppear {
-        isViewVisible = true
-      }
-      .onDisappear {
-        isViewVisible = false
-        cancelGenerateTestData()
       }
     #endif
   }
@@ -116,64 +110,11 @@ public struct SettingsView: View {
   }
 
   #if DEBUG
-    private enum TestDataAlert: Identifiable {
-      case success
-      case failure(message: String)
-
-      var id: String {
-        switch self {
-        case .success: "success"
-        case .failure: "failure"
-        }
-      }
-    }
-
-    private func startGenerateTestData() {
-      guard !isGeneratingTestData else { return }
-
-      isGeneratingTestData = true
-      isShowingTestDataHUD = false
-      testDataAlert = nil
-
-      generateTestDataHUDDelayTask?.cancel()
-      generateTestDataHUDDelayTask = Task { @MainActor in
-        try? await Task.sleep(for: .milliseconds(300))
-        guard !Task.isCancelled, isGeneratingTestData else { return }
-        isShowingTestDataHUD = true
-      }
-
-      generateTestDataTask?.cancel()
-      generateTestDataTask = Task { @MainActor in
-        defer {
-          isGeneratingTestData = false
-          isShowingTestDataHUD = false
-          generateTestDataTask = nil
-          generateTestDataHUDDelayTask?.cancel()
-          generateTestDataHUDDelayTask = nil
-        }
-
-        do {
-          try await TestDataGenerator.generateSamplePeople(into: modelContext)
-          guard !Task.isCancelled else { return }
-          guard isViewVisible else { return }
-          testDataAlert = .success
-        } catch is CancellationError {
-          // Cancellation is user intent: no success/failure prompt.
-        } catch {
-          guard isViewVisible else { return }
-          let message = L10n.Settings.testDataCreationFailedMessage(error.localizedDescription)
-          testDataAlert = .failure(message: message)
-        }
-      }
-    }
-
-    private func cancelGenerateTestData() {
-      generateTestDataTask?.cancel()
-      generateTestDataHUDDelayTask?.cancel()
-      generateTestDataTask = nil
-      generateTestDataHUDDelayTask = nil
-      isGeneratingTestData = false
-      isShowingTestDataHUD = false
+    private var testDataAlertBinding: Binding<TestDataGenerationController.Alert?> {
+      Binding(
+        get: { testDataGeneration.alert },
+        set: { testDataGeneration.alert = $0 }
+      )
     }
   #endif
 }
