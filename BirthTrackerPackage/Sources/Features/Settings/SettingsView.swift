@@ -186,7 +186,7 @@ public struct SettingsView: View {
     var body: some View {
       ZStack {
         Color.black.opacity(0.1)
-          .ignoresSafeArea()
+          .allowsHitTesting(false)
 
         VStack(spacing: 12) {
           ProgressView(title)
