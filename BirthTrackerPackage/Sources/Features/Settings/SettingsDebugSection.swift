@@ -22,10 +22,10 @@ import SwiftUI
           Button(L10n.Settings.generateTestData, systemImage: "sparkles") {
             testDataGeneration.start(modelContext: modelContext)
           }
+          .testDataGenerationFeedback(testDataGeneration, modelContext: modelContext)
           .disabled(testDataGeneration.isGenerating)
         }
       }
-      .testDataGenerationFeedback(testDataGeneration, modelContext: modelContext)
     }
   }
 #endif

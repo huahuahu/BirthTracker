@@ -59,6 +59,7 @@ import SwiftUI
     var body: some View {
       ZStack {
         Color.black.opacity(0.1)
+          .ignoresSafeArea()
           .allowsHitTesting(false)
 
         VStack(spacing: 12) {
@@ -73,7 +74,7 @@ import SwiftUI
         .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
         .accessibilityElement(children: .combine)
       }
+      .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
   }
 #endif
-
