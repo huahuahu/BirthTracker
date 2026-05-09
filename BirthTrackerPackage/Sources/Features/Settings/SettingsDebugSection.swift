@@ -6,9 +6,9 @@ import SwiftUI
 
 #if DEBUG
   struct SettingsDebugSection: View {
-    @Binding var storageMode: String
-    let modelContext: ModelContext
-    let testDataGeneration: TestDataGenerationController
+    @Environment(\.modelContext) private var modelContext
+    @AppStorage(AppSettingsKey.storageMode) private var storageMode = DebugStorageMode.local.rawValue
+    @State private var testDataGeneration = TestDataGenerationController()
 
     var body: some View {
       Section(L10n.Settings.debug) {
@@ -25,7 +25,7 @@ import SwiftUI
           .disabled(testDataGeneration.isGenerating)
         }
       }
+      .testDataGenerationFeedback(testDataGeneration, modelContext: modelContext)
     }
   }
 #endif
-

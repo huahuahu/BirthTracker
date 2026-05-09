@@ -1,20 +1,13 @@
 import DesignSystem
 import Localization
 import Models
-import Persistence
-import SwiftData
 import SwiftUI
 
 public struct SettingsView: View {
-  @Environment(\.modelContext) private var modelContext
   @AppStorage(AppSettingsKey.appearanceMode) private var appearanceMode = AppearanceMode.system.rawValue
   @AppStorage(AppSettingsKey.enabledCalendarKinds) private var enabledCalendarKinds =
     BirthdayCalendarKind.rawSelectionKinds(
       BirthdayCalendarKind.defaultSelectionKinds)
-  #if DEBUG
-    @AppStorage(AppSettingsKey.storageMode) private var storageMode = DebugStorageMode.local.rawValue
-    @State private var testDataGeneration = TestDataGenerationController()
-  #endif
 
   private var selectedCalendarKinds: [BirthdayCalendarKind] {
     BirthdayCalendarKind.selectionKinds(from: enabledCalendarKinds)
@@ -39,17 +32,10 @@ public struct SettingsView: View {
       }
 
       #if DEBUG
-        SettingsDebugSection(
-          storageMode: $storageMode,
-          modelContext: modelContext,
-          testDataGeneration: testDataGeneration
-        )
+        SettingsDebugSection()
       #endif
     }
     .navigationTitle(L10n.Settings.title)
-    #if DEBUG
-      .testDataGenerationFeedback(testDataGeneration, modelContext: modelContext)
-    #endif
   }
 
   private func calendarBinding(for kind: BirthdayCalendarKind) -> Binding<Bool> {
