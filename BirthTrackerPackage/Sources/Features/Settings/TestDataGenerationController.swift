@@ -1,10 +1,12 @@
 import Localization
+import Observation
 import Persistence
 import SwiftData
 
 @MainActor
-final class TestDataGenerationController: ObservableObject {
-  enum Alert: Identifiable {
+@Observable
+final class TestDataGenerationController {
+  enum Feedback: Identifiable {
     case success
     case failure(message: String)
 
@@ -16,9 +18,9 @@ final class TestDataGenerationController: ObservableObject {
     }
   }
 
-  @Published private(set) var isGenerating = false
-  @Published private(set) var isShowingHUD = false
-  @Published var alert: Alert?
+  private(set) var isGenerating = false
+  private(set) var isShowingHUD = false
+  var feedback: Feedback?
 
   private var isViewVisible = false
   private var generationTask: Task<Void, Never>?
@@ -48,7 +50,7 @@ final class TestDataGenerationController: ObservableObject {
   func start(modelContext: ModelContext) {
     guard !isGenerating else { return }
 
-    alert = nil
+    feedback = nil
     isGenerating = true
     isShowingHUD = false
 
@@ -73,13 +75,13 @@ final class TestDataGenerationController: ObservableObject {
         try await generate(modelContext)
         guard !Task.isCancelled else { return }
         guard isViewVisible else { return }
-        alert = .success
+        feedback = .success
       } catch is CancellationError {
         // Cancellation is user intent: no success/failure prompt.
       } catch {
         guard isViewVisible else { return }
         let message = L10n.Settings.testDataCreationFailedMessage(error.localizedDescription)
-        alert = .failure(message: message)
+        feedback = .failure(message: message)
       }
     }
   }
@@ -93,4 +95,3 @@ final class TestDataGenerationController: ObservableObject {
     isShowingHUD = false
   }
 }
-
