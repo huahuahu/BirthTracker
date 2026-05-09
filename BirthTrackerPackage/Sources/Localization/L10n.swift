@@ -10,6 +10,8 @@ public enum L10n {
     public static let birthdays = LocalizedStringResource("Birthdays", bundle: .atURL(Bundle.module.bundleURL))
     public static let calendar = LocalizedStringResource("Calendar", bundle: .atURL(Bundle.module.bundleURL))
     public static let cancel = LocalizedStringResource("Cancel", bundle: .atURL(Bundle.module.bundleURL))
+    public static let ok = LocalizedStringResource("OK", bundle: .atURL(Bundle.module.bundleURL))
+    public static let retry = LocalizedStringResource("Retry", bundle: .atURL(Bundle.module.bundleURL))
     public static let save = LocalizedStringResource("Save", bundle: .atURL(Bundle.module.bundleURL))
     public static let settings = LocalizedStringResource("Settings", bundle: .atURL(Bundle.module.bundleURL))
   }
@@ -40,12 +42,22 @@ public enum L10n {
 
   public enum Settings {
     public static let appearance = LocalizedStringResource("Appearance", bundle: .atURL(Bundle.module.bundleURL))
+    public static let creatingTestData = LocalizedStringResource("Creating Test Data…", bundle: .atURL(Bundle.module.bundleURL))
     public static let database = LocalizedStringResource("Database", bundle: .atURL(Bundle.module.bundleURL))
     public static let debug = LocalizedStringResource("Debug", bundle: .atURL(Bundle.module.bundleURL))
     public static let generateTestData = LocalizedStringResource(
       "Generate Test Data", bundle: .atURL(Bundle.module.bundleURL))
     public static let mode = LocalizedStringResource("Mode", bundle: .atURL(Bundle.module.bundleURL))
+    public static let testDataCreated = LocalizedStringResource("Test Data Created", bundle: .atURL(Bundle.module.bundleURL))
+    public static let testDataCreationFailedTitle = LocalizedStringResource(
+      "Test Data Creation Failed", bundle: .atURL(Bundle.module.bundleURL))
     public static let title = Common.settings
+
+    public static func testDataCreationFailedMessage(_ reason: String) -> String {
+      let format = L10n.string(
+        LocalizedStringResource("Creation failed: %@", bundle: .atURL(Bundle.module.bundleURL)))
+      return String.localizedStringWithFormat(format, reason)
+    }
   }
 
   public enum Appearance {
