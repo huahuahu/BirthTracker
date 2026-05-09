@@ -1,0 +1,35 @@
+{
+  "sourceLanguage": "en",
+  "strings": {
+    "CFBundleDisplayName": {
+      "comment": "App display name shown on the iOS Home Screen. Keep it short and recognizable.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "BirthTracker"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "生日追踪"
+          }
+        }
+      }
+    },
+    "CFBundleName": {
+      "comment": "Internal bundle name for the main app. Usually keep this as the product name unless the platform requires localization.",
+      "extractionState": "extracted_with_value",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "BirthTracker"
+          }
+        }
+      }
+    }
+  },
+  "version": "1.0"
+}

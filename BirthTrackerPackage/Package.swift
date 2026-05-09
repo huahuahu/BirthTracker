@@ -4,14 +4,16 @@ import PackageDescription
 
 let package = Package(
   name: "BirthTrackerPackage",
+  defaultLocalization: "en",
   platforms: [
     .iOS(.v26),
-    .macOS(.v14),
+    .macOS(.v26),
   ],
   products: [
     .library(name: "App", targets: ["App"]),
     .library(name: "DesignSystem", targets: ["DesignSystem"]),
     .library(name: "Features", targets: ["Features"]),
+    .library(name: "Localization", targets: ["Localization"]),
     .library(name: "Models", targets: ["Models"]),
     .library(name: "Persistence", targets: ["Persistence"]),
     .library(name: "TestingSupport", targets: ["TestingSupport"]),
@@ -29,8 +31,13 @@ let package = Package(
     ),
     .target(
       name: "Features",
-      dependencies: ["DesignSystem", "Models", "Persistence"],
+      dependencies: ["DesignSystem", "Localization", "Models", "Persistence"],
       path: "Sources/Features"
+    ),
+    .target(
+      name: "Localization",
+      path: "Sources/Localization",
+      resources: [.process("Resources")]
     ),
     .target(
       name: "Models",

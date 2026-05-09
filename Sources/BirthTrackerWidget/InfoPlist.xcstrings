@@ -1,0 +1,35 @@
+{
+  "sourceLanguage": "en",
+  "strings": {
+    "CFBundleDisplayName": {
+      "comment": "Widget extension display name shown by iOS. Short noun label for birthday widgets.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Birthdays"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "生日"
+          }
+        }
+      }
+    },
+    "CFBundleName": {
+      "comment": "Internal bundle name for the widget extension. Usually keep this as the product name unless the platform requires localization.",
+      "extractionState": "extracted_with_value",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "BirthTrackerWidget"
+          }
+        }
+      }
+    }
+  },
+  "version": "1.0"
+}

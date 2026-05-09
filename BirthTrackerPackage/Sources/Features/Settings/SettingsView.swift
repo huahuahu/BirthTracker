@@ -1,4 +1,5 @@
 import DesignSystem
+import Localization
 import Models
 import Persistence
 import SwiftData
@@ -22,37 +23,37 @@ public struct SettingsView: View {
 
   public var body: some View {
     Form {
-      Section("Appearance") {
-        Picker("Mode", selection: $appearanceMode) {
+      Section(L10n.Settings.appearance) {
+        Picker(L10n.Settings.mode, selection: $appearanceMode) {
           ForEach(AppearanceMode.allCases) { mode in
-            Text(mode.title).tag(mode.rawValue)
+            Text(mode.localizedTitle).tag(mode.rawValue)
           }
         }
       }
 
-      Section("Calendar") {
+      Section(L10n.Common.calendar) {
         ForEach(BirthdayCalendarKind.allCases) { kind in
-          Toggle(kind.title, isOn: calendarBinding(for: kind))
+          Toggle(kind.localizedTitle, isOn: calendarBinding(for: kind))
         }
       }
 
       #if DEBUG
-        Section("Debug") {
-          Picker("Database", selection: $storageMode) {
+        Section(L10n.Settings.debug) {
+          Picker(L10n.Settings.database, selection: $storageMode) {
             ForEach(DebugStorageMode.allCases) { mode in
-              Text(mode.title).tag(mode.rawValue)
+              Text(mode.localizedTitle).tag(mode.rawValue)
             }
           }
 
           if storageMode == DebugStorageMode.memory.rawValue {
-            Button("Generate Test Data", systemImage: "sparkles") {
+            Button(L10n.Settings.generateTestData, systemImage: "sparkles") {
               generateTestData()
             }
           }
         }
       #endif
     }
-    .navigationTitle("Settings")
+    .navigationTitle(L10n.Settings.title)
   }
 
   private func calendarBinding(for kind: BirthdayCalendarKind) -> Binding<Bool> {

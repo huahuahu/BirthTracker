@@ -9,16 +9,6 @@ public enum BirthdayCalendarKind: String, CaseIterable, Codable, Identifiable, S
 
   public var id: String { rawValue }
 
-  public var title: String {
-    switch self {
-    case .gregorian: "Gregorian"
-    case .buddhist: "Buddhist"
-    case .chinese: "Chinese"
-    case .hebrew: "Hebrew"
-    case .islamicUmmAlQura: "Islamic"
-    }
-  }
-
   public var calendarIdentifier: Calendar.Identifier {
     switch self {
     case .gregorian: .gregorian
