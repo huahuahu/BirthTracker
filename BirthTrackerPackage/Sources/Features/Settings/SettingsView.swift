@@ -1,19 +1,15 @@
 import DesignSystem
 import Localization
 import Models
-import Persistence
-import SwiftData
 import SwiftUI
 
 public struct SettingsView: View {
-  @Environment(\.modelContext) private var modelContext
-  @AppStorage(AppSettingsKey.appearanceMode) private var appearanceMode = AppearanceMode.system.rawValue
-  @AppStorage(AppSettingsKey.enabledCalendarKinds) private var enabledCalendarKinds =
+  @AppStorage(AppSettingsKey.appearanceMode)
+  private var appearanceMode = AppearanceMode.system.rawValue
+  @AppStorage(AppSettingsKey.enabledCalendarKinds)
+  private var enabledCalendarKinds =
     BirthdayCalendarKind.rawSelectionKinds(
       BirthdayCalendarKind.defaultSelectionKinds)
-  #if DEBUG
-    @AppStorage(AppSettingsKey.storageMode) private var storageMode = DebugStorageMode.local.rawValue
-  #endif
 
   private var selectedCalendarKinds: [BirthdayCalendarKind] {
     BirthdayCalendarKind.selectionKinds(from: enabledCalendarKinds)
@@ -38,19 +34,7 @@ public struct SettingsView: View {
       }
 
       #if DEBUG
-        Section(L10n.Settings.debug) {
-          Picker(L10n.Settings.database, selection: $storageMode) {
-            ForEach(DebugStorageMode.allCases) { mode in
-              Text(mode.localizedTitle).tag(mode.rawValue)
-            }
-          }
-
-          if storageMode == DebugStorageMode.memory.rawValue {
-            Button(L10n.Settings.generateTestData, systemImage: "sparkles") {
-              generateTestData()
-            }
-          }
-        }
+        SettingsDebugSection()
       #endif
     }
     .navigationTitle(L10n.Settings.title)
@@ -73,22 +57,6 @@ public struct SettingsView: View {
       enabledCalendarKinds = BirthdayCalendarKind.rawSelectionKinds(kinds)
     }
   }
-
-  #if DEBUG
-    private func generateTestData() {
-      let examples: [(String, Birthday, String)] = [
-        ("Alex Chen", Birthday(calendarKind: .gregorian, year: 1990, month: 1, day: 12), "Sample local contact"),
-        ("Jamie Lin", Birthday(calendarKind: .gregorian, year: 1988, month: 5, day: 5), "Sample coworker"),
-        ("Morgan Lee", Birthday(calendarKind: .gregorian, year: 2016, month: 11, day: 23), "Sample family member"),
-      ]
-
-      for example in examples {
-        modelContext.insert(TrackedPerson(name: example.0, birthday: example.1, notes: example.2))
-      }
-
-      try? modelContext.save()
-    }
-  #endif
 }
 
 #Preview {

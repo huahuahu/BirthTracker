@@ -4,7 +4,8 @@ import Models
 import SwiftUI
 
 public struct PersonFormView: View {
-  @Environment(\.dismiss) private var dismiss
+  @Environment(\.dismiss)
+  private var dismiss
 
   public let calendarKinds: [BirthdayCalendarKind]
   public let onSave: (TrackedPerson) -> Void

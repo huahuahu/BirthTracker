@@ -4,7 +4,8 @@ import SwiftUI
 
 @main
 struct BirthTrackerApp: App {
-  @AppStorage(AppSettingsKey.appearanceMode) private var appearanceMode = AppearanceMode.system.rawValue
+  @AppStorage(AppSettingsKey.appearanceMode)
+  private var appearanceMode = AppearanceMode.system.rawValue
 
   var body: some Scene {
     WindowGroup {

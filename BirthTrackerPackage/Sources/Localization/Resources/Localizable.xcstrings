@@ -409,6 +409,108 @@
       },
       "comment": "Debug-only button that inserts sample birthday records into local storage."
     },
+    "Creating Test Data…": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Creating test data…"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在创建测试数据…"
+          }
+        }
+      },
+      "comment": "HUD/overlay title displayed while generating sample test data."
+    },
+    "Test Data Created": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Test Data Created"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Test Data 创建完成"
+          }
+        }
+      },
+      "comment": "Success message shown after generating sample test data."
+    },
+    "Test Data Creation Failed": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Test Data Creation Failed"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "创建失败"
+          }
+        }
+      },
+      "comment": "Alert title shown when generating sample test data fails."
+    },
+    "Creation failed: %@": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Creation failed: %@"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "创建失败：%@"
+          }
+        }
+      },
+      "comment": "Alert message format shown when generating sample test data fails. %@ is a user-readable reason."
+    },
+    "Retry": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Retry"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "重试"
+          }
+        }
+      },
+      "comment": "Button title for retrying an operation after a failure."
+    },
+    "OK": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "OK"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "好的"
+          }
+        }
+      },
+      "comment": "Generic confirmation button title used in alerts."
+    },
     "Mode": {
       "localizations": {
         "en": {

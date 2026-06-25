@@ -8,7 +8,8 @@ public struct BirthTrackerRootView: View {
   @State private var modelContainer = makeModelContainer()
   @State private var modelContainerID = UUID()
   #if DEBUG
-    @AppStorage(AppSettingsKey.storageMode) private var storageMode = DebugStorageMode.local.rawValue
+    @AppStorage(AppSettingsKey.storageMode)
+    private var storageMode = DebugStorageMode.local.rawValue
   #endif
 
   public init() {}

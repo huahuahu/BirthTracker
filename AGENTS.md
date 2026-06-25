@@ -26,4 +26,9 @@
 - Keep changes focused; avoid unrelated refactors.
 
 ## XcodeBuildMcp
-The xcodebuildmcp is install as cli. The config is in .xcodebuildmcp/config.yaml. Prefer it over `xcrun simctl`
+
+- The xcodebuildmcp is installed as a CLI. Prefer it over `xcrun simctl`.
+- Project defaults live in `.xcodebuildmcp/config.yaml`.
+- At the start of each new agent session, before the first xcodebuildmcp build/run/test call, show active defaults with `session_show_defaults`.
+- If active defaults are missing or differ from `.xcodebuildmcp/config.yaml`, read that file and apply its `sessionDefaults` with `session_set_defaults` before building, running, or testing.
+- Do not assume the MCP server automatically loads this repo's config file. It only reads `.xcodebuildmcp/config.yaml` from the MCP process cwd, which may not be the repo root. If configuring the MCP server startup, set `XCODEBUILDMCP_CWD` to the repo root.
