@@ -7,9 +7,12 @@ import SwiftUI
 import WidgetKit
 
 public struct PeopleTimelineView: View {
-  @Environment(\.modelContext) private var modelContext
-  @Query(sort: \TrackedPerson.name) private var people: [TrackedPerson]
-  @AppStorage(AppSettingsKey.enabledCalendarKinds) private var enabledCalendarKinds =
+  @Environment(\.modelContext)
+  private var modelContext
+  @Query(sort: \TrackedPerson.name)
+  private var people: [TrackedPerson]
+  @AppStorage(AppSettingsKey.enabledCalendarKinds)
+  private var enabledCalendarKinds =
     BirthdayCalendarKind.rawSelectionKinds(
       BirthdayCalendarKind.defaultSelectionKinds)
   @State private var isAddingPerson = false

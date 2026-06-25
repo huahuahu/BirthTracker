@@ -7,6 +7,7 @@ import TestingSupport
 @Suite("Test data generation")
 struct TestDataGeneratorTests {
   @Test("Sample people are inserted and saved")
+  @MainActor
   func samplePeopleAreInsertedAndSaved() async throws {
     let container = try PersistenceFixtures.makeInMemoryContainer()
     let context = ModelContext(container)
@@ -17,4 +18,3 @@ struct TestDataGeneratorTests {
     #expect(people.count == 3)
   }
 }
-

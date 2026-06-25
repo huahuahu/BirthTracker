@@ -2,6 +2,7 @@ import Models
 import SwiftData
 
 public enum TestDataGenerator {
+  @MainActor
   public static func generateSamplePeople(into modelContext: ModelContext) async throws {
     for person in makeSamplePeople() {
       try Task.checkCancellation()
@@ -33,4 +34,3 @@ public enum TestDataGenerator {
     ]
   }
 }
-

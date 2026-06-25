@@ -42,9 +42,9 @@ import SwiftUI
         }
     }
 
-    private func feedbackBinding(_ controller: TestDataGenerationController)
-      -> Binding<TestDataGenerationController.Feedback?>
-    {
+    private func feedbackBinding(
+      _ controller: TestDataGenerationController
+    ) -> Binding<TestDataGenerationController.Feedback?> {
       Binding(
         get: { controller.feedback },
         set: { controller.feedback = $0 }

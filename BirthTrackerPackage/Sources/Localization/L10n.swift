@@ -42,13 +42,15 @@ public enum L10n {
 
   public enum Settings {
     public static let appearance = LocalizedStringResource("Appearance", bundle: .atURL(Bundle.module.bundleURL))
-    public static let creatingTestData = LocalizedStringResource("Creating Test Data…", bundle: .atURL(Bundle.module.bundleURL))
+    public static let creatingTestData = LocalizedStringResource(
+      "Creating Test Data…", bundle: .atURL(Bundle.module.bundleURL))
     public static let database = LocalizedStringResource("Database", bundle: .atURL(Bundle.module.bundleURL))
     public static let debug = LocalizedStringResource("Debug", bundle: .atURL(Bundle.module.bundleURL))
     public static let generateTestData = LocalizedStringResource(
       "Generate Test Data", bundle: .atURL(Bundle.module.bundleURL))
     public static let mode = LocalizedStringResource("Mode", bundle: .atURL(Bundle.module.bundleURL))
-    public static let testDataCreated = LocalizedStringResource("Test Data Created", bundle: .atURL(Bundle.module.bundleURL))
+    public static let testDataCreated = LocalizedStringResource(
+      "Test Data Created", bundle: .atURL(Bundle.module.bundleURL))
     public static let testDataCreationFailedTitle = LocalizedStringResource(
       "Test Data Creation Failed", bundle: .atURL(Bundle.module.bundleURL))
     public static let title = Common.settings

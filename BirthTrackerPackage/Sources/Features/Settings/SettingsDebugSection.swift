@@ -6,8 +6,10 @@ import SwiftUI
 
 #if DEBUG
   struct SettingsDebugSection: View {
-    @Environment(\.modelContext) private var modelContext
-    @AppStorage(AppSettingsKey.storageMode) private var storageMode = DebugStorageMode.local.rawValue
+    @Environment(\.modelContext)
+    private var modelContext
+    @AppStorage(AppSettingsKey.storageMode)
+    private var storageMode = DebugStorageMode.local.rawValue
     @State private var testDataGeneration = TestDataGenerationController()
 
     var body: some View {

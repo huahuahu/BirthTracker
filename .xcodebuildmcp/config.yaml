@@ -1,16 +1,19 @@
 schemaVersion: 1
 enabledWorkflows:
+  - coverage
   - debugging
   - doctor
   - logging
   - swift-package
   - ui-automation
   - utilities
-  - coverage
 debug: true
 sentryDisabled: false
 sessionDefaults:
   projectPath: BirthTracker.xcodeproj
   scheme: BirthTracker
-  simulatorId: F8AFBC61-0935-4C51-826E-E03D6DCD3D71
-  simulatorName: iPhone 17 Pro Max
+  simulatorName: birth tracker 17 pro
+  simulatorId: F4B82181-8A72-4AC3-9C95-454DE83A0C62
+setupPreferences:
+  platforms:
+    - iOS

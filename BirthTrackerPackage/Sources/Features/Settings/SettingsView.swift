@@ -4,8 +4,10 @@ import Models
 import SwiftUI
 
 public struct SettingsView: View {
-  @AppStorage(AppSettingsKey.appearanceMode) private var appearanceMode = AppearanceMode.system.rawValue
-  @AppStorage(AppSettingsKey.enabledCalendarKinds) private var enabledCalendarKinds =
+  @AppStorage(AppSettingsKey.appearanceMode)
+  private var appearanceMode = AppearanceMode.system.rawValue
+  @AppStorage(AppSettingsKey.enabledCalendarKinds)
+  private var enabledCalendarKinds =
     BirthdayCalendarKind.rawSelectionKinds(
       BirthdayCalendarKind.defaultSelectionKinds)
 
