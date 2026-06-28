@@ -17,7 +17,7 @@ public enum AppearanceMode: String, CaseIterable, Identifiable {
   }
 }
 
-public enum AppSettingsKey {
+nonisolated public enum AppSettingsKey {
   public static let appearanceMode = "settings.appearanceMode"
   public static let enabledCalendarKinds = "settings.enabledCalendarKinds"
   public static let storageMode = "settings.storageMode"

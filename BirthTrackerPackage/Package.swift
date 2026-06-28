@@ -25,17 +25,20 @@ let package = Package(
     .target(
       name: "App",
       dependencies: ["DesignSystem", "Features", "Persistence"],
-      path: "Sources/App"
+      path: "Sources/App",
+      swiftSettings: [.defaultIsolation(MainActor.self)]
     ),
     .target(
       name: "DesignSystem",
       dependencies: ["Models"],
-      path: "Sources/DesignSystem"
+      path: "Sources/DesignSystem",
+      swiftSettings: [.defaultIsolation(MainActor.self)]
     ),
     .target(
       name: "Features",
       dependencies: ["DesignSystem", "Localization", "Models", "Persistence", "SFSafeSymbols"],
-      path: "Sources/Features"
+      path: "Sources/Features",
+      swiftSettings: [.defaultIsolation(MainActor.self)]
     ),
     .target(
       name: "Localization",
