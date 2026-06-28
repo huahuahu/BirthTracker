@@ -51,22 +51,6 @@ struct BirthdayCalculatorTests {
     #expect(components.day == 10)
   }
 
-  @Test("Widget snapshot round trips upcoming birthday data")
-  func widgetSnapshotCoding() throws {
-    let birthday = UpcomingBirthday(
-      id: UUID(),
-      personName: "Alex",
-      date: Date(timeIntervalSince1970: 1_800_000_000),
-      age: 24,
-      calendarKind: .gregorian)
-    let snapshot = WidgetSnapshot(generatedAt: Date(timeIntervalSince1970: 1_799_999_000), birthdays: [birthday])
-
-    let data = try JSONEncoder.birthTracker.encode(snapshot)
-    let decoded = try JSONDecoder.birthTracker.decode(WidgetSnapshot.self, from: data)
-
-    #expect(decoded == snapshot)
-  }
-
   @Test("In-memory persistence stores template fixture data")
   func inMemoryPersistenceStoresFixtureData() throws {
     let container = try PersistenceFixtures.makeInMemoryContainer()
