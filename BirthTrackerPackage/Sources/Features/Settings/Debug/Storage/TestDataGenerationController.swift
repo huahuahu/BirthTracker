@@ -31,7 +31,7 @@ final class TestDataGenerationController {
   init(
     hudDelay: Duration = .milliseconds(300),
     generate: @escaping @MainActor (ModelContext) async throws -> Void = { modelContext in
-      try await TestDataGenerator.generateSamplePeople(into: modelContext)
+      try await TestDataGenerator.resetSamplePeople(into: modelContext)
     }
   ) {
     self.hudDelay = hudDelay
@@ -73,7 +73,7 @@ final class TestDataGenerationController {
         nextFeedback = nil
       } catch {
         if isViewVisible {
-          let message = L10n.Settings.testDataCreationFailedMessage(error.localizedDescription)
+          let message = L10n.Settings.testDataResetFailedMessage(error.localizedDescription)
           nextFeedback = .failure(message: message)
         } else {
           nextFeedback = nil

@@ -511,6 +511,125 @@
       },
       "comment": "Alert message format shown when generating sample test data fails. %@ is a user-readable reason."
     },
+    "Reset Test Data": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reset Test Data"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "重置测试数据"
+          }
+        }
+      },
+      "comment": "Debug-only button that deletes existing birthday records and inserts sample test data."
+    },
+    "Resetting Test Data…": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Resetting test data…"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在重置测试数据…"
+          }
+        }
+      },
+      "comment": "HUD/overlay title displayed while resetting sample test data."
+    },
+    "Restart Required": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Restart Required"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "需要重启"
+          }
+        }
+      },
+      "comment": "Alert title shown after changing the debug storage location."
+    },
+    "Storage location updated. Restart the app to use it.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Storage location updated. Restart the app to use it."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "存储位置已更新，重启 App 后生效。"
+          }
+        }
+      },
+      "comment": "Alert message shown after changing debug storage; the new model container is created on the next launch."
+    },
+    "Test Data Reset": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Test Data Reset"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "测试数据已重置"
+          }
+        }
+      },
+      "comment": "Success message shown after resetting sample test data."
+    },
+    "Test Data Reset Failed": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Test Data Reset Failed"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "重置失败"
+          }
+        }
+      },
+      "comment": "Alert title shown when resetting sample test data fails."
+    },
+    "Reset failed: %@": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reset failed: %@"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "重置失败：%@"
+          }
+        }
+      },
+      "comment": "Alert message format shown when resetting sample test data fails. %@ is a user-readable reason."
+    },
     "Retry": {
       "localizations": {
         "en": {

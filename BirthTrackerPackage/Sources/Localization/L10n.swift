@@ -42,22 +42,26 @@ public enum L10n {
 
   public enum Settings {
     public static let appearance = LocalizedStringResource("Appearance", bundle: .atURL(Bundle.module.bundleURL))
-    public static let creatingTestData = LocalizedStringResource(
-      "Creating Test Data…", bundle: .atURL(Bundle.module.bundleURL))
     public static let database = LocalizedStringResource("Database", bundle: .atURL(Bundle.module.bundleURL))
     public static let debug = LocalizedStringResource("Debug", bundle: .atURL(Bundle.module.bundleURL))
-    public static let generateTestData = LocalizedStringResource(
-      "Generate Test Data", bundle: .atURL(Bundle.module.bundleURL))
     public static let mode = LocalizedStringResource("Mode", bundle: .atURL(Bundle.module.bundleURL))
-    public static let testDataCreated = LocalizedStringResource(
-      "Test Data Created", bundle: .atURL(Bundle.module.bundleURL))
-    public static let testDataCreationFailedTitle = LocalizedStringResource(
-      "Test Data Creation Failed", bundle: .atURL(Bundle.module.bundleURL))
+    public static let resetTestData = LocalizedStringResource(
+      "Reset Test Data", bundle: .atURL(Bundle.module.bundleURL))
+    public static let resettingTestData = LocalizedStringResource(
+      "Resetting Test Data…", bundle: .atURL(Bundle.module.bundleURL))
+    public static let storageRestartRequiredMessage = LocalizedStringResource(
+      "Storage location updated. Restart the app to use it.", bundle: .atURL(Bundle.module.bundleURL))
+    public static let storageRestartRequiredTitle = LocalizedStringResource(
+      "Restart Required", bundle: .atURL(Bundle.module.bundleURL))
+    public static let testDataReset = LocalizedStringResource(
+      "Test Data Reset", bundle: .atURL(Bundle.module.bundleURL))
+    public static let testDataResetFailedTitle = LocalizedStringResource(
+      "Test Data Reset Failed", bundle: .atURL(Bundle.module.bundleURL))
     public static let title = Common.settings
 
-    public static func testDataCreationFailedMessage(_ reason: String) -> String {
+    public static func testDataResetFailedMessage(_ reason: String) -> String {
       let format = L10n.string(
-        LocalizedStringResource("Creation failed: %@", bundle: .atURL(Bundle.module.bundleURL)))
+        LocalizedStringResource("Reset failed: %@", bundle: .atURL(Bundle.module.bundleURL)))
       return String.localizedStringWithFormat(format, reason)
     }
   }

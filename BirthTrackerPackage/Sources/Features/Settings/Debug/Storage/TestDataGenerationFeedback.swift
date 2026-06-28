@@ -11,7 +11,7 @@ import SwiftUI
       self
         .overlay {
           if controller.isShowingHUD {
-            TestDataGenerationHUD(title: L10n.Settings.creatingTestData) {
+            TestDataGenerationHUD(title: L10n.Settings.resettingTestData) {
               controller.cancel()
             }
           }
@@ -26,12 +26,12 @@ import SwiftUI
           switch feedback {
           case .success:
             return Alert(
-              title: Text(L10n.Settings.testDataCreated),
+              title: Text(L10n.Settings.testDataReset),
               dismissButton: .default(Text(L10n.Common.ok))
             )
           case .failure(let message):
             return Alert(
-              title: Text(L10n.Settings.testDataCreationFailedTitle),
+              title: Text(L10n.Settings.testDataResetFailedTitle),
               message: Text(message),
               primaryButton: .default(Text(L10n.Common.retry)) {
                 controller.start(modelContext: modelContext)
