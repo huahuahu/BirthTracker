@@ -8,9 +8,9 @@ Settings 的 debug 页面目前直接在 `SettingsDebugSection.swift` 中包含�
 
 ## 推荐方案
 
-采用 `BirthTrackerPackage/Sources/Features/Settings/DebugStorage/` 子目录承载 debug 数据库存储能力：
+采用 `BirthTrackerPackage/Sources/Features/Settings/Debug/Storage/` 两级子目录承载 debug 数据库存储能力，给后续新的 debug 功能预留 `Settings/Debug/<Feature>/` 的并列空间：
 
-- `SettingsDebugSection` 只负责组合 debug 页面内容，实际数据库控件移动到 DebugStorage 子目录内的专用 view。
+- `SettingsDebugSection` 只负责组合 debug 页面内容，实际数据库控件移动到 `Debug/Storage` 子目录内的专用 view。
 - 存储模式 Picker 继续写入 `AppSettingsKey.storageMode`，但 root view 不再监听并即时替换 `ModelContainer`。
 - 当用户选择了不同存储模式时，显示提示，说明新设置需要重启 App 后生效。
 - 测试数据按钮始终显示为“重置测试数据”，对当前已启动的 `modelContext` 先删除已有 `TrackedPerson`，再插入简易测试数据。
@@ -36,13 +36,13 @@ Debug 存储模式仍包含 memory、local、cloud 三个选项。选择值会�
 
 ## 代码结构
 
-新增子目录：
+新增两级子目录：
 
 ```text
-BirthTrackerPackage/Sources/Features/Settings/DebugStorage/
+BirthTrackerPackage/Sources/Features/Settings/Debug/Storage/
 ```
 
-该目录放置数据库存储 debug UI 与控制器相关文件，例如：
+该目录放置数据库存储 debug UI 与控制器相关文件；后续新的 debug 功能使用同级目录，例如 `Settings/Debug/Diagnostics/` 或 `Settings/Debug/Fixtures/`。本次目录内文件包括：
 
 - `DebugStorageSection.swift`：存储模式 Picker、重启提示、重置测试数据按钮。
 - `TestDataGenerationController.swift`：沿用现有 HUD、取消和反馈状态管理，默认执行重置逻辑。
@@ -69,6 +69,6 @@ BirthTrackerPackage/Sources/Features/Settings/DebugStorage/
 - debug 设置页仍通过 Settings 入口进入，并由 debug view 承载 debug section。
 - 数据库切换不再触发 root view 热重建 `ModelContainer`。
 - 测试数据重置会先删除已有 `TrackedPerson`，再插入 3 条简易 fixture。
-- Settings debug 源文件引用 DebugStorage 子目录组件，保证组织结构意图不会回退。
+- Settings debug 源文件引用 `Debug/Storage` 子目录组件，保证组织结构意图不会回退。
 
 代码变更完成后运行 `make check`。
