@@ -28,7 +28,7 @@ struct WidgetPersonEntity: AppEntity {
   var name: String
 
   var displayRepresentation: DisplayRepresentation {
-    DisplayRepresentation(title: LocalizedStringResource(stringLiteral: name))
+    DisplayRepresentation(title: "\(name)")
   }
 
   init(id: UUID, name: String) {
