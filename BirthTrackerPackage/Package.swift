@@ -18,6 +18,9 @@ let package = Package(
     .library(name: "Persistence", targets: ["Persistence"]),
     .library(name: "TestingSupport", targets: ["TestingSupport"]),
   ],
+  dependencies: [
+    .package(url: "https://github.com/SFSafeSymbols/SFSafeSymbols.git", .upToNextMajor(from: "7.0.0")),
+  ],
   targets: [
     .target(
       name: "App",
@@ -31,7 +34,7 @@ let package = Package(
     ),
     .target(
       name: "Features",
-      dependencies: ["DesignSystem", "Localization", "Models", "Persistence"],
+      dependencies: ["DesignSystem", "Localization", "Models", "Persistence", "SFSafeSymbols"],
       path: "Sources/Features"
     ),
     .target(
