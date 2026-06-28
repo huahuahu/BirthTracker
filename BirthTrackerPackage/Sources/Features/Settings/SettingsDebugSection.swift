@@ -5,6 +5,15 @@ import SwiftData
 import SwiftUI
 
 #if DEBUG
+  struct SettingsDebugView: View {
+    var body: some View {
+      Form {
+        SettingsDebugSection()
+      }
+      .navigationTitle(L10n.Settings.debug)
+    }
+  }
+
   struct SettingsDebugSection: View {
     @Environment(\.modelContext)
     private var modelContext

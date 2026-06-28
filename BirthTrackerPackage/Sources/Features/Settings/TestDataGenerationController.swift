@@ -63,31 +63,35 @@ final class TestDataGenerationController {
 
     generationTask?.cancel()
     generationTask = Task { @MainActor in
-      defer {
-        isGenerating = false
-        isShowingHUD = false
-        generationTask = nil
-        hudDelayTask?.cancel()
-        hudDelayTask = nil
-      }
+      let nextFeedback: Feedback?
 
       do {
         try await generate(modelContext)
-        guard !Task.isCancelled else { return }
-        guard isViewVisible else { return }
-        feedback = .success
+        nextFeedback = Task.isCancelled || !isViewVisible ? nil : .success
       } catch is CancellationError {
         // Cancellation is user intent: no success/failure prompt.
+        nextFeedback = nil
       } catch {
-        guard isViewVisible else { return }
-        let message = L10n.Settings.testDataCreationFailedMessage(error.localizedDescription)
-        feedback = .failure(message: message)
+        if isViewVisible {
+          let message = L10n.Settings.testDataCreationFailedMessage(error.localizedDescription)
+          nextFeedback = .failure(message: message)
+        } else {
+          nextFeedback = nil
+        }
       }
+
+      finishGeneration()
+      feedback = nextFeedback
     }
   }
 
   func cancel() {
     generationTask?.cancel()
+    hudDelayTask?.cancel()
+    finishGeneration()
+  }
+
+  private func finishGeneration() {
     hudDelayTask?.cancel()
     generationTask = nil
     hudDelayTask = nil
