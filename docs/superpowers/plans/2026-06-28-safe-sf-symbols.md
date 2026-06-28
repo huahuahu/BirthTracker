@@ -281,7 +281,7 @@ xcodebuildmcp-session_show_defaults
 Expected: active defaults include `projectPath: BirthTracker.xcodeproj`, `scheme: BirthTracker`, and an iOS Simulator target. If defaults are missing, call:
 
 ```text
-xcodebuildmcp-session_set_defaults(projectPath: "/Users/tigerguo/git/copilot-worktrees/BirthTracker/huahuahu-special-umbrella/BirthTracker.xcodeproj", scheme: "BirthTracker", simulatorName: "birth tracker 17 pro", simulatorId: "F4B82181-8A72-4AC3-9C95-454DE83A0C62")
+xcodebuildmcp-session_set_defaults(projectPath: "<repo-root>/BirthTracker.xcodeproj", scheme: "BirthTracker", simulatorName: "configured simulator", simulatorId: "configured simulator id")
 ```
 
 - [ ] **Step 4: 运行 lint 和格式检查**
