@@ -1,6 +1,7 @@
 import DesignSystem
 import Localization
 import Persistence
+import SFSafeSymbols
 import SwiftData
 import SwiftUI
 
@@ -30,7 +31,7 @@ import SwiftUI
         }
 
         if storageMode == DebugStorageMode.memory.rawValue {
-          Button(L10n.Settings.generateTestData, systemImage: "sparkles") {
+          Button(L10n.Settings.generateTestData, systemImage: SFSymbol.sparkles.rawValue) {
             testDataGeneration.start(modelContext: modelContext)
           }
           .disabled(testDataGeneration.isGenerating)
