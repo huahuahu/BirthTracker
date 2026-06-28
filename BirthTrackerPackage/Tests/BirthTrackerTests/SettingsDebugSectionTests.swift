@@ -32,6 +32,15 @@ struct SettingsDebugSectionTests {
     #expect(disabledRange.lowerBound < feedbackRange.lowerBound)
   }
 
+  @Test("Generation state is cleared before feedback alert is shown")
+  func generationStateClearsBeforeFeedbackAlert() throws {
+    let source = try settingsSource(named: "TestDataGenerationController.swift")
+    let taskRange = try #require(source.range(of: "generationTask = Task"))
+    let feedbackRange = try #require(source.range(of: "finishGeneration()\n      feedback = nextFeedback"))
+
+    #expect(taskRange.lowerBound < feedbackRange.lowerBound)
+  }
+
   private func settingsSource(named fileName: String) throws -> String {
     let sourceURL = URL(fileURLWithPath: #filePath)
       .deletingLastPathComponent()
