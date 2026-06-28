@@ -3,6 +3,7 @@ import Localization
 import Models
 import OSLog
 import Persistence
+import SFSafeSymbols
 import SwiftData
 import SwiftUI
 import WidgetKit
@@ -34,7 +35,7 @@ public struct PeopleTimelineView: View {
         if upcomingBirthdays.isEmpty {
           ContentUnavailableView(
             L10n.Timeline.noBirthdays,
-            systemImage: "calendar.badge.plus",
+            systemImage: SFSymbol.calendarBadgePlus.rawValue,
             description: Text(L10n.Timeline.emptyDescription)
           )
         } else {
@@ -63,7 +64,7 @@ public struct PeopleTimelineView: View {
       .navigationTitle(L10n.Common.birthdays)
       .toolbar {
         ToolbarItem(placement: .primaryAction) {
-          Button(L10n.Timeline.addPerson, systemImage: "plus") {
+          Button(L10n.Timeline.addPerson, systemImage: SFSymbol.plus.rawValue) {
             isAddingPerson = true
           }
         }
@@ -72,7 +73,7 @@ public struct PeopleTimelineView: View {
           NavigationLink {
             SettingsView()
           } label: {
-            Label(L10n.Common.settings, systemImage: "gearshape")
+            Label(L10n.Common.settings, systemImage: SFSymbol.gearshape.rawValue)
           }
         }
       }
@@ -143,7 +144,7 @@ private struct BirthdayTimelineRow: View {
 
   var body: some View {
     HStack(spacing: 12) {
-      Image(systemName: "gift")
+      Image(systemSymbol: .gift)
         .font(.title2)
         .foregroundStyle(.pink)
         .frame(width: 36, height: 36)

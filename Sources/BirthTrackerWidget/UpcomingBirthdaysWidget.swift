@@ -1,6 +1,7 @@
 import Localization
 import Models
 import Persistence
+import SFSafeSymbols
 import SwiftUI
 import WidgetKit
 
@@ -80,7 +81,7 @@ private struct UpcomingBirthdaysWidgetView: View {
 
   var body: some View {
     VStack(alignment: .leading, spacing: 8) {
-      Label(L10n.Widget.title, systemImage: "gift")
+      Label(L10n.Widget.title, systemImage: SFSymbol.gift.rawValue)
         .font(.headline)
 
       if entry.selectedPersonUnavailable {

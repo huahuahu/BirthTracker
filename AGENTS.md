@@ -24,6 +24,7 @@
 ## Change Guidance
 
 - Follow existing SwiftUI, SwiftData, and WidgetKit patterns.
+- Use `SFSafeSymbols` typed APIs for SF Symbols instead of raw `systemName` or `systemImage` strings.
 - Put app/widget shared logic in `Sources/BirthTrackerShared`.
 - Keep changes focused; avoid unrelated refactors.
 
