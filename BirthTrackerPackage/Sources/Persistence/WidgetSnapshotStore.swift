@@ -2,7 +2,7 @@ import Foundation
 import Models
 import SwiftData
 
-public enum WidgetSnapshotStoreError: LocalizedError {
+public enum WidgetSnapshotStoreError: LocalizedError, Equatable {
   case appGroupUnavailable
 
   public var errorDescription: String? {

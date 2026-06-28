@@ -1,10 +1,13 @@
 import DesignSystem
 import Localization
 import Models
+import OSLog
 import Persistence
 import SwiftData
 import SwiftUI
 import WidgetKit
+
+private let widgetSnapshotLogger = Logger(subsystem: "BirthTracker", category: "WidgetSnapshot")
 
 public struct PeopleTimelineView: View {
   @Environment(\.modelContext)
@@ -126,7 +129,11 @@ public struct PeopleTimelineView: View {
       try WidgetSnapshotStore.rebuild(with: snapshots)
       WidgetCenter.shared.reloadTimelines(ofKind: BirthTrackerWidgetKind.upcomingBirthdays)
     } catch {
-      assertionFailure("Unable to persist widget snapshots: \(error)")
+      if (error as? WidgetSnapshotStoreError) == .appGroupUnavailable {
+        widgetSnapshotLogger.error("Skipping widget snapshot persistence because App Group is unavailable.")
+      } else {
+        assertionFailure("Unable to persist widget snapshots: \(error)")
+      }
     }
   }
 }
