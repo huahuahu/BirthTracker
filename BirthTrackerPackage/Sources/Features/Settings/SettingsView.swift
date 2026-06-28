@@ -34,7 +34,13 @@ public struct SettingsView: View {
       }
 
       #if DEBUG
-        SettingsDebugSection()
+        Section {
+          NavigationLink {
+            SettingsDebugView()
+          } label: {
+            Text(L10n.Settings.debug)
+          }
+        }
       #endif
     }
     .navigationTitle(L10n.Settings.title)
