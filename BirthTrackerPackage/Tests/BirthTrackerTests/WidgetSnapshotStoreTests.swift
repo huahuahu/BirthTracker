@@ -140,4 +140,40 @@ struct WidgetSnapshotStoreTests {
     #expect(syncCalled)
     #expect(reportCalled == false)
   }
+
+  @Test("Widget snapshot sync is skipped with pending changes")
+  func widgetSnapshotSyncIsSkippedWithPendingChanges() {
+    var syncCalled = false
+    var reportCalled = false
+
+    WidgetSnapshotSyncGate.runWhenNoPendingChanges(
+      hasPendingChanges: true,
+      sync: {
+        syncCalled = true
+      },
+      reportPendingChanges: {
+        reportCalled = true
+      })
+
+    #expect(syncCalled == false)
+    #expect(reportCalled)
+  }
+
+  @Test("Widget snapshot sync runs without pending changes")
+  func widgetSnapshotSyncRunsWithoutPendingChanges() {
+    var syncCalled = false
+    var reportCalled = false
+
+    WidgetSnapshotSyncGate.runWhenNoPendingChanges(
+      hasPendingChanges: false,
+      sync: {
+        syncCalled = true
+      },
+      reportPendingChanges: {
+        reportCalled = true
+      })
+
+    #expect(syncCalled)
+    #expect(reportCalled == false)
+  }
 }

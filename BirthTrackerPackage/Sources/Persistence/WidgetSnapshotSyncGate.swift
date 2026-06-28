@@ -1,4 +1,19 @@
 public enum WidgetSnapshotSyncGate {
+  public static func runWhenNoPendingChanges(
+    hasPendingChanges: Bool,
+    sync: () -> Void,
+    reportPendingChanges: () -> Void = {
+      assertionFailure("Skipping widget snapshot sync because model context has unsaved changes.")
+    }
+  ) {
+    guard !hasPendingChanges else {
+      reportPendingChanges()
+      return
+    }
+
+    sync()
+  }
+
   public static func runAfterSuccessfulSave(
     save: () throws -> Void,
     sync: () -> Void,

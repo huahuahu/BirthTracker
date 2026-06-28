@@ -89,7 +89,11 @@ public struct PeopleTimelineView: View {
         persistWidgetSnapshots()
       }
       .onChange(of: people.map(\.id)) {
-        persistWidgetSnapshots()
+        WidgetSnapshotSyncGate.runWhenNoPendingChanges(
+          hasPendingChanges: modelContext.hasChanges,
+          sync: {
+            persistWidgetSnapshots()
+          })
       }
     }
   }
