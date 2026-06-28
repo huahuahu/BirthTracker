@@ -29,57 +29,6 @@
           }
         }
       }
-    },
-    "Choose Person": {
-      "comment": "Widget configuration title for selecting which person to show.",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Choose Person"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "选择联系人"
-          }
-        }
-      }
-    },
-    "Choose which person's birthday this widget shows.": {
-      "comment": "Widget configuration description for selecting a person.",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Choose which person's birthday this widget shows."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "选择这个小组件显示哪位联系人的生日。"
-          }
-        }
-      }
-    },
-    "Person": {
-      "comment": "Widget configuration parameter label for a tracked person.",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Person"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "联系人"
-          }
-        }
-      }
     }
   },
   "version": "1.0"
