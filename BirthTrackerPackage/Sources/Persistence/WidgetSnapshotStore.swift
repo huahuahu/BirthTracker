@@ -57,10 +57,7 @@ public enum WidgetSnapshotStore {
     }
 
     let context = ModelContext(activeContainer)
-    let existing = try context.fetch(FetchDescriptor<WidgetPersonSnapshotRecord>())
-    for record in existing {
-      context.delete(record)
-    }
+    try context.delete(model: WidgetPersonSnapshotRecord.self)
 
     for snapshot in snapshots {
       context.insert(WidgetPersonSnapshotRecord(snapshot: snapshot))
