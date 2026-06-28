@@ -77,14 +77,14 @@ public struct PeopleTimelineView: View {
         PersonFormView(calendarKinds: BirthdayCalendarKind.selectionKinds(from: enabledCalendarKinds)) { person in
           modelContext.insert(person)
           try? modelContext.save()
-          persistWidgetSnapshot(for: people + [person])
+          persistWidgetSnapshots(for: people + [person])
         }
       }
       .onAppear {
-        persistWidgetSnapshot()
+        persistWidgetSnapshots()
       }
       .onChange(of: people.map(\.id)) {
-        persistWidgetSnapshot()
+        persistWidgetSnapshots()
       }
     }
   }
@@ -98,23 +98,17 @@ public struct PeopleTimelineView: View {
       modelContext.delete(people[index])
     }
     try? modelContext.save()
-    persistWidgetSnapshot(for: remainingPeople)
+    persistWidgetSnapshots(for: remainingPeople)
   }
 
-  private func persistWidgetSnapshot(for people: [TrackedPerson]? = nil) {
-    let birthdays = (people ?? self.people)
-      .compactMap { $0.upcomingBirthday() }
-      .sorted { $0.date < $1.date }
-
-    let snapshot = WidgetSnapshot(birthdays: Array(birthdays.prefix(8)))
-    guard let url = AppGroup.snapshotURL else { return }
+  private func persistWidgetSnapshots(for people: [TrackedPerson]? = nil) {
+    let snapshots = WidgetSnapshotBuilder.makeSnapshots(from: people ?? self.people)
 
     do {
-      let data = try JSONEncoder.birthTracker.encode(snapshot)
-      try data.write(to: url, options: [.atomic])
+      try WidgetSnapshotStore.rebuild(with: snapshots)
       WidgetCenter.shared.reloadTimelines(ofKind: BirthTrackerWidgetKind.upcomingBirthdays)
     } catch {
-      assertionFailure("Unable to persist widget snapshot: \(error)")
+      assertionFailure("Unable to persist widget snapshots: \(error)")
     }
   }
 }

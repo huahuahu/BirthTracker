@@ -70,4 +70,28 @@ struct WidgetSnapshotStoreTests {
     #expect(try WidgetSnapshotStore.fetchPerson(id: removedID, in: container) == nil)
     #expect(try WidgetSnapshotStore.fetchPerson(id: keptID, in: container)?.displayName == "Kept Person")
   }
+
+  @Test("Widget snapshot builder sorts people by next birthday")
+  func widgetSnapshotBuilderSortsPeopleByNextBirthday() throws {
+    let calendar = Calendar(identifier: .gregorian)
+    let referenceDate = try #require(calendar.date(from: DateComponents(year: 2026, month: 1, day: 1)))
+    let laterPersonID = UUID()
+    let earlierPersonID = UUID()
+    let laterPerson = TrackedPerson(
+      id: laterPersonID,
+      name: "Later Birthday",
+      birthday: Birthday(calendarKind: .gregorian, year: 1990, month: 12, day: 10))
+    let earlierPerson = TrackedPerson(
+      id: earlierPersonID,
+      name: "Earlier Birthday",
+      birthday: Birthday(calendarKind: .gregorian, year: 1990, month: 2, day: 1))
+
+    let snapshots = WidgetSnapshotBuilder.makeSnapshots(
+      from: [laterPerson, earlierPerson],
+      after: referenceDate)
+
+    #expect(snapshots.map(\.personID) == [earlierPersonID, laterPersonID])
+    #expect(snapshots.map(\.sortIndex) == [0, 1])
+    #expect(snapshots.allSatisfy { $0.generatedAt == referenceDate })
+  }
 }
