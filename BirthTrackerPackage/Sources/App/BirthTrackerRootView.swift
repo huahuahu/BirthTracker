@@ -6,15 +6,16 @@ import SwiftUI
 
 public struct BirthTrackerRootView: View {
   #if DEBUG
+    private static let debugStartupStorageMode = DebugStorageMode.current
+
     @State private var activeDebugStorageMode: DebugStorageMode
   #endif
   @State private var modelContainer: ModelContainer
 
   public init() {
     #if DEBUG
-      let startupStorageMode = DebugStorageMode.current
-      _activeDebugStorageMode = State(initialValue: startupStorageMode)
-      _modelContainer = State(initialValue: Self.makeModelContainer(storageMode: startupStorageMode))
+      _activeDebugStorageMode = State(initialValue: Self.debugStartupStorageMode)
+      _modelContainer = State(initialValue: Self.makeModelContainer(storageMode: Self.debugStartupStorageMode))
     #else
       _modelContainer = State(initialValue: Self.makeModelContainer())
     #endif

@@ -88,15 +88,23 @@ struct SettingsDebugSectionTests {
   func rootViewInjectsActiveDebugStorageModeCapturedAtStartup() throws {
     let source = try sourceFile(at: "Sources/App/BirthTrackerRootView.swift")
     let stateRange = try #require(source.range(of: "@State private var activeDebugStorageMode: DebugStorageMode"))
-    let captureRange = try #require(source.range(of: "let startupStorageMode = DebugStorageMode.current"))
+    let captureRange = try #require(
+      source.range(of: "private static let debugStartupStorageMode = DebugStorageMode.current"))
+    let initRange = try #require(source.range(of: "public init()"))
+    let activeModeRange = try #require(
+      source.range(of: "_activeDebugStorageMode = State(initialValue: Self.debugStartupStorageMode)"))
     let containerRange = try #require(
-      source.range(of: "Self.makeModelContainer(storageMode: startupStorageMode)"))
+      source.range(of: "Self.makeModelContainer(storageMode: Self.debugStartupStorageMode)"))
     let environmentRange = try #require(
       source.range(of: ".environment(\\.activeDebugStorageMode, activeDebugStorageMode)"))
 
-    #expect(stateRange.lowerBound < captureRange.lowerBound)
-    #expect(captureRange.lowerBound < containerRange.lowerBound)
+    #expect(source[..<captureRange.lowerBound].contains("#if DEBUG"))
+    #expect(captureRange.lowerBound < stateRange.lowerBound)
+    #expect(captureRange.lowerBound < initRange.lowerBound)
+    #expect(initRange.lowerBound < activeModeRange.lowerBound)
+    #expect(activeModeRange.lowerBound < containerRange.lowerBound)
     #expect(containerRange.lowerBound < environmentRange.lowerBound)
+    #expect(!source.contains("let startupStorageMode = DebugStorageMode.current"))
   }
 
   @Test("Features module defines active debug storage mode environment value")
