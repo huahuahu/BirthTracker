@@ -60,6 +60,15 @@ struct SettingsDebugSectionTests {
     #expect(!source.contains("TestDataGenerator.generateSamplePeople(into: modelContext)"))
   }
 
+  @Test("Root view does not hot swap model containers when debug storage changes")
+  func rootViewDoesNotHotSwapModelContainersWhenDebugStorageChanges() throws {
+    let source = try sourceFile(at: "Sources/App/BirthTrackerRootView.swift")
+
+    #expect(!source.contains("@AppStorage(AppSettingsKey.storageMode)"))
+    #expect(!source.contains(".onChange(of: storageMode)"))
+    #expect(!source.contains("modelContainerID"))
+  }
+
   private func sourceFile(at relativePath: String) throws -> String {
     let sourceURL = URL(fileURLWithPath: #filePath)
       .deletingLastPathComponent()
