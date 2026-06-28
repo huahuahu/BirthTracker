@@ -76,8 +76,13 @@ public struct PeopleTimelineView: View {
       .sheet(isPresented: $isAddingPerson) {
         PersonFormView(calendarKinds: BirthdayCalendarKind.selectionKinds(from: enabledCalendarKinds)) { person in
           modelContext.insert(person)
-          try? modelContext.save()
-          persistWidgetSnapshots(for: people + [person])
+          WidgetSnapshotSyncGate.runAfterSuccessfulSave(
+            save: {
+              try modelContext.save()
+            },
+            sync: {
+              persistWidgetSnapshots(for: people + [person])
+            })
         }
       }
       .onAppear {
@@ -97,8 +102,13 @@ public struct PeopleTimelineView: View {
     for index in offsets {
       modelContext.delete(people[index])
     }
-    try? modelContext.save()
-    persistWidgetSnapshots(for: remainingPeople)
+    WidgetSnapshotSyncGate.runAfterSuccessfulSave(
+      save: {
+        try modelContext.save()
+      },
+      sync: {
+        persistWidgetSnapshots(for: remainingPeople)
+      })
   }
 
   private func persistWidgetSnapshots(for people: [TrackedPerson]? = nil) {

@@ -6,6 +6,10 @@ import Testing
 
 @Suite("Widget snapshot store")
 struct WidgetSnapshotStoreTests {
+  private enum TestSaveError: Error, Equatable {
+    case failed
+  }
+
   @Test("Widget store round trips snapshots in sort order")
   func widgetStoreRoundTripsSnapshots() throws {
     let container = try WidgetSnapshotStore.makeInMemoryContainer()
@@ -93,5 +97,47 @@ struct WidgetSnapshotStoreTests {
     #expect(snapshots.map(\.personID) == [earlierPersonID, laterPersonID])
     #expect(snapshots.map(\.sortIndex) == [0, 1])
     #expect(snapshots.allSatisfy { $0.generatedAt == referenceDate })
+  }
+
+  @Test("Widget snapshot sync is skipped when save fails")
+  func widgetSnapshotSyncIsSkippedWhenSaveFails() {
+    var syncCalled = false
+    var reportedError: TestSaveError?
+
+    WidgetSnapshotSyncGate.runAfterSuccessfulSave(
+      save: {
+        throw TestSaveError.failed
+      },
+      sync: {
+        syncCalled = true
+      },
+      reportFailure: { error in
+        reportedError = error as? TestSaveError
+      })
+
+    #expect(syncCalled == false)
+    #expect(reportedError == .failed)
+  }
+
+  @Test("Widget snapshot sync runs after successful save")
+  func widgetSnapshotSyncRunsAfterSuccessfulSave() {
+    var saveCalled = false
+    var syncCalled = false
+    var reportCalled = false
+
+    WidgetSnapshotSyncGate.runAfterSuccessfulSave(
+      save: {
+        saveCalled = true
+      },
+      sync: {
+        syncCalled = true
+      },
+      reportFailure: { _ in
+        reportCalled = true
+      })
+
+    #expect(saveCalled)
+    #expect(syncCalled)
+    #expect(reportCalled == false)
   }
 }
