@@ -3,7 +3,7 @@ import Foundation
 import Models
 import SwiftData
 
-public enum DebugStorageMode: String, CaseIterable, Identifiable {
+public enum DebugStorageMode: String, CaseIterable, Identifiable, Sendable {
   case memory
   case local
   case cloud
