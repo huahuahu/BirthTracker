@@ -27,12 +27,11 @@ Debug 存储模式仍包含 memory、local、cloud 三个选项。选择值会�
 
 新增“重置测试数据”操作，三种存储模式都可用。它针对当前运行中的存储执行：
 
-1. fetch 当前所有 `TrackedPerson`。
-2. 逐个删除。
-3. 插入现有的简易测试人物 fixture。
-4. 保存 context。
+1. 使用 `try modelContext.delete(model: TrackedPerson.self)` 按模型类型删除当前所有 `TrackedPerson`，不先 fetch 实例。
+2. 插入现有的简易测试人物 fixture。
+3. 保存 context。
 
-如果任务被取消或保存失败，已插入的新数据会回滚；删除旧数据后的保存失败由 SwiftData 抛出错误并通过现有失败提示展示。CloudKit 模式下删除和插入会按 SwiftData/CloudKit 的同步机制传播。
+如果删除、插入或保存失败，由 SwiftData 抛出错误并通过现有失败提示展示。CloudKit 模式下删除和插入会按 SwiftData/CloudKit 的同步机制传播。
 
 ## 代码结构
 
@@ -68,7 +67,7 @@ BirthTrackerPackage/Sources/Features/Settings/Debug/Storage/
 
 - debug 设置页仍通过 Settings 入口进入，并由 debug view 承载 debug section。
 - 数据库切换不再触发 root view 热重建 `ModelContainer`。
-- 测试数据重置会先删除已有 `TrackedPerson`，再插入 3 条简易 fixture。
+- 测试数据重置会通过 `ModelContext.delete(model:)` 删除已有 `TrackedPerson`，再插入 3 条简易 fixture。
 - Settings debug 源文件引用 `Debug/Storage` 子目录组件，保证组织结构意图不会回退。
 
 代码变更完成后运行 `make check`。
