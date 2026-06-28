@@ -4,26 +4,30 @@ import SwiftData
 public enum TestDataGenerator {
   @MainActor
   public static func generateSamplePeople(into modelContext: ModelContext) async throws {
+    let operationContext = ModelContext(modelContext.container)
+
     do {
-      try await insertSamplePeople(into: modelContext)
+      try await insertSamplePeople(into: operationContext)
       try Task.checkCancellation()
-      try modelContext.save()
+      try operationContext.save()
     } catch {
-      modelContext.rollback()
+      operationContext.rollback()
       throw error
     }
   }
 
   @MainActor
   public static func resetSamplePeople(into modelContext: ModelContext) async throws {
+    let operationContext = ModelContext(modelContext.container)
+
     do {
       try Task.checkCancellation()
-      try modelContext.delete(model: TrackedPerson.self)
-      try await insertSamplePeople(into: modelContext)
+      try operationContext.delete(model: TrackedPerson.self)
+      try await insertSamplePeople(into: operationContext)
       try Task.checkCancellation()
-      try modelContext.save()
+      try operationContext.save()
     } catch {
-      modelContext.rollback()
+      operationContext.rollback()
       throw error
     }
   }

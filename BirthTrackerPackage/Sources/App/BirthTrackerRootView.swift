@@ -5,13 +5,27 @@ import SwiftData
 import SwiftUI
 
 public struct BirthTrackerRootView: View {
-  @State private var modelContainer = makeModelContainer()
+  #if DEBUG
+    @State private var activeDebugStorageMode: DebugStorageMode
+  #endif
+  @State private var modelContainer: ModelContainer
 
-  public init() {}
+  public init() {
+    #if DEBUG
+      let startupStorageMode = DebugStorageMode.current
+      _activeDebugStorageMode = State(initialValue: startupStorageMode)
+      _modelContainer = State(initialValue: Self.makeModelContainer(storageMode: startupStorageMode))
+    #else
+      _modelContainer = State(initialValue: Self.makeModelContainer())
+    #endif
+  }
 
   public var body: some View {
     PeopleTimelineView()
       .modelContainer(modelContainer)
+      #if DEBUG
+        .environment(\.activeDebugStorageMode, activeDebugStorageMode)
+      #endif
   }
 
   private static func makeModelContainer(storageMode: DebugStorageMode = DebugStorageMode.current) -> ModelContainer {

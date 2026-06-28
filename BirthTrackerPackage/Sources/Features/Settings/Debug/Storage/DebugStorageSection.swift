@@ -9,6 +9,8 @@ import SwiftUI
   struct DebugStorageSection: View {
     @Environment(\.modelContext)
     private var modelContext
+    @Environment(\.activeDebugStorageMode)
+    private var activeDebugStorageMode
     @AppStorage(AppSettingsKey.storageMode)
     private var storageMode = DebugStorageMode.local.rawValue
     @State private var restartPrompt: RestartPrompt?
@@ -25,8 +27,14 @@ import SwiftUI
         Button(L10n.Settings.resetTestData, systemImage: SFSymbol.arrowCounterclockwise.rawValue) {
           testDataGeneration.start(modelContext: modelContext)
         }
-        .disabled(testDataGeneration.isGenerating)
+        .disabled(testDataGeneration.isGenerating || hasPendingStorageModeChange)
         .testDataGenerationFeedback(testDataGeneration, modelContext: modelContext)
+
+        if hasPendingStorageModeChange {
+          Text(L10n.Settings.storageRestartRequiredMessage)
+            .font(.footnote)
+            .foregroundStyle(.secondary)
+        }
       }
       .alert(item: restartPromptBinding) { _ in
         Alert(
@@ -53,6 +61,10 @@ import SwiftUI
       } set: {
         restartPrompt = $0
       }
+    }
+
+    private var hasPendingStorageModeChange: Bool {
+      storageMode != activeDebugStorageMode.rawValue
     }
   }
 
