@@ -645,7 +645,7 @@
           }
         }
       },
-      "comment": "Widget configuration parameter label for a tracked person."
+      "comment": "Label for a tracked person in forms and widget configuration."
     },
     "Save": {
       "localizations": {
