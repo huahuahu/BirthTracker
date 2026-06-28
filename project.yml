@@ -16,6 +16,9 @@ configs:
 packages:
   BirthTrackerPackage:
     path: BirthTrackerPackage
+  SFSafeSymbols:
+    url: https://github.com/SFSafeSymbols/SFSafeSymbols.git
+    from: 7.0.0
 targets:
   BirthTracker:
     type: application
@@ -54,6 +57,8 @@ targets:
         product: Persistence
       - package: BirthTrackerPackage
         product: Localization
+      - package: SFSafeSymbols
+        product: SFSafeSymbols
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: $(WIDGET_BUNDLE_ID)
