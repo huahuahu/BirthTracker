@@ -1,11 +1,14 @@
 import DesignSystem
 import Localization
 import Models
+import OSLog
 import Persistence
 import SFSafeSymbols
 import SwiftData
 import SwiftUI
 import WidgetKit
+
+private let widgetSnapshotLogger = Logger(subsystem: "BirthTracker", category: "WidgetSnapshot")
 
 public struct PeopleTimelineView: View {
   @Environment(\.modelContext)
@@ -77,15 +80,28 @@ public struct PeopleTimelineView: View {
       .sheet(isPresented: $isAddingPerson) {
         PersonFormView(calendarKinds: BirthdayCalendarKind.selectionKinds(from: enabledCalendarKinds)) { person in
           modelContext.insert(person)
-          try? modelContext.save()
-          persistWidgetSnapshot(for: people + [person])
+          WidgetSnapshotSyncGate.runAfterSuccessfulSave(
+            save: {
+              try modelContext.save()
+            },
+            sync: {
+              persistWidgetSnapshots(for: people + [person])
+            })
         }
       }
       .onAppear {
-        persistWidgetSnapshot()
+        WidgetSnapshotSyncGate.runWhenNoPendingChanges(
+          hasPendingChanges: modelContext.hasChanges,
+          sync: {
+            persistWidgetSnapshots()
+          })
       }
       .onChange(of: people.map(\.id)) {
-        persistWidgetSnapshot()
+        WidgetSnapshotSyncGate.runWhenNoPendingChanges(
+          hasPendingChanges: modelContext.hasChanges,
+          sync: {
+            persistWidgetSnapshots()
+          })
       }
     }
   }
@@ -98,24 +114,27 @@ public struct PeopleTimelineView: View {
     for index in offsets {
       modelContext.delete(people[index])
     }
-    try? modelContext.save()
-    persistWidgetSnapshot(for: remainingPeople)
+    WidgetSnapshotSyncGate.runAfterSuccessfulSave(
+      save: {
+        try modelContext.save()
+      },
+      sync: {
+        persistWidgetSnapshots(for: remainingPeople)
+      })
   }
 
-  private func persistWidgetSnapshot(for people: [TrackedPerson]? = nil) {
-    let birthdays = (people ?? self.people)
-      .compactMap { $0.upcomingBirthday() }
-      .sorted { $0.date < $1.date }
-
-    let snapshot = WidgetSnapshot(birthdays: Array(birthdays.prefix(8)))
-    guard let url = AppGroup.snapshotURL else { return }
+  private func persistWidgetSnapshots(for people: [TrackedPerson]? = nil) {
+    let snapshots = WidgetSnapshotBuilder.makeSnapshots(from: people ?? self.people)
 
     do {
-      let data = try JSONEncoder.birthTracker.encode(snapshot)
-      try data.write(to: url, options: [.atomic])
+      try WidgetSnapshotStore.rebuild(with: snapshots)
       WidgetCenter.shared.reloadTimelines(ofKind: BirthTrackerWidgetKind.upcomingBirthdays)
     } catch {
-      assertionFailure("Unable to persist widget snapshot: \(error)")
+      if (error as? WidgetSnapshotStoreError) == .appGroupUnavailable {
+        widgetSnapshotLogger.error("Skipping widget snapshot persistence because App Group is unavailable.")
+      } else {
+        assertionFailure("Unable to persist widget snapshots: \(error)")
+      }
     }
   }
 }

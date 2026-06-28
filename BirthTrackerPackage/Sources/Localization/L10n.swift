@@ -88,10 +88,16 @@ public enum L10n {
   }
 
   public enum Widget {
+    public static let choosePerson = LocalizedStringResource("Choose Person", bundle: .atURL(Bundle.module.bundleURL))
+    public static let choosePersonDescription = LocalizedStringResource(
+      "Choose which person's birthday this widget shows.", bundle: .atURL(Bundle.module.bundleURL))
     public static let description = LocalizedStringResource(
       "See the next birthdays at a glance.", bundle: .atURL(Bundle.module.bundleURL))
     public static let noUpcomingBirthdays = LocalizedStringResource(
       "No upcoming birthdays", bundle: .atURL(Bundle.module.bundleURL))
+    public static let person = LocalizedStringResource("Person", bundle: .atURL(Bundle.module.bundleURL))
+    public static let selectedPersonUnavailable = LocalizedStringResource(
+      "Selected person is no longer available.", bundle: .atURL(Bundle.module.bundleURL))
     public static let title = LocalizedStringResource("Birthdays", bundle: .atURL(Bundle.module.bundleURL))
     public static let upcomingBirthdays = LocalizedStringResource(
       "Upcoming Birthdays", bundle: .atURL(Bundle.module.bundleURL))

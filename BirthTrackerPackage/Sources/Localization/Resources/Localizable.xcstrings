@@ -205,6 +205,40 @@
       },
       "comment": "Settings/form label for choosing which calendar system is used for a birthday."
     },
+    "Choose Person": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choose Person"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "选择联系人"
+          }
+        }
+      },
+      "comment": "Widget configuration title for selecting which person to show."
+    },
+    "Choose which person's birthday this widget shows.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choose which person's birthday this widget shows."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "选择这个小组件显示哪位联系人的生日。"
+          }
+        }
+      },
+      "comment": "Widget configuration description for selecting a person."
+    },
     "calendar.kind.buddhist": {
       "localizations": {
         "en": {
@@ -611,7 +645,7 @@
           }
         }
       },
-      "comment": "Section title in the add birthday form for person details such as name and notes."
+      "comment": "Label for a tracked person in forms and widget configuration."
     },
     "Save": {
       "localizations": {
@@ -697,6 +731,23 @@
         }
       },
       "comment": "Widget description shown in the widget gallery. Keep it short and benefit-oriented."
+    },
+    "Selected person is no longer available.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Selected person is no longer available."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "所选联系人已不在列表中。"
+          }
+        }
+      },
+      "comment": "Widget empty state shown when a configured person was deleted."
     },
     "Upcoming Birthdays": {
       "localizations": {
