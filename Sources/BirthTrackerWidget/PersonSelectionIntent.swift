@@ -2,7 +2,10 @@ import AppIntents
 import Foundation
 import Localization
 import Models
+import OSLog
 import Persistence
+
+let logger = Logger(subsystem: "birthTracc11", category: "widget")
 
 struct SelectPersonIntent: WidgetConfigurationIntent {
   static let title: LocalizedStringResource = "Choose Person"
@@ -44,17 +47,22 @@ struct WidgetPersonQuery: EntityQuery {
       uniqueKeysWithValues: snapshots.map { snapshot in
         (snapshot.personID, WidgetPersonEntity(snapshot: snapshot))
       })
-    return
+
+    let result =
       identifiers.map { identifier in
         entitiesByID[identifier]
           ?? WidgetPersonEntity(
             id: identifier,
             name: L10n.string(L10n.Widget.selectedPersonUnavailable))
       }
+    logger.info("entities for \(identifiers), result is \(result)")
+    return result
   }
 
   func suggestedEntities() async throws -> [WidgetPersonEntity] {
-    try WidgetSnapshotStore.fetchAll().map(WidgetPersonEntity.init(snapshot:))
+    let result = try WidgetSnapshotStore.fetchAll().map(WidgetPersonEntity.init(snapshot:))
+    logger.info("suggestedEntities \(result.map(\.id))")
+    return result
   }
 }
 

@@ -1,5 +1,6 @@
 import Localization
 import Models
+import OSLog
 import Persistence
 import SFSafeSymbols
 import SwiftUI
@@ -38,6 +39,7 @@ struct UpcomingBirthdaysProvider: AppIntentTimelineProvider {
 
   private func loadEntry(for selectedPersonID: UUID?) -> UpcomingBirthdaysEntry {
     do {
+      logger.info("load Entry for \(selectedPersonID?.uuidString ?? "nil")")
       if let selectedPersonID {
         guard let snapshot = try WidgetSnapshotStore.fetchPerson(id: selectedPersonID) else {
           return UpcomingBirthdaysEntry(date: .now, birthdays: [], selectedPersonUnavailable: true)
@@ -109,7 +111,7 @@ private struct UpcomingBirthdaysWidgetView: View {
   }
 }
 
-#Preview(as: .systemSmall) {
+#Preview("small", as: .systemSmall) {
   UpcomingBirthdaysWidget()
 } timeline: {
   UpcomingBirthdaysEntry(
@@ -119,3 +121,37 @@ private struct UpcomingBirthdaysWidgetView: View {
     ],
     selectedPersonUnavailable: false)
 }
+
+#Preview("medium", as: .systemMedium) {
+  UpcomingBirthdaysWidget()
+} timeline: {
+  UpcomingBirthdaysEntry(
+    date: .now,
+    birthdays: [
+      UpcomingBirthday(id: UUID(), personName: "Taylor", date: .now, age: 30, calendarKind: .gregorian)
+    ],
+    selectedPersonUnavailable: false)
+}
+//
+// #Preview(as: .systemLarge) {
+//  UpcomingBirthdaysWidget()
+// } timeline: {
+//  UpcomingBirthdaysEntry(
+//    date: .now,
+//    birthdays: [
+//      UpcomingBirthday(id: UUID(), personName: "Taylor", date: .now, age: 30, calendarKind: .gregorian)
+//    ],
+//    selectedPersonUnavailable: false)
+// }
+//
+//
+// #Preview(as: .systemExtraLarge) {
+//  UpcomingBirthdaysWidget()
+// } timeline: {
+//  UpcomingBirthdaysEntry(
+//    date: .now,
+//    birthdays: [
+//      UpcomingBirthday(id: UUID(), personName: "Taylor", date: .now, age: 30, calendarKind: .gregorian)
+//    ],
+//    selectedPersonUnavailable: false)
+// }

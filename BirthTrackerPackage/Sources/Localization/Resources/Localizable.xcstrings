@@ -1,890 +1,895 @@
 {
-  "sourceLanguage": "en",
-  "strings": {
-    "Add a person to start the timeline.": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Add a person to start the timeline."
+  "sourceLanguage" : "en",
+  "strings" : {
+    "Add a person to start the timeline." : {
+      "comment" : "Empty-state description shown on the main timeline when no people have been added yet.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add a person to start the timeline."
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "添加一个联系人以开始生日时间线。"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "添加一个联系人以开始生日时间线。"
           }
         }
-      },
-      "comment": "Empty-state description shown on the main timeline when no people have been added yet."
+      }
     },
-    "Add Birthday": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Add Birthday"
+    "Add Birthday" : {
+      "comment" : "Navigation title for the form used to create a new birthday/person entry.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add Birthday"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "添加生日"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "添加生日"
           }
         }
-      },
-      "comment": "Navigation title for the form used to create a new birthday/person entry."
+      }
     },
-    "Add Person": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Add Person"
+    "Add Person" : {
+      "comment" : "Toolbar button title on the main birthdays timeline. Opens the add birthday/person form.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add Person"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "添加联系人"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "添加联系人"
           }
         }
-      },
-      "comment": "Toolbar button title on the main birthdays timeline. Opens the add birthday/person form."
+      }
     },
-    "Appearance": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Appearance"
+    "Appearance" : {
+      "comment" : "Settings section title for app appearance options.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Appearance"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "外观"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "外观"
           }
         }
-      },
-      "comment": "Settings section title for app appearance options."
+      }
     },
-    "appearance.mode.dark": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Dark"
+    "appearance.mode.dark" : {
+      "comment" : "Appearance mode option: force the app to use dark mode.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dark"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "深色"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "深色"
           }
         }
-      },
-      "comment": "Appearance mode option: force the app to use dark mode."
+      }
     },
-    "appearance.mode.light": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Light"
+    "appearance.mode.light" : {
+      "comment" : "Appearance mode option: force the app to use light mode.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Light"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "浅色"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "浅色"
           }
         }
-      },
-      "comment": "Appearance mode option: force the app to use light mode."
+      }
     },
-    "appearance.mode.system": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Follow System"
+    "appearance.mode.system" : {
+      "comment" : "Appearance mode option: follow the device system appearance setting.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Follow System"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "跟随系统"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "跟随系统"
           }
         }
-      },
-      "comment": "Appearance mode option: follow the device system appearance setting."
+      }
     },
-    "Birth date": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Birth date"
+    "Birth date" : {
+      "comment" : "Label for the date picker in the add birthday form. Refers to the person’s date of birth.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Birth date"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "出生日期"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "出生日期"
           }
         }
-      },
-      "comment": "Label for the date picker in the add birthday form. Refers to the person’s date of birth."
+      }
     },
-    "Birthday": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Birthday"
+    "Birthday" : {
+      "comment" : "Section title in the add form for birthday date and calendar fields. Singular noun.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Birthday"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "生日"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "生日"
           }
         }
-      },
-      "comment": "Section title in the add form for birthday date and calendar fields. Singular noun."
+      }
     },
-    "birthday.age.accessibility.format": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Turns %lld"
+    "birthday.age.accessibility.format" : {
+      "comment" : "VoiceOver label for the age number shown in a birthday row. Contains one integer placeholder for the age the person will turn, e.g. “Turns 30”. Preserve the numeric placeholder.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Turns %lld"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "即将 %lld 岁"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "即将 %lld 岁"
           }
         }
-      },
-      "comment": "VoiceOver label for the age number shown in a birthday row. Contains one integer placeholder for the age the person will turn, e.g. “Turns 30”. Preserve the numeric placeholder."
+      }
     },
-    "Birthdays": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Birthdays"
+    "Birthdays" : {
+      "comment" : "Main app title and widget header. Plural noun referring to tracked birthdays.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Birthdays"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "生日"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "生日"
           }
         }
-      },
-      "comment": "Main app title and widget header. Plural noun referring to tracked birthdays."
+      }
     },
-    "Calendar": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Calendar"
+    "Calendar" : {
+      "comment" : "Settings/form label for choosing which calendar system is used for a birthday.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Calendar"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "日历"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "日历"
           }
         }
-      },
-      "comment": "Settings/form label for choosing which calendar system is used for a birthday."
+      }
     },
-    "Choose Person": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Choose Person"
+    "calendar.kind.buddhist" : {
+      "comment" : "Calendar system option: Buddhist calendar.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Buddhist"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "选择联系人"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "佛历"
           }
         }
-      },
-      "comment": "Widget configuration title for selecting which person to show."
+      }
     },
-    "Choose which person's birthday this widget shows.": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Choose which person's birthday this widget shows."
+    "calendar.kind.chinese" : {
+      "comment" : "Calendar system option: Chinese calendar.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chinese"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "选择这个小组件显示哪位联系人的生日。"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "农历"
           }
         }
-      },
-      "comment": "Widget configuration description for selecting a person."
+      }
     },
-    "calendar.kind.buddhist": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Buddhist"
+    "calendar.kind.gregorian" : {
+      "comment" : "Calendar system option: Gregorian calendar.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gregorian"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "佛历"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "公历"
           }
         }
-      },
-      "comment": "Calendar system option: Buddhist calendar."
+      }
     },
-    "calendar.kind.chinese": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Chinese"
+    "calendar.kind.hebrew" : {
+      "comment" : "Calendar system option: Hebrew calendar.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hebrew"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "农历"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "希伯来历"
           }
         }
-      },
-      "comment": "Calendar system option: Chinese calendar."
+      }
     },
-    "calendar.kind.gregorian": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Gregorian"
+    "calendar.kind.islamic" : {
+      "comment" : "Calendar system option: Islamic Umm al-Qura calendar. Short label is preferred for compact picker rows.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Islamic"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "公历"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "伊斯兰历"
           }
         }
-      },
-      "comment": "Calendar system option: Gregorian calendar."
+      }
     },
-    "calendar.kind.hebrew": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Hebrew"
+    "Cancel" : {
+      "comment" : "Common action button that dismisses the current sheet without saving.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancel"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "希伯来历"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "取消"
           }
         }
-      },
-      "comment": "Calendar system option: Hebrew calendar."
+      }
     },
-    "calendar.kind.islamic": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Islamic"
+    "Choose Person" : {
+      "comment" : "Widget configuration title for selecting which person to show.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose Person"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "伊斯兰历"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "选择联系人"
           }
         }
-      },
-      "comment": "Calendar system option: Islamic Umm al-Qura calendar. Short label is preferred for compact picker rows."
+      }
     },
-    "Cancel": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Cancel"
+    "Choose which person's birthday this widget shows." : {
+      "comment" : "Widget configuration description for selecting a person.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose which person's birthday this widget shows."
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "取消"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "选择这个小组件显示哪位联系人的生日。"
           }
         }
-      },
-      "comment": "Common action button that dismisses the current sheet without saving."
+      }
     },
-    "Database": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Database"
+    "Creating Test Data…" : {
+      "comment" : "HUD/overlay title displayed while generating sample test data.",
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Creating test data…"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "数据库"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "正在创建测试数据…"
           }
         }
-      },
-      "comment": "Debug settings picker label for choosing the storage backend."
+      }
     },
-    "Debug": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Debug"
+    "Creation failed: %@" : {
+      "comment" : "Alert message format shown when generating sample test data fails. %@ is a user-readable reason.",
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Creation failed: %@"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "调试"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "创建失败：%@"
           }
         }
-      },
-      "comment": "Settings section title shown only in debug builds for developer/test options."
+      }
     },
-    "debug.storage.cloud": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "iCloud"
+    "Database" : {
+      "comment" : "Debug settings picker label for choosing the storage backend.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Database"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "iCloud"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "数据库"
           }
         }
-      },
-      "comment": "Debug storage option: use CloudKit/iCloud-backed persistent storage."
+      }
     },
-    "debug.storage.local": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Local"
+    "Debug" : {
+      "comment" : "Settings section title shown only in debug builds for developer/test options.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Debug"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "本地"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "调试"
           }
         }
-      },
-      "comment": "Debug storage option: use local on-device persistent storage without iCloud sync."
+      }
     },
-    "debug.storage.memory": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Memory"
+    "debug.storage.cloud" : {
+      "comment" : "Debug storage option: use CloudKit/iCloud-backed persistent storage.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iCloud"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "内存"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iCloud"
           }
         }
-      },
-      "comment": "Debug storage option: use in-memory storage that is reset when the app restarts."
+      }
     },
-    "Generate Test Data": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Generate Test Data"
+    "debug.storage.local" : {
+      "comment" : "Debug storage option: use local on-device persistent storage without iCloud sync.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Local"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "生成测试数据"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "本地"
           }
         }
-      },
-      "comment": "Debug-only button that inserts sample birthday records into local storage."
+      }
     },
-    "Creating Test Data…": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Creating test data…"
+    "debug.storage.memory" : {
+      "comment" : "Debug storage option: use in-memory storage that is reset when the app restarts.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Memory"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "正在创建测试数据…"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "内存"
           }
         }
-      },
-      "comment": "HUD/overlay title displayed while generating sample test data."
+      }
     },
-    "Test Data Created": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Test Data Created"
+    "Generate Test Data" : {
+      "comment" : "Debug-only button that inserts sample birthday records into local storage.",
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Generate Test Data"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Test Data 创建完成"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "生成测试数据"
           }
         }
-      },
-      "comment": "Success message shown after generating sample test data."
+      }
     },
-    "Test Data Creation Failed": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Test Data Creation Failed"
+    "Mode" : {
+      "comment" : "Settings picker label for appearance mode: follow system, light, or dark.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mode"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "创建失败"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "模式"
           }
         }
-      },
-      "comment": "Alert title shown when generating sample test data fails."
+      }
     },
-    "Creation failed: %@": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Creation failed: %@"
+    "Name" : {
+      "comment" : "Text field label for the person’s name in the add birthday form.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Name"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "创建失败：%@"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "姓名"
           }
         }
-      },
-      "comment": "Alert message format shown when generating sample test data fails. %@ is a user-readable reason."
+      }
     },
-    "Reset Test Data": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Reset Test Data"
+    "No Birthdays" : {
+      "comment" : "Empty-state title on the main timeline when no birthdays are being tracked.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No Birthdays"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "重置测试数据"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "暂无生日"
           }
         }
-      },
-      "comment": "Debug-only button that deletes existing birthday records and inserts sample test data."
+      }
     },
-    "Resetting Test Data…": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Resetting test data…"
+    "No upcoming birthdays" : {
+      "comment" : "Widget empty-state text when there are no upcoming birthday entries to show.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No upcoming birthdays"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "正在重置测试数据…"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "暂无即将到来的生日"
           }
         }
-      },
-      "comment": "HUD/overlay title displayed while resetting sample test data."
+      }
     },
-    "Restart Required": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Restart Required"
+    "Notes" : {
+      "comment" : "Optional notes text field label in the add birthday form.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Notes"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "需要重启"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "备注"
           }
         }
-      },
-      "comment": "Alert title shown after changing the debug storage location."
+      }
     },
-    "Storage location updated. Restart the app to use it.": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Storage location updated. Restart the app to use it."
+    "OK" : {
+      "comment" : "Generic confirmation button title used in alerts.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OK"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "存储位置已更新，重启 App 后生效。"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "好的"
           }
         }
-      },
-      "comment": "Alert message shown after changing debug storage; the new model container is created on the next launch."
+      }
     },
-    "Test Data Reset": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Test Data Reset"
+    "People" : {
+      "comment" : "Section title on the main timeline listing all tracked people.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "People"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "测试数据已重置"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "联系人"
           }
         }
-      },
-      "comment": "Success message shown after resetting sample test data."
+      }
     },
-    "Test Data Reset Failed": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Test Data Reset Failed"
+    "Person" : {
+      "comment" : "Label for a tracked person in forms and widget configuration.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Person"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "重置失败"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "联系人"
           }
         }
-      },
-      "comment": "Alert title shown when resetting sample test data fails."
+      }
     },
-    "Reset failed: %@": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Reset failed: %@"
+    "Reset failed: %@" : {
+      "comment" : "Alert message format shown when resetting sample test data fails. %@ is a user-readable reason.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reset failed: %@"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "重置失败：%@"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "重置失败：%@"
           }
         }
-      },
-      "comment": "Alert message format shown when resetting sample test data fails. %@ is a user-readable reason."
+      }
     },
-    "Retry": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Retry"
+    "Reset Test Data" : {
+      "comment" : "Debug-only button that deletes existing birthday records and inserts sample test data.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reset Test Data"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "重试"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "重置测试数据"
           }
         }
-      },
-      "comment": "Button title for retrying an operation after a failure."
+      }
     },
-    "OK": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "OK"
+    "Resetting Test Data…" : {
+      "comment" : "HUD/overlay title displayed while resetting sample test data.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Resetting test data…"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "好的"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "正在重置测试数据…"
           }
         }
-      },
-      "comment": "Generic confirmation button title used in alerts."
+      }
     },
-    "Mode": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mode"
+    "Restart Required" : {
+      "comment" : "Alert title shown after changing the debug storage location.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restart Required"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "模式"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "需要重启"
           }
         }
-      },
-      "comment": "Settings picker label for appearance mode: follow system, light, or dark."
+      }
     },
-    "Name": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Name"
+    "Retry" : {
+      "comment" : "Button title for retrying an operation after a failure.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Retry"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "姓名"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "重试"
           }
         }
-      },
-      "comment": "Text field label for the person’s name in the add birthday form."
+      }
     },
-    "No Birthdays": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "No Birthdays"
+    "Save" : {
+      "comment" : "Common confirmation action button that saves the current form.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "暂无生日"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "保存"
           }
         }
-      },
-      "comment": "Empty-state title on the main timeline when no birthdays are being tracked."
+      }
     },
-    "Notes": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Notes"
+    "See the next birthdays at a glance." : {
+      "comment" : "Widget description shown in the widget gallery. Keep it short and benefit-oriented.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "See the next birthdays at a glance."
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "备注"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "一眼查看接下来的生日。"
           }
         }
-      },
-      "comment": "Optional notes text field label in the add birthday form."
+      }
     },
-    "People": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "People"
+    "Selected person is no longer available." : {
+      "comment" : "Widget empty state shown when a configured person was deleted.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Selected person is no longer available."
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "联系人"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "所选联系人已不在列表中。"
           }
         }
-      },
-      "comment": "Section title on the main timeline listing all tracked people."
+      }
     },
-    "Person": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Person"
+    "Settings" : {
+      "comment" : "Navigation title and button label for the settings screen.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Settings"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "联系人"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "设置"
           }
         }
-      },
-      "comment": "Label for a tracked person in forms and widget configuration."
+      }
     },
-    "Save": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Save"
+    "Storage location updated. Restart the app to use it." : {
+      "comment" : "Alert message shown after changing debug storage; the new model container is created on the next launch.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Storage location updated. Restart the app to use it."
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "保存"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "存储位置已更新，重启 App 后生效。"
           }
         }
-      },
-      "comment": "Common confirmation action button that saves the current form."
+      }
     },
-    "Settings": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Settings"
+    "Test Data Created" : {
+      "comment" : "Success message shown after generating sample test data.",
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Test Data Created"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "设置"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Test Data 创建完成"
           }
         }
-      },
-      "comment": "Navigation title and button label for the settings screen."
+      }
     },
-    "Upcoming": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Upcoming"
+    "Test Data Creation Failed" : {
+      "comment" : "Alert title shown when generating sample test data fails.",
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Test Data Creation Failed"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "即将到来"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "创建失败"
           }
         }
-      },
-      "comment": "Section title on the main timeline for upcoming birthday occurrences."
+      }
     },
-    "No upcoming birthdays": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "No upcoming birthdays"
+    "Test Data Reset" : {
+      "comment" : "Success message shown after resetting sample test data.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Test Data Reset"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "暂无即将到来的生日"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "测试数据已重置"
           }
         }
-      },
-      "comment": "Widget empty-state text when there are no upcoming birthday entries to show."
+      }
     },
-    "See the next birthdays at a glance.": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "See the next birthdays at a glance."
+    "Test Data Reset Failed" : {
+      "comment" : "Alert title shown when resetting sample test data fails.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Test Data Reset Failed"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "一眼查看接下来的生日。"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "重置失败"
           }
         }
-      },
-      "comment": "Widget description shown in the widget gallery. Keep it short and benefit-oriented."
+      }
     },
-    "Selected person is no longer available.": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Selected person is no longer available."
+    "Upcoming" : {
+      "comment" : "Section title on the main timeline for upcoming birthday occurrences.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Upcoming"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "所选联系人已不在列表中。"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "即将到来"
           }
         }
-      },
-      "comment": "Widget empty state shown when a configured person was deleted."
+      }
     },
-    "Upcoming Birthdays": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Upcoming Birthdays"
+    "Upcoming Birthdays" : {
+      "comment" : "Widget display name shown in the widget gallery.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Upcoming Birthdays"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "即将到来的生日"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "即将到来的生日"
           }
         }
-      },
-      "comment": "Widget display name shown in the widget gallery."
+      }
     }
   },
-  "version": "1.0"
+  "version" : "1.0"
 }
