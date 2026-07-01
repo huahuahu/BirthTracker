@@ -59,7 +59,7 @@ medium 小组件使用同一套暖色背景和圆角卡片语言：
 3. `UpcomingBirthdaysWidgetView` 根据 `entry.birthdays` 和 `entry.selectedPersonUnavailable` 渲染不同状态。
 4. UI 层根据 `entry.date` 与 `UpcomingBirthday.date` 计算展示用倒计时文案。
 
-倒计时只用于展示，不写回 store，也不改变 timeline 刷新策略。`entry.date` 代表快照生成时间或当前 fallback 时间，能让 preview 和 timeline 输出保持确定性。
+倒计时只用于展示，不写回 store，也不改变 timeline 刷新策略。`entry.date` 代表 Widget 当前刷新/展示时间；快照的 `generatedAt` 只描述缓存生成时间，不参与倒计时计算。
 
 ## 错误处理
 
