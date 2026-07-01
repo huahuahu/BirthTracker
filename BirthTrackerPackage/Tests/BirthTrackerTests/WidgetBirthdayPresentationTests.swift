@@ -65,6 +65,32 @@ struct WidgetBirthdayPresentationTests {
     #expect(presentation.daysUntil == 0)
   }
 
+  @Test("Widget display uses current refresh date instead of stale snapshot generation date")
+  func widgetDisplayUsesCurrentRefreshDateForCountdown() throws {
+    let snapshotGeneratedAt = try #require(calendar.date(from: DateComponents(year: 2026, month: 7, day: 1)))
+    let displayDate = try #require(calendar.date(from: DateComponents(year: 2026, month: 7, day: 10, hour: 9)))
+    let personID = UUID()
+    let snapshot = WidgetPersonSnapshot(
+      personID: personID,
+      displayName: "Taylor",
+      nextBirthdayDate: displayDate,
+      age: 30,
+      calendarKind: .gregorian,
+      generatedAt: snapshotGeneratedAt,
+      sortIndex: 0)
+
+    let display = WidgetUpcomingBirthdaysDisplay.make(
+      from: [snapshot],
+      displayDate: displayDate)
+    let presentation = WidgetBirthdayPresentation.make(
+      for: try #require(display.birthdays.first),
+      referenceDate: display.referenceDate,
+      calendar: calendar)
+
+    #expect(display.referenceDate == displayDate)
+    #expect(presentation.daysUntil == 0)
+  }
+
   private func makeBirthday(
     dayOffset: Int,
     age: Int?,

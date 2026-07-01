@@ -38,26 +38,33 @@ struct UpcomingBirthdaysProvider: AppIntentTimelineProvider {
   }
 
   private func loadEntry(for selectedPersonID: UUID?) -> UpcomingBirthdaysEntry {
+    let displayDate = Date.now
     do {
       logger.info("load Entry for \(selectedPersonID?.uuidString ?? "nil")")
       if let selectedPersonID {
         guard let snapshot = try WidgetSnapshotStore.fetchPerson(id: selectedPersonID) else {
-          return UpcomingBirthdaysEntry(date: .now, birthdays: [], selectedPersonUnavailable: true)
+          return UpcomingBirthdaysEntry(date: displayDate, birthdays: [], selectedPersonUnavailable: true)
         }
 
+        let display = WidgetUpcomingBirthdaysDisplay.make(
+          from: [snapshot],
+          displayDate: displayDate)
         return UpcomingBirthdaysEntry(
-          date: snapshot.generatedAt,
-          birthdays: [snapshot.upcomingBirthday],
+          date: display.referenceDate,
+          birthdays: display.birthdays,
           selectedPersonUnavailable: false)
       }
 
       let snapshots = try WidgetSnapshotStore.fetchAll()
+      let display = WidgetUpcomingBirthdaysDisplay.make(
+        from: Array(snapshots.prefix(8)),
+        displayDate: displayDate)
       return UpcomingBirthdaysEntry(
-        date: snapshots.first?.generatedAt ?? .now,
-        birthdays: snapshots.prefix(8).map(\.upcomingBirthday),
+        date: display.referenceDate,
+        birthdays: display.birthdays,
         selectedPersonUnavailable: false)
     } catch {
-      return UpcomingBirthdaysEntry(date: .now, birthdays: [], selectedPersonUnavailable: false)
+      return UpcomingBirthdaysEntry(date: displayDate, birthdays: [], selectedPersonUnavailable: false)
     }
   }
 }
@@ -313,6 +320,7 @@ private struct BirthdayWidgetStatusView: View {
       Image(systemSymbol: .sparkles)
         .font(.title.weight(.bold))
         .foregroundStyle(.white.opacity(0.9))
+        .accessibilityHidden(true)
 
       Text(title)
         .font(.headline.weight(.bold))
