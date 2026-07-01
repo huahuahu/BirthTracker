@@ -889,6 +889,142 @@
           }
         }
       }
+    },
+    "widget.countdown.days.format" : {
+      "comment" : "Widget countdown label for birthdays more than one day away. Contains one integer placeholder, e.g. “In 8 days”.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In %lld days"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld 天后"
+          }
+        }
+      }
+    },
+    "widget.countdown.today" : {
+      "comment" : "Widget countdown label for a birthday happening today.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Today"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "今天"
+          }
+        }
+      }
+    },
+    "widget.countdown.tomorrow" : {
+      "comment" : "Widget countdown label for a birthday happening tomorrow.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tomorrow"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "明天"
+          }
+        }
+      }
+    },
+    "widget.empty.description" : {
+      "comment" : "Widget empty-state description shown when there are no birthday entries.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add birthdays in the app to fill this widget."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "在 App 中添加生日后，小组件会显示在这里。"
+          }
+        }
+      }
+    },
+    "widget.moreBirthdays.placeholder" : {
+      "comment" : "Medium widget placeholder shown when only one birthday is available.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "More birthdays will appear here."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "更多生日会显示在这里。"
+          }
+        }
+      }
+    },
+    "widget.nextBirthday" : {
+      "comment" : "Small label above the primary birthday in the widget.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Next birthday"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "下一个生日"
+          }
+        }
+      }
+    },
+    "widget.selectedPersonUnavailable.description" : {
+      "comment" : "Widget empty-state description shown when the configured person was deleted.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose another person in widget settings."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "请在小组件设置中选择另一位联系人。"
+          }
+        }
+      }
+    },
+    "widget.turningAge.format" : {
+      "comment" : "Widget age label. Contains one integer placeholder for the age the person will turn, e.g. “Turns 30”.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Turns %lld"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "即将 %lld 岁"
+          }
+        }
+      }
     }
   },
   "version" : "1.0"

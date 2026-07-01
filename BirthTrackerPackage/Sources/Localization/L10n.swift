@@ -95,15 +95,39 @@ public enum L10n {
     public static let choosePerson = LocalizedStringResource("Choose Person", bundle: .atURL(Bundle.module.bundleURL))
     public static let choosePersonDescription = LocalizedStringResource(
       "Choose which person's birthday this widget shows.", bundle: .atURL(Bundle.module.bundleURL))
+    public static let countdownToday = LocalizedStringResource(
+      "widget.countdown.today", bundle: .atURL(Bundle.module.bundleURL))
+    public static let countdownTomorrow = LocalizedStringResource(
+      "widget.countdown.tomorrow", bundle: .atURL(Bundle.module.bundleURL))
     public static let description = LocalizedStringResource(
       "See the next birthdays at a glance.", bundle: .atURL(Bundle.module.bundleURL))
+    public static let emptyDescription = LocalizedStringResource(
+      "widget.empty.description", bundle: .atURL(Bundle.module.bundleURL))
+    public static let moreBirthdaysPlaceholder = LocalizedStringResource(
+      "widget.moreBirthdays.placeholder", bundle: .atURL(Bundle.module.bundleURL))
+    public static let nextBirthday = LocalizedStringResource(
+      "widget.nextBirthday", bundle: .atURL(Bundle.module.bundleURL))
     public static let noUpcomingBirthdays = LocalizedStringResource(
       "No upcoming birthdays", bundle: .atURL(Bundle.module.bundleURL))
     public static let person = LocalizedStringResource("Person", bundle: .atURL(Bundle.module.bundleURL))
     public static let selectedPersonUnavailable = LocalizedStringResource(
       "Selected person is no longer available.", bundle: .atURL(Bundle.module.bundleURL))
+    public static let selectedPersonUnavailableDescription = LocalizedStringResource(
+      "widget.selectedPersonUnavailable.description", bundle: .atURL(Bundle.module.bundleURL))
     public static let title = LocalizedStringResource("Birthdays", bundle: .atURL(Bundle.module.bundleURL))
     public static let upcomingBirthdays = LocalizedStringResource(
       "Upcoming Birthdays", bundle: .atURL(Bundle.module.bundleURL))
+
+    public static func countdownDays(_ days: Int) -> String {
+      let format = L10n.string(
+        LocalizedStringResource("widget.countdown.days.format", bundle: .atURL(Bundle.module.bundleURL)))
+      return String.localizedStringWithFormat(format, days)
+    }
+
+    public static func turningAge(_ age: Int) -> String {
+      let format = L10n.string(
+        LocalizedStringResource("widget.turningAge.format", bundle: .atURL(Bundle.module.bundleURL)))
+      return String.localizedStringWithFormat(format, age)
+    }
   }
 }
