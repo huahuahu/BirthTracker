@@ -44,6 +44,8 @@ cp Config/Project.xcconfig.example Config/Project.xcconfig
 
 Replace the placeholder bundle identifiers, CloudKit container, App Group, and team id in `Config/Project.xcconfig`. This file is ignored by git so local signing and app identifiers are not committed.
 
+For Copilot worktree sessions, add `./scripts/copilot-session-create.sh` as a `session.create` lifecycle script. It copies the ignored local `Config/Project.xcconfig` from the main checkout into new worktrees when missing, falls back to `Config/Project.xcconfig.example`, and then runs `xcodegen generate` in the worktree.
+
 Debug builds default to local SwiftData storage so unsigned simulator tests run reliably. Set `BIRTHTRACKER_STORAGE_MODE=memory`, `local`, or `cloud` to exercise the alternate storage modes.
 
 Release builds use the private CloudKit database configured by `CLOUDKIT_CONTAINER_ID`.
