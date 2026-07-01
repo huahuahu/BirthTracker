@@ -11,7 +11,6 @@
 
 - Do not commit `Config/Project.xcconfig`; it contains local signing and app identifiers.
 - Commit `Config/Project.xcconfig.example` as the template.
-- In worktree sessions, copy `Config/Project.xcconfig` from the main checkout into the current worktree if it is missing before running `xcodegen generate` or Xcode. Do not print its contents or commit it. If the main checkout file is also missing, copy `Config/Project.xcconfig.example` as a placeholder and tell the user to update local signing values.
 - Keep committed plist and entitlement files using placeholders like `$(APP_GROUP_ID)` and `$(CLOUDKIT_CONTAINER_ID)`.
 - Keep AI-generated local output under `AIOutput/`; it is ignored and may contain logs, goals, images, and similar artifacts.
 

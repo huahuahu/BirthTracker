@@ -23,6 +23,10 @@ if ! WORKSPACE_PATH="$(cd "$COPILOT_WORKSPACE_PATH" 2>/dev/null && pwd -P)"; the
   exit 2
 fi
 
+mkdir -p "$WORKSPACE_PATH/AIOutput"
+exec >> "$WORKSPACE_PATH/AIOutput/copilot-session-create.log" 2>&1
+date
+
 if ! ROOT_PATH="$(cd "$COPILOT_ROOT_PATH" 2>/dev/null && pwd -P)"; then
   echo "error: COPILOT_ROOT_PATH does not exist: $COPILOT_ROOT_PATH" >&2
   exit 2
