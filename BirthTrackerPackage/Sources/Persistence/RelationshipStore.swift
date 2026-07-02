@@ -189,18 +189,21 @@ public struct RelationshipStore {
         fact.personAID == personID || fact.personBID == personID
       }
     )
-    let preferencesDescriptor = FetchDescriptor<RelationshipDisplayPreference>(
-      predicate: #Predicate<RelationshipDisplayPreference> { preference in
-        preference.perspectivePersonID == personID || preference.targetPersonID == personID
-      }
-    )
-
-    for fact in try context.fetch(factsDescriptor) {
-      context.delete(fact)
-    }
+    let deletedFacts = try context.fetch(factsDescriptor)
+    let deletedFactIDs = Set(deletedFacts.map(\.id))
+    let preferencesDescriptor = FetchDescriptor<RelationshipDisplayPreference>()
 
     for preference in try context.fetch(preferencesDescriptor) {
-      context.delete(preference)
+      let referencesDeletedPerson = preference.perspectivePersonID == personID || preference.targetPersonID == personID
+      let referencesDeletedFact = preference.primaryFactID.map(deletedFactIDs.contains) == true
+
+      if referencesDeletedPerson || referencesDeletedFact {
+        context.delete(preference)
+      }
+    }
+
+    for fact in deletedFacts {
+      context.delete(fact)
     }
 
     if save {
