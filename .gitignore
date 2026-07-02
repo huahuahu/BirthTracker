@@ -44,6 +44,7 @@ Carthage/Build/
 # Remove this ignore rule if the project intentionally commits the generated project.
 *.xcodeproj/
 *.xcworkspace/
+buildServer.json
 
 # Dependency managers and Ruby tooling
 vendor/bundle/
