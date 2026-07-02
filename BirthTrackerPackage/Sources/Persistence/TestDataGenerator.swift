@@ -22,7 +22,7 @@ public enum TestDataGenerator {
 
     do {
       try Task.checkCancellation()
-      try operationContext.delete(model: TrackedPerson.self)
+      try TrackedPersonStore(context: operationContext).stageDeleteAllTrackedPeople()
       try await insertSamplePeople(into: operationContext)
       try Task.checkCancellation()
       try operationContext.save()

@@ -107,16 +107,14 @@ public struct PeopleTimelineView: View {
   }
 
   private func deletePeople(at offsets: IndexSet) {
+    let peopleToDelete = offsets.map { people[$0] }
     let remainingPeople = people.enumerated()
       .filter { !offsets.contains($0.offset) }
       .map(\.element)
 
-    for index in offsets {
-      modelContext.delete(people[index])
-    }
     WidgetSnapshotSyncGate.runAfterSuccessfulSave(
       save: {
-        try modelContext.save()
+        try TrackedPersonStore(context: modelContext).delete(peopleToDelete)
       },
       sync: {
         persistWidgetSnapshots(for: remainingPeople)

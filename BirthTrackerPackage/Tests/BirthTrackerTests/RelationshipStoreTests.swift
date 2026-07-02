@@ -140,35 +140,158 @@ struct RelationshipStoreTests {
     let firstTimestamp = Date(timeIntervalSince1970: 1_800_000_000)
     let secondTimestamp = Date(timeIntervalSince1970: 1_800_000_500)
     let thirdTimestamp = Date(timeIntervalSince1970: 1_800_001_000)
-    var timestamps = [firstTimestamp, secondTimestamp, thirdTimestamp]
+    let fourthTimestamp = Date(timeIntervalSince1970: 1_800_001_500)
+    let fifthTimestamp = Date(timeIntervalSince1970: 1_800_002_000)
+    var timestamps = [firstTimestamp, secondTimestamp, thirdTimestamp, fourthTimestamp, fifthTimestamp]
     let store = RelationshipStore(context: context, now: { timestamps.removeFirst() })
     let personAID = UUID()
     let personBID = UUID()
-    let firstFactID = UUID()
-    let secondFactID = UUID()
+    let firstFact = try store.createFact(
+      personAID: personAID,
+      personBID: personBID,
+      kind: .spouse,
+      personARole: .spouse,
+      personBRole: .spouse)
+    let secondFact = try store.createFact(
+      personAID: personAID,
+      personBID: personBID,
+      kind: .friend,
+      personARole: .friend,
+      personBRole: .friend)
 
     let firstPreference = try store.setDisplayPreference(
       perspectivePersonID: personAID,
       targetPersonID: personBID,
-      primaryFactID: firstFactID)
+      primaryFactID: firstFact.id)
     let reversePreference = try store.setDisplayPreference(
       perspectivePersonID: personBID,
       targetPersonID: personAID,
-      primaryFactID: secondFactID)
+      primaryFactID: secondFact.id)
     let updatedPreference = try store.setDisplayPreference(
       perspectivePersonID: personAID,
       targetPersonID: personBID,
-      primaryFactID: secondFactID)
+      primaryFactID: secondFact.id)
 
     #expect(firstPreference.id == updatedPreference.id)
-    #expect(updatedPreference.primaryFactID == secondFactID)
-    #expect(updatedPreference.createdAt == firstTimestamp)
-    #expect(updatedPreference.updatedAt == thirdTimestamp)
+    #expect(updatedPreference.primaryFactID == secondFact.id)
+    #expect(updatedPreference.createdAt == thirdTimestamp)
+    #expect(updatedPreference.updatedAt == fifthTimestamp)
     #expect(reversePreference.perspectivePersonID == personBID)
     #expect(reversePreference.targetPersonID == personAID)
-    #expect(reversePreference.primaryFactID == secondFactID)
-    #expect(reversePreference.createdAt == secondTimestamp)
-    #expect(reversePreference.updatedAt == secondTimestamp)
+    #expect(reversePreference.primaryFactID == secondFact.id)
+    #expect(reversePreference.createdAt == fourthTimestamp)
+    #expect(reversePreference.updatedAt == fourthTimestamp)
+  }
+
+  @Test("Store rejects role combinations that do not match relationship kind")
+  @MainActor
+  func storeRejectsInvalidRoleCombinations() throws {
+    let container = try PersistenceFixtures.makeInMemoryContainer()
+    let context = ModelContext(container)
+    let store = RelationshipStore(context: context, now: { Date(timeIntervalSince1970: 1_800_000_000) })
+    let personAID = try #require(UUID(uuidString: "00000000-0000-0000-0000-000000000001"))
+    let personBID = try #require(UUID(uuidString: "FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF"))
+
+    #expect(
+      throws: RelationshipStoreError.invalidRoleCombination(
+        kind: .parentChild,
+        personARole: .parent,
+        personBRole: .sibling)
+    ) {
+      _ = try store.createFact(
+        personAID: personAID,
+        personBID: personBID,
+        kind: .parentChild,
+        personARole: .parent,
+        personBRole: .sibling)
+    }
+
+    #expect(
+      throws: RelationshipStoreError.invalidRoleCombination(
+        kind: .friend,
+        personARole: .friend,
+        personBRole: .coworker)
+    ) {
+      _ = try store.createFact(
+        personAID: personAID,
+        personBID: personBID,
+        kind: .friend,
+        personARole: .friend,
+        personBRole: .coworker)
+    }
+  }
+
+  @Test("Updating a fact rejects invalid role combinations without mutating the stored fact")
+  @MainActor
+  func updatingFactRejectsInvalidRoleCombinationWithoutMutation() throws {
+    let container = try PersistenceFixtures.makeInMemoryContainer()
+    let context = ModelContext(container)
+    let store = RelationshipStore(context: context, now: { Date(timeIntervalSince1970: 1_800_000_000) })
+    let fact = try store.createFact(
+      personAID: UUID(),
+      personBID: UUID(),
+      kind: .sibling,
+      personARole: .sibling,
+      personBRole: .sibling,
+      notes: "Original")
+
+    #expect(
+      throws: RelationshipStoreError.invalidRoleCombination(
+        kind: .sibling,
+        personARole: .sibling,
+        personBRole: .friend)
+    ) {
+      _ = try store.updateFact(
+        id: fact.id,
+        kind: .sibling,
+        personARole: .sibling,
+        personBRole: .friend,
+        notes: "Invalid")
+    }
+
+    let facts = try context.fetch(FetchDescriptor<RelationshipFact>())
+    let storedFact = try #require(facts.first)
+    #expect(storedFact.kind == .sibling)
+    #expect(storedFact.personARole == .sibling)
+    #expect(storedFact.personBRole == .sibling)
+    #expect(storedFact.notes == "Original")
+  }
+
+  @Test("Display preference rejects missing and unrelated primary facts")
+  @MainActor
+  func displayPreferenceRejectsMissingAndUnrelatedPrimaryFacts() throws {
+    let container = try PersistenceFixtures.makeInMemoryContainer()
+    let context = ModelContext(container)
+    let store = RelationshipStore(context: context, now: { Date(timeIntervalSince1970: 1_800_000_000) })
+    let personAID = UUID()
+    let personBID = UUID()
+    let unrelatedPersonID = UUID()
+    let missingFactID = UUID()
+    let fact = try store.createFact(
+      personAID: personAID,
+      personBID: personBID,
+      kind: .friend,
+      personARole: .friend,
+      personBRole: .friend)
+
+    #expect(throws: RelationshipStoreError.factNotFound(missingFactID)) {
+      _ = try store.setDisplayPreference(
+        perspectivePersonID: personAID,
+        targetPersonID: personBID,
+        primaryFactID: missingFactID)
+    }
+
+    #expect(
+      throws: RelationshipStoreError.unrelatedPrimaryFact(
+        primaryFactID: fact.id,
+        perspectivePersonID: personAID,
+        targetPersonID: unrelatedPersonID)
+    ) {
+      _ = try store.setDisplayPreference(
+        perspectivePersonID: personAID,
+        targetPersonID: unrelatedPersonID,
+        primaryFactID: fact.id)
+    }
   }
 
   @Test("Deleting person references removes facts and preferences")
@@ -180,7 +303,7 @@ struct RelationshipStoreTests {
     let removedPersonID = UUID()
     let keptPersonID = UUID()
     let unrelatedPersonID = UUID()
-    _ = try store.createFact(
+    let removedFact = try store.createFact(
       personAID: removedPersonID,
       personBID: keptPersonID,
       kind: .friend,
@@ -195,7 +318,7 @@ struct RelationshipStoreTests {
     _ = try store.setDisplayPreference(
       perspectivePersonID: removedPersonID,
       targetPersonID: keptPersonID,
-      primaryFactID: keptFact.id)
+      primaryFactID: removedFact.id)
     _ = try store.setDisplayPreference(
       perspectivePersonID: keptPersonID,
       targetPersonID: unrelatedPersonID,

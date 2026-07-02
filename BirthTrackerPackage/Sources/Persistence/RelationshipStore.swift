@@ -6,6 +6,14 @@ public enum RelationshipStoreError: Error, Equatable {
   case duplicateFact
   case factNotFound(UUID)
   case invalidSelfRelationship(UUID)
+  case invalidRoleCombination(
+    kind: RelationshipKind,
+    personARole: RelationshipRole,
+    personBRole: RelationshipRole)
+  case unrelatedPrimaryFact(
+    primaryFactID: UUID,
+    perspectivePersonID: UUID,
+    targetPersonID: UUID)
 }
 
 @MainActor
@@ -40,6 +48,10 @@ public struct RelationshipStore {
       personARole: personARole,
       personBRole: personBRole
     )
+    try validateRoleCombination(
+      kind: kind,
+      personARole: normalized.personARole,
+      personBRole: normalized.personBRole)
 
     if try fetchMatchingFact(
       personAID: normalized.personAID,
@@ -82,6 +94,10 @@ public struct RelationshipStore {
       personARole: personARole,
       personBRole: personBRole
     )
+    try validateRoleCombination(
+      kind: kind,
+      personARole: normalized.personARole,
+      personBRole: normalized.personBRole)
 
     let duplicate = try fetchMatchingFact(
       personAID: normalized.personAID,
@@ -120,6 +136,11 @@ public struct RelationshipStore {
     targetPersonID: UUID,
     primaryFactID: UUID
   ) throws -> RelationshipDisplayPreference {
+    try validatePrimaryFact(
+      primaryFactID,
+      connects: perspectivePersonID,
+      and: targetPersonID)
+
     let timestamp = now()
 
     if let existingPreference = try fetchDisplayPreference(
@@ -159,6 +180,10 @@ public struct RelationshipStore {
   }
 
   public func deleteReferences(toPersonID personID: UUID) throws {
+    try deleteReferences(toPersonID: personID, save: true)
+  }
+
+  func deleteReferences(toPersonID personID: UUID, save: Bool) throws {
     let factsDescriptor = FetchDescriptor<RelationshipFact>(
       predicate: #Predicate<RelationshipFact> { fact in
         fact.personAID == personID || fact.personBID == personID
@@ -178,7 +203,9 @@ public struct RelationshipStore {
       context.delete(preference)
     }
 
-    try context.save()
+    if save {
+      try context.save()
+    }
   }
 
   private func fetchFact(id: UUID) throws -> RelationshipFact {
@@ -233,6 +260,54 @@ public struct RelationshipStore {
     descriptor.fetchLimit = 1
 
     return try context.fetch(descriptor).first
+  }
+
+  private func validateRoleCombination(
+    kind: RelationshipKind,
+    personARole: RelationshipRole,
+    personBRole: RelationshipRole
+  ) throws {
+    let isValid =
+      switch kind {
+      case .parentChild:
+        (personARole == .parent && personBRole == .child)
+          || (personARole == .child && personBRole == .parent)
+      case .sibling:
+        personARole == .sibling && personBRole == .sibling
+      case .spouse:
+        personARole == .spouse && personBRole == .spouse
+      case .friend:
+        personARole == .friend && personBRole == .friend
+      case .classmate:
+        personARole == .classmate && personBRole == .classmate
+      case .coworker:
+        personARole == .coworker && personBRole == .coworker
+      }
+
+    guard isValid else {
+      throw RelationshipStoreError.invalidRoleCombination(
+        kind: kind,
+        personARole: personARole,
+        personBRole: personBRole)
+    }
+  }
+
+  private func validatePrimaryFact(
+    _ primaryFactID: UUID,
+    connects perspectivePersonID: UUID,
+    and targetPersonID: UUID
+  ) throws {
+    let primaryFact = try fetchFact(id: primaryFactID)
+    let connectsRequestedPair =
+      (primaryFact.personAID == perspectivePersonID && primaryFact.personBID == targetPersonID)
+      || (primaryFact.personAID == targetPersonID && primaryFact.personBID == perspectivePersonID)
+
+    guard connectsRequestedPair else {
+      throw RelationshipStoreError.unrelatedPrimaryFact(
+        primaryFactID: primaryFactID,
+        perspectivePersonID: perspectivePersonID,
+        targetPersonID: targetPersonID)
+    }
   }
 
   private func normalizedEndpointPair(
