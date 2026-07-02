@@ -58,6 +58,8 @@ BirthTracker 的核心目标仍然很简单：记录生日、查看生日、提�
 - `createdAt`
 - `updatedAt`
 
+`createdAt` 在创建 fact 时写入一次。`updatedAt` 不依赖 SwiftData 自动维护；所有新增、修改关系类型、调整两端 role、编辑 notes 的操作都必须通过关系写入服务完成，由服务在保存前显式设置为当前时间。
+
 关系类型分为两组：
 
 | 类型 | 参与亲属推断 | 说明 |
@@ -85,6 +87,8 @@ BirthTracker 的核心目标仍然很简单：记录生日、查看生日、提�
 - `primaryFactID`
 - `createdAt`
 - `updatedAt`
+
+`createdAt` 在创建 preference 时写入一次。`updatedAt` 不依赖 SwiftData 自动维护；所有修改主关系、切换 `primaryFactID` 或清除主关系偏好的操作都必须通过关系写入服务完成，由服务在保存前显式设置为当前时间。
 
 `perspectivePersonID -> targetPersonID` 是有方向的。A 看 B 可以选择 sibling 作为主关系，B 看 A 可以选择 classmate 作为主关系。`primaryFactID` 指向某条显式 `RelationshipFact` 的 UUID；如果该 fact 因同步延迟或删除而不存在，系统回退到自动选择的主关系。
 
@@ -179,6 +183,7 @@ BirthTracker 的核心目标仍然很简单：记录生日、查看生日、提�
 ## 数据一致性与错误处理
 
 - 新增关系事实前，服务层按规范化 person pair、kind 和 roles 做应用层去重。
+- `RelationshipFact` 和 `RelationshipDisplayPreference` 只能通过关系写入服务创建或修改；该服务负责统一设置 `createdAt` 和 `updatedAt`，避免各个 UI 调用点漏更新。
 - 删除 Person 时，服务层先删除引用该 person UUID 的 `RelationshipFact` 和 `RelationshipDisplayPreference`，再删除 Person。
 - SwiftData 保存失败必须提示用户，不做静默成功。
 - CloudKit 同步延迟导致 fact 只同步到一端 Person 时，resolver 暂时忽略该 fact，并在详情或 debug 信息中标记缺失端点。
