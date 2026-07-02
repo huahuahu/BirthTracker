@@ -49,14 +49,16 @@ BirthTracker 的核心目标仍然很简单：记录生日、查看生日、提�
 字段：
 
 - `id`
-- `firstPersonID`
-- `secondPersonID`
+- `personAID`
+- `personBID`
 - `kindRawValue`
-- `firstRoleRawValue`
-- `secondRoleRawValue`
+- `personARoleRawValue`
+- `personBRoleRawValue`
 - `notes`
 - `createdAt`
 - `updatedAt`
+
+`personA` 和 `personB` 只是这条关系事实的两个端点槽位，不表示方向、主从、年龄或视角。关系语义由 `kindRawValue` 和两端 role 决定：例如 parent-child fact 中，`personA` 可以是 parent、`personB` 可以是 child；也可以反过来，只要对应 role 写清楚即可。方向性的“从 A 看 B 主显示什么关系”不放在这里，而是放在 `RelationshipDisplayPreference`。
 
 `createdAt` 在创建 fact 时写入一次。`updatedAt` 不依赖 SwiftData 自动维护；所有新增、修改关系类型、调整两端 role、编辑 notes 的操作都必须通过关系写入服务完成，由服务在保存前显式设置为当前时间。
 
