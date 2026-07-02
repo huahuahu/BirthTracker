@@ -47,6 +47,23 @@ run_xcodegen() {
   (cd "$WORKSPACE_PATH" && xcodegen generate)
 }
 
+run_xcode_build_server() {
+  if ! command -v xcode-build-server >/dev/null 2>&1; then
+    echo "error: xcode-build-server is required to generate buildServer.json for VS Code." >&2
+    exit 127
+  fi
+
+  echo "copilot-session-create: generating xcode-build-server config."
+  (cd "$WORKSPACE_PATH" && xcode-build-server config -project BirthTracker.xcodeproj -scheme BirthTracker)
+
+  if [ ! -f "$WORKSPACE_PATH/buildServer.json" ]; then
+    echo "error: xcode-build-server did not generate buildServer.json." >&2
+    exit 1
+  fi
+
+  echo "copilot-session-create: generated buildServer.json."
+}
+
 TARGET_DIR="$WORKSPACE_PATH/Config"
 TARGET_CONFIG="$TARGET_DIR/Project.xcconfig"
 MAIN_CONFIG="$ROOT_PATH/Config/Project.xcconfig"
@@ -68,3 +85,4 @@ else
 fi
 
 run_xcodegen
+run_xcode_build_server

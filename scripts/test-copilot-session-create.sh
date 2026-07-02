@@ -67,7 +67,7 @@ STUB
 
   run_and_capture env \
     PATH="$bin:$PATH" \
-    COPILOT_TEST_EXPECTED_WORKSPACE="$workspace" \
+    COPILOT_TEST_EXPECTED_WORKSPACE="$(cd "$workspace" && pwd -P)" \
     COPILOT_SCRIPT_TRIGGER=session.create \
     COPILOT_WORKSPACE_PATH="$workspace" \
     COPILOT_ROOT_PATH="$main" \
