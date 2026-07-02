@@ -1,7 +1,7 @@
 #!/bin/sh
 set -eu
 
-TRIGGER="${COPILOT_SCRIPT_TRIGGER:-session.create}"
+TRIGGER="${COPILOT_SCRIPT_TRIGGER:-}"
 
 if [ "$TRIGGER" != "session.create" ]; then
   echo "copilot-session-create: skipping trigger '$TRIGGER'."

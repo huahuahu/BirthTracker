@@ -91,6 +91,48 @@ STUB
     || fail "session create log should include buildServer.json completion output"
 }
 
+test_skips_when_trigger_is_unset() {
+  local tmp main workspace bin log
+  tmp="$(mktemp -d)"
+  trap 'rm -rf "$tmp"' RETURN
+
+  main="$tmp/main"
+  workspace="$tmp/workspace"
+  bin="$tmp/bin"
+  log="$workspace/AIOutput/copilot-session-create.log"
+
+  mkdir -p "$main/Config" "$workspace" "$bin"
+  printf '%s\n' 'APP_BUNDLE_ID = example.local' > "$main/Config/Project.xcconfig.example"
+  cat > "$bin/xcodegen" <<'STUB'
+#!/usr/bin/env bash
+set -euo pipefail
+echo "xcodegen should not run when COPILOT_SCRIPT_TRIGGER is unset" >&2
+exit 42
+STUB
+  chmod +x "$bin/xcodegen"
+
+  cat > "$bin/xcode-build-server" <<'STUB'
+#!/usr/bin/env bash
+set -euo pipefail
+echo "xcode-build-server should not run when COPILOT_SCRIPT_TRIGGER is unset" >&2
+exit 43
+STUB
+  chmod +x "$bin/xcode-build-server"
+
+  run_and_capture env -u COPILOT_SCRIPT_TRIGGER \
+    PATH="$bin:$PATH" \
+    COPILOT_WORKSPACE_PATH="$workspace" \
+    COPILOT_ROOT_PATH="$main" \
+    bash "$SCRIPT"
+
+  [[ "$STATUS" -eq 0 ]] || fail "unset trigger should exit 0: $OUTPUT"
+  [[ "$OUTPUT" == "copilot-session-create: skipping trigger ''." ]] \
+    || fail "unset trigger should print skip output, got: $OUTPUT"
+  [[ ! -f "$log" ]] || fail "unset trigger should not create a session create log"
+  [[ ! -f "$workspace/buildServer.json" ]] || fail "unset trigger should not generate buildServer.json"
+}
+
+test_skips_when_trigger_is_unset
 test_logs_session_create_output_to_aioutput
 
 echo "copilot-session-create tests passed"
