@@ -44,7 +44,7 @@ cp Config/Project.xcconfig.example Config/Project.xcconfig
 
 Replace the placeholder bundle identifiers, CloudKit container, App Group, and team id in `Config/Project.xcconfig`. This file is ignored by git so local signing and app identifiers are not committed.
 
-For Copilot worktree sessions, add `./scripts/copilot-session-create.sh` as a `session.create` lifecycle script. It copies the ignored local `Config/Project.xcconfig` from the main checkout into new worktrees when missing, falls back to `Config/Project.xcconfig.example`, and then runs `xcodegen generate` in the worktree.
+For Copilot worktree sessions, add `./scripts/copilot-session-create.sh` as a `session.create` lifecycle script. It copies the ignored local `Config/Project.xcconfig` from the main checkout into new worktrees when missing, falls back to `Config/Project.xcconfig.example`, runs `xcodegen generate`, and then runs `xcode-build-server config -project BirthTracker.xcodeproj -scheme BirthTracker` in the worktree. The generated `buildServer.json` lets VS Code SourceKit-LSP resolve Swift build settings so clicking symbols, properties, and types can jump to their definitions.
 
 Debug builds default to local SwiftData storage so unsigned simulator tests run reliably. Set `BIRTHTRACKER_STORAGE_MODE=memory`, `local`, or `cloud` to exercise the alternate storage modes.
 
