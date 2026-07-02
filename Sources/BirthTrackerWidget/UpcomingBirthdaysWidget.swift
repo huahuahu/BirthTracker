@@ -84,6 +84,7 @@ struct UpcomingBirthdaysWidget: Widget {
     .configurationDisplayName(L10n.Widget.upcomingBirthdays)
     .description(L10n.Widget.description)
     .supportedFamilies([.systemSmall, .systemMedium])
+    .contentMarginsDisabled()
   }
 }
 
@@ -155,12 +156,15 @@ private struct SmallBirthdayWidgetView: View {
   let primary: WidgetBirthdayPresentation
 
   var body: some View {
-    VStack(alignment: .leading, spacing: 10) {
+    VStack(alignment: .leading, spacing: 8) {
       WidgetHeader()
-      Spacer(minLength: 6)
-      BirthdayHeroView(presentation: primary, nameFont: .title2.weight(.bold))
+      BirthdayHeroView(
+        presentation: primary,
+        nameFont: .title3.weight(.bold),
+        showsLabel: false)
+      Spacer(minLength: 0)
     }
-    .padding(16)
+    .padding(12)
     .accessibilityElement(children: .combine)
   }
 }
@@ -170,11 +174,14 @@ private struct MediumBirthdayWidgetView: View {
   let secondary: [WidgetBirthdayPresentation]
 
   var body: some View {
-    HStack(alignment: .top, spacing: 14) {
-      VStack(alignment: .leading, spacing: 10) {
+    HStack(alignment: .top, spacing: 12) {
+      VStack(alignment: .leading, spacing: 8) {
         WidgetHeader()
-        Spacer(minLength: 4)
-        BirthdayHeroView(presentation: primary, nameFont: .title.weight(.bold))
+        BirthdayHeroView(
+          presentation: primary,
+          nameFont: .title3.weight(.bold),
+          showsLabel: false)
+        Spacer(minLength: 0)
       }
       .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
 
@@ -182,10 +189,11 @@ private struct MediumBirthdayWidgetView: View {
         .fill(.white.opacity(0.18))
         .frame(width: 1)
 
-      VStack(alignment: .leading, spacing: 10) {
-        Text(L10n.Widget.upcomingBirthdays)
+      VStack(alignment: .leading, spacing: 8) {
+        Text(L10n.Widget.title)
           .font(.caption.weight(.bold))
           .foregroundStyle(.white.opacity(0.8))
+          .lineLimit(1)
           .textCase(.uppercase)
 
         if secondary.isEmpty {
@@ -195,14 +203,14 @@ private struct MediumBirthdayWidgetView: View {
             .lineLimit(3)
             .frame(maxHeight: .infinity, alignment: .center)
         } else {
-          ForEach(secondary) { presentation in
+          ForEach(secondary.prefix(2)) { presentation in
             UpcomingBirthdayRow(presentation: presentation)
           }
         }
       }
       .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
     }
-    .padding(16)
+    .padding(12)
   }
 }
 
@@ -213,7 +221,7 @@ private struct WidgetHeader: View {
     } icon: {
       Image(systemSymbol: .gift)
     }
-    .font(.caption.weight(.bold))
+    .font(.caption2.weight(.bold))
     .foregroundStyle(.white.opacity(0.84))
     .labelStyle(.titleAndIcon)
   }
@@ -222,13 +230,16 @@ private struct WidgetHeader: View {
 private struct BirthdayHeroView: View {
   let presentation: WidgetBirthdayPresentation
   let nameFont: Font
+  let showsLabel: Bool
 
   var body: some View {
-    VStack(alignment: .leading, spacing: 8) {
-      Text(L10n.Widget.nextBirthday)
-        .font(.caption2.weight(.bold))
-        .foregroundStyle(.white.opacity(0.76))
-        .textCase(.uppercase)
+    VStack(alignment: .leading, spacing: 6) {
+      if showsLabel {
+        Text(L10n.Widget.nextBirthday)
+          .font(.caption2.weight(.bold))
+          .foregroundStyle(.white.opacity(0.76))
+          .textCase(.uppercase)
+      }
 
       CountdownBadge(text: presentation.countdownText)
 
@@ -248,10 +259,10 @@ private struct CountdownBadge: View {
 
   var body: some View {
     Text(verbatim: text)
-      .font(.headline.weight(.heavy))
+      .font(.subheadline.weight(.heavy))
       .foregroundStyle(.white)
-      .padding(.horizontal, 12)
-      .padding(.vertical, 7)
+      .padding(.horizontal, 10)
+      .padding(.vertical, 5)
       .background(.white.opacity(0.2), in: Capsule())
       .overlay {
         Capsule()
@@ -290,8 +301,8 @@ private struct UpcomingBirthdayRow: View {
           .font(.caption.weight(.heavy))
       }
       .foregroundStyle(.white)
-      .frame(width: 42, height: 42)
-      .background(.white.opacity(0.18), in: RoundedRectangle(cornerRadius: 15, style: .continuous))
+      .frame(width: 38, height: 38)
+      .background(.white.opacity(0.18), in: RoundedRectangle(cornerRadius: 13, style: .continuous))
 
       VStack(alignment: .leading, spacing: 2) {
         Text(verbatim: presentation.birthday.personName)
@@ -316,22 +327,21 @@ private struct BirthdayWidgetStatusView: View {
   var body: some View {
     VStack(alignment: .leading, spacing: 10) {
       WidgetHeader()
-      Spacer(minLength: 4)
       Image(systemSymbol: .sparkles)
-        .font(.title.weight(.bold))
+        .font(.title2.weight(.bold))
         .foregroundStyle(.white.opacity(0.9))
         .accessibilityHidden(true)
 
       Text(title)
-        .font(.headline.weight(.bold))
+        .font(.subheadline.weight(.bold))
         .lineLimit(2)
 
       Text(message)
-        .font(.caption)
+        .font(.caption2)
         .foregroundStyle(.white.opacity(0.74))
-        .lineLimit(3)
+        .lineLimit(2)
     }
-    .padding(16)
+    .padding(12)
     .accessibilityElement(children: .combine)
   }
 }
