@@ -21,7 +21,11 @@ public enum DebugStorageMode: String, CaseIterable, Identifiable, Sendable {
 }
 
 public enum BirthTrackerModelContainer {
-  public static let schema = Schema([TrackedPerson.self])
+  public static let schema = Schema([
+    TrackedPerson.self,
+    RelationshipFact.self,
+    RelationshipDisplayPreference.self,
+  ])
 
   public static func make() throws -> ModelContainer {
     try make(storageMode: DebugStorageMode.current)
