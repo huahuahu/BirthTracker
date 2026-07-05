@@ -188,6 +188,23 @@
         }
       }
     },
+    "Born for" : {
+      "comment" : "Metric label on a person detail page showing how long the person has been born.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Born for"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已经出生"
+          }
+        }
+      }
+    },
     "Calendar" : {
       "comment" : "Settings/form label for choosing which calendar system is used for a birthday.",
       "localizations" : {
@@ -341,6 +358,23 @@
         }
       }
     },
+    "Contact Details" : {
+      "comment" : "Navigation title for a single tracked person's detail page.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Contact Details"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "联系人详情"
+          }
+        }
+      }
+    },
     "Creating Test Data…" : {
       "comment" : "HUD/overlay title displayed while generating sample test data.",
       "extractionState" : "stale",
@@ -390,6 +424,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "数据库"
+          }
+        }
+      }
+    },
+    "Days until birthday" : {
+      "comment" : "Metric label for the number of days until the next birthday.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Days until birthday"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "距离生日"
           }
         }
       }
@@ -462,6 +513,40 @@
         }
       }
     },
+    "Edit" : {
+      "comment" : "Toolbar button for editing a person detail page.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Edit"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "编辑"
+          }
+        }
+      }
+    },
+    "Edit Person" : {
+      "comment" : "Navigation title for the form used to edit an existing person.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Edit Person"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "编辑联系人"
+          }
+        }
+      }
+    },
     "Generate Test Data" : {
       "comment" : "Debug-only button that inserts sample birthday records into local storage.",
       "extractionState" : "stale",
@@ -476,6 +561,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "生成测试数据"
+          }
+        }
+      }
+    },
+    "Known birth year" : {
+      "comment" : "Toggle label in the person form. When off, only month and day are treated as known.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Known birth year"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "知道出生年份"
           }
         }
       }
@@ -514,6 +616,57 @@
         }
       }
     },
+    "Name is required." : {
+      "comment" : "Validation error shown when saving a person without a name.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Name is required."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "姓名不能为空。"
+          }
+        }
+      }
+    },
+    "Next age" : {
+      "comment" : "Metric label for the age a person will turn on their next birthday.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Next age"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "下次年龄"
+          }
+        }
+      }
+    },
+    "No birthday recorded" : {
+      "comment" : "Empty state on a person detail page when no birthday exists.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No birthday recorded"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "未记录生日"
+          }
+        }
+      }
+    },
     "No Birthdays" : {
       "comment" : "Empty-state title on the main timeline when no birthdays are being tracked.",
       "localizations" : {
@@ -527,6 +680,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "暂无生日"
+          }
+        }
+      }
+    },
+    "No notes" : {
+      "comment" : "Placeholder on a person detail page when notes are empty.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No notes"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "暂无备注"
           }
         }
       }
@@ -612,6 +782,125 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "联系人"
+          }
+        }
+      }
+    },
+    "person.detail.birth.duration.format" : {
+      "comment" : "Person detail birth duration format. Arguments are years, months, days.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lldy %lldm %lldd"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld 年 %lld 月 %lld 天"
+          }
+        }
+      }
+    },
+    "person.detail.days.until.birthday.format" : {
+      "comment" : "Person detail days-until-birthday format. Argument is day count.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld days"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld 天"
+          }
+        }
+      }
+    },
+    "person.detail.next.age.format" : {
+      "comment" : "Person detail next-age format. Argument is age.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld years old"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld 岁"
+          }
+        }
+      }
+    },
+    "Relationship gender" : {
+      "comment" : "Picker label for selecting the gender used by relationship title inference.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Relationship gender"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "称谓性别"
+          }
+        }
+      }
+    },
+    "relationship.gender.female" : {
+      "comment" : "Relationship inference gender option.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Female"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "女性"
+          }
+        }
+      }
+    },
+    "relationship.gender.male" : {
+      "comment" : "Relationship inference gender option.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Male"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "男性"
+          }
+        }
+      }
+    },
+    "relationship.gender.unknown" : {
+      "comment" : "Relationship inference gender option.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Not specified"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "未指定"
           }
         }
       }
@@ -856,6 +1145,23 @@
         }
       }
     },
+    "Unable to Save" : {
+      "comment" : "Alert title shown when saving a person form fails.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unable to Save"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "无法保存"
+          }
+        }
+      }
+    },
     "Upcoming" : {
       "comment" : "Section title on the main timeline for upcoming birthday occurrences.",
       "localizations" : {
@@ -886,6 +1192,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "即将到来的生日"
+          }
+        }
+      }
+    },
+    "Widget preview" : {
+      "comment" : "Label above a small preview card on the person detail page.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Widget preview"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Widget 预览"
+          }
+        }
+      }
+    },
+    "widget.birth.duration.format" : {
+      "comment" : "Compact Widget birth duration format. Arguments are years, months, days.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Born %lldy %lldm %lldd"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "出生 %lld 年 %lld 月 %lld 天"
           }
         }
       }
