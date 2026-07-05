@@ -68,4 +68,45 @@ struct TrackedPersonModelTests {
     #expect(fetchedPerson.birthday == nil)
     #expect(try verificationContext.fetch(FetchDescriptor<Birthday>()).isEmpty)
   }
+
+  @Test("Relationship gender defaults to unknown and round trips")
+  @MainActor
+  func relationshipGenderDefaultsToUnknownAndRoundTrips() throws {
+    let container = try PersistenceFixtures.makeInMemoryContainer()
+    let context = ModelContext(container)
+    let defaultPerson = TrackedPerson(name: "Unknown Gender")
+    let femalePerson = TrackedPerson(name: "Female Gender", relationshipGender: .female)
+
+    context.insert(defaultPerson)
+    context.insert(femalePerson)
+    try context.save()
+
+    let verificationContext = ModelContext(container)
+    let people = try verificationContext.fetch(FetchDescriptor<TrackedPerson>())
+    let fetchedDefault = try #require(people.first { $0.id == defaultPerson.id })
+    let fetchedFemale = try #require(people.first { $0.id == femalePerson.id })
+    #expect(fetchedDefault.relationshipGender == .unknown)
+    #expect(fetchedFemale.relationshipGender == .female)
+  }
+
+  @Test("Tracked person maps to relationship resolver input")
+  func trackedPersonMapsToRelationshipResolverInput() throws {
+    let personID = try #require(UUID(uuidString: "00000000-0000-0000-0000-000000000101"))
+    let person = TrackedPerson(
+      id: personID,
+      name: "Mapped Person",
+      birthday: Birthday(calendarKind: .gregorian, era: 1, year: 1990, month: 6, day: 10),
+      notes: "Fixture",
+      relationshipGender: .male)
+
+    let input = RelationshipPersonInput(trackedPerson: person)
+
+    #expect(input.id == personID)
+    #expect(input.relationshipGender == .male)
+    #expect(input.birthday?.calendarKind == .gregorian)
+    #expect(input.birthday?.era == 1)
+    #expect(input.birthday?.year == 1990)
+    #expect(input.birthday?.month == 6)
+    #expect(input.birthday?.day == 10)
+  }
 }
