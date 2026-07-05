@@ -103,6 +103,12 @@ private struct UpcomingBirthdaysWidgetView: View {
             Text(birthday.date, format: .dateTime.month(.abbreviated).day())
               .font(.caption)
               .foregroundStyle(.secondary)
+            if let duration = birthday.birthDuration {
+              Text(L10n.Widget.birthDuration(duration.years, duration.months, duration.days))
+                .font(.caption2)
+                .foregroundStyle(.secondary)
+                .lineLimit(1)
+            }
           }
         }
       }
@@ -117,7 +123,14 @@ private struct UpcomingBirthdaysWidgetView: View {
   UpcomingBirthdaysEntry(
     date: .now,
     birthdays: [
-      UpcomingBirthday(id: UUID(), personName: "Taylor", date: .now, age: 30, calendarKind: .gregorian)
+      UpcomingBirthday(
+        id: UUID(),
+        personName: "Taylor",
+        date: .now,
+        age: 30,
+        calendarKind: .gregorian,
+        birthDuration: PersonBirthdaySummary.BirthDuration(years: 2, months: 0, days: 0),
+        daysUntilNextBirthday: 30)
     ],
     selectedPersonUnavailable: false)
 }
@@ -128,7 +141,14 @@ private struct UpcomingBirthdaysWidgetView: View {
   UpcomingBirthdaysEntry(
     date: .now,
     birthdays: [
-      UpcomingBirthday(id: UUID(), personName: "Taylor", date: .now, age: 30, calendarKind: .gregorian)
+      UpcomingBirthday(
+        id: UUID(),
+        personName: "Taylor",
+        date: .now,
+        age: 30,
+        calendarKind: .gregorian,
+        birthDuration: PersonBirthdaySummary.BirthDuration(years: 2, months: 0, days: 0),
+        daysUntilNextBirthday: 30)
     ],
     selectedPersonUnavailable: false)
 }
@@ -139,7 +159,14 @@ private struct UpcomingBirthdaysWidgetView: View {
 //  UpcomingBirthdaysEntry(
 //    date: .now,
 //    birthdays: [
-//      UpcomingBirthday(id: UUID(), personName: "Taylor", date: .now, age: 30, calendarKind: .gregorian)
+//      UpcomingBirthday(
+//        id: UUID(),
+//        personName: "Taylor",
+//        date: .now,
+//        age: 30,
+//        calendarKind: .gregorian,
+//        birthDuration: PersonBirthdaySummary.BirthDuration(years: 2, months: 0, days: 0),
+//        daysUntilNextBirthday: 30)
 //    ],
 //    selectedPersonUnavailable: false)
 // }
@@ -151,7 +178,14 @@ private struct UpcomingBirthdaysWidgetView: View {
 //  UpcomingBirthdaysEntry(
 //    date: .now,
 //    birthdays: [
-//      UpcomingBirthday(id: UUID(), personName: "Taylor", date: .now, age: 30, calendarKind: .gregorian)
+//      UpcomingBirthday(
+//        id: UUID(),
+//        personName: "Taylor",
+//        date: .now,
+//        age: 30,
+//        calendarKind: .gregorian,
+//        birthDuration: PersonBirthdaySummary.BirthDuration(years: 2, months: 0, days: 0),
+//        daysUntilNextBirthday: 30)
 //    ],
 //    selectedPersonUnavailable: false)
 // }
