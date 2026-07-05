@@ -1,3 +1,4 @@
+import Foundation
 import Models
 import Persistence
 import SwiftData
@@ -24,23 +25,43 @@ struct TestDataGeneratorTests {
   func resetDeletesExistingPeopleBeforeInsertingSamples() async throws {
     let container = try PersistenceFixtures.makeInMemoryContainer()
     let context = ModelContext(container)
-    context.insert(
-      TrackedPerson(
-        name: "Existing Person",
-        birthday: Birthday(calendarKind: .gregorian, year: 2001, month: 2, day: 3),
-        notes: "Should be removed by reset"
-      ))
+    let existingPerson = TrackedPerson(
+      name: "Existing Person",
+      birthday: Birthday(calendarKind: .gregorian, year: 2001, month: 2, day: 3),
+      notes: "Should be removed by reset"
+    )
+    let relatedPerson = TrackedPerson(
+      name: "Related Person",
+      birthday: Birthday(calendarKind: .gregorian, year: 2002, month: 3, day: 4),
+      notes: "Should also be removed by reset"
+    )
+    context.insert(existingPerson)
+    context.insert(relatedPerson)
     try context.save()
+    let relationshipStore = RelationshipStore(context: context, now: { Date(timeIntervalSince1970: 1_800_000_000) })
+    let fact = try relationshipStore.createFact(
+      personAID: existingPerson.id,
+      personBID: relatedPerson.id,
+      kind: .friend,
+      personARole: .friend,
+      personBRole: .friend)
+    _ = try relationshipStore.setPrimaryDisplayFact(
+      perspectivePersonID: existingPerson.id,
+      targetPersonID: relatedPerson.id,
+      primaryFactID: fact.id)
 
     try await TestDataGenerator.resetSamplePeople(into: context)
 
     let verificationContext = ModelContext(container)
     let people = try verificationContext.fetch(FetchDescriptor<TrackedPerson>())
+    let facts = try verificationContext.fetch(FetchDescriptor<RelationshipFact>())
     #expect(people.count == 3)
-    #expect(!people.contains { $0.name == "Existing Person" })
+    #expect(people.contains { $0.name == "Existing Person" } == false)
+    #expect(people.contains { $0.name == "Related Person" } == false)
     #expect(people.contains { $0.name == "Alex Chen" })
     #expect(people.contains { $0.name == "Jamie Lin" })
     #expect(people.contains { $0.name == "Morgan Lee" })
+    #expect(facts.isEmpty)
   }
 
   @Test("Reset does not save unrelated pending inserts in the caller context")

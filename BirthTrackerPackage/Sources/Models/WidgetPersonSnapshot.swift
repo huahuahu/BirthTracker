@@ -8,13 +8,21 @@ public enum WidgetSnapshotSchema {
 public struct WidgetPersonSnapshot: Equatable, Identifiable, Sendable {
   public var id: UUID { personID }
 
+  /// 对应主数据库人物的业务 ID。
   public var personID: UUID
+  /// Widget 中展示的人物名称。
   public var displayName: String
+  /// 下一次生日日期。
   public var nextBirthdayDate: Date
+  /// 下一次生日时的年龄；未知出生年份时为空。
   public var age: Int?
+  /// 该生日使用的日历系统。
   public var calendarKind: BirthdayCalendarKind
+  /// 快照数据结构版本，用于后续兼容升级。
   public var schemaVersion: Int
+  /// 快照生成时间。
   public var generatedAt: Date
+  /// Widget 展示排序序号。
   public var sortIndex: Int
 
   public init(
@@ -61,13 +69,21 @@ public struct WidgetPersonSnapshot: Equatable, Identifiable, Sendable {
 
 @Model
 public final class WidgetPersonSnapshotRecord {
+  /// 对应主数据库人物的业务 ID。
   public var personID: UUID = UUID()
+  /// Widget 中展示的人物名称。
   public var displayName: String = ""
+  /// 下一次生日日期。
   public var nextBirthdayDate: Date = Date()
+  /// 下一次生日时的年龄；未知出生年份时为空。
   public var age: Int?
+  /// 生日日历类型原始值，持久化时保存 enum rawValue。
   public var calendarKindRawValue: String = BirthdayCalendarKind.gregorian.rawValue
+  /// 快照数据结构版本，用于后续兼容升级。
   public var schemaVersion: Int = WidgetSnapshotSchema.currentVersion
+  /// 快照生成时间。
   public var generatedAt: Date = Date()
+  /// Widget 展示排序序号。
   public var sortIndex: Int = 0
 
   public init(snapshot: WidgetPersonSnapshot) {

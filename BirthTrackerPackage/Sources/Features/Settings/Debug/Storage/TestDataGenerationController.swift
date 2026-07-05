@@ -1,6 +1,6 @@
 import Localization
+import Models
 import Observation
-import Persistence
 import SwiftData
 
 @MainActor
