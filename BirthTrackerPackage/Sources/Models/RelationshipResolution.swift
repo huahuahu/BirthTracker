@@ -32,6 +32,23 @@ public struct RelationshipResolution: Equatable, Identifiable, Sendable {
   }
 }
 
+public struct RelationshipResolverResult: Equatable, Sendable {
+  public let resolutions: [RelationshipResolution]
+  public let diagnostics: Set<RelationshipResolutionDiagnostic>
+
+  public var hasMissingEndpoint: Bool {
+    diagnostics.contains(.missingEndpoint)
+  }
+
+  public init(
+    resolutions: [RelationshipResolution],
+    diagnostics: Set<RelationshipResolutionDiagnostic> = []
+  ) {
+    self.resolutions = resolutions
+    self.diagnostics = diagnostics
+  }
+}
+
 public enum RelationshipResolutionDiagnostic: Hashable, Sendable {
   case missingEndpoint
   case conflict
