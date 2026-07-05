@@ -330,6 +330,89 @@ struct RelationshipResolverTests {
   }
 }
 
+extension RelationshipResolverTests {
+  @Test("Duplicate facts do not duplicate labels")
+  func duplicateFactsDoNotDuplicateLabels() throws {
+    let perspectiveID = id(1)
+    let friendID = id(2)
+    let people = [person(perspectiveID), person(friendID)]
+    let duplicateA = fact(
+      id: id(501),
+      a: perspectiveID,
+      b: friendID,
+      kind: .friend,
+      aRole: .friend,
+      bRole: .friend)
+    let duplicateB = fact(
+      id: id(502),
+      a: perspectiveID,
+      b: friendID,
+      kind: .friend,
+      aRole: .friend,
+      bRole: .friend)
+
+    let result = resolution(
+      friendID,
+      in: RelationshipResolver.resolve(
+        people: people,
+        facts: [duplicateA, duplicateB],
+        perspectivePersonID: perspectiveID))
+
+    #expect(result.primaryLabel == "朋友")
+    #expect(result.additionalLabels.isEmpty)
+    #expect(result.inferencePaths.count == 1)
+  }
+
+  @Test("Facts with missing endpoints mark known participants and are ignored for inference")
+  func factsWithMissingEndpointsMarkKnownParticipantsAndAreIgnoredForInference() throws {
+    let perspectiveID = id(1)
+    let knownID = id(2)
+    let missingID = id(999)
+    let people = [person(perspectiveID), person(knownID)]
+    let facts = [
+      fact(id: id(601), a: perspectiveID, b: knownID, kind: .friend, aRole: .friend, bRole: .friend),
+      fact(
+        id: id(602),
+        a: knownID,
+        b: missingID,
+        kind: .parentChild,
+        aRole: .parent,
+        bRole: .child),
+    ]
+
+    let result = resolution(
+      knownID,
+      in: RelationshipResolver.resolve(people: people, facts: facts, perspectivePersonID: perspectiveID))
+
+    #expect(result.primaryLabel == "朋友")
+    #expect(result.hasMissingEndpoint)
+  }
+
+  @Test("Conflicting kinship facts mark both affected resolutions")
+  func conflictingKinshipFactsMarkBothAffectedResolutions() throws {
+    let perspectiveID = id(1)
+    let targetID = id(2)
+    let people = [person(perspectiveID), person(targetID)]
+    let facts = [
+      fact(id: id(701), a: perspectiveID, b: targetID, kind: .sibling, aRole: .sibling, bRole: .sibling),
+      fact(
+        id: id(702),
+        a: perspectiveID,
+        b: targetID,
+        kind: .parentChild,
+        aRole: .parent,
+        bRole: .child),
+    ]
+
+    let result = resolution(
+      targetID,
+      in: RelationshipResolver.resolve(people: people, facts: facts, perspectivePersonID: perspectiveID))
+
+    #expect(result.hasConflict)
+    #expect(result.primaryLabel == "子女")
+  }
+}
+
 private func id(_ value: Int) -> UUID {
   guard let uuid = UUID(uuidString: String(format: "00000000-0000-0000-0000-%012d", value)) else {
     preconditionFailure("Invalid deterministic UUID fixture")

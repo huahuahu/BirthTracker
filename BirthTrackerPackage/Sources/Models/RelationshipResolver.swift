@@ -15,6 +15,7 @@ public enum RelationshipResolver {
         .filter { $0.id != perspectivePersonID }
         .map { ($0.id, ResolutionAccumulator(targetPersonID: $0.id)) })
     var seenFactKeys = Set<FactKey>()
+    var kinshipKindsByPair: [FactPairKey: Set<RelationshipKind>] = [:]
     var graph = KinshipGraph(peopleIDs: Set(people.map(\.id)))
 
     for fact in facts.sorted(by: factSortPrecedes) {
@@ -32,6 +33,16 @@ public enum RelationshipResolver {
           accumulators[knownID]?.addDiagnostic(RelationshipResolutionDiagnostic.missingEndpoint)
         }
         continue
+      }
+
+      if fact.kind.isKinship {
+        let pairKey = FactPairKey(fact.personAID, fact.personBID)
+        let existingKinds = kinshipKindsByPair[pairKey, default: []]
+        if existingKinds.isEmpty == false, existingKinds.contains(fact.kind) == false {
+          accumulators[fact.personAID]?.addDiagnostic(.conflict)
+          accumulators[fact.personBID]?.addDiagnostic(.conflict)
+        }
+        kinshipKindsByPair[pairKey, default: []].insert(fact.kind)
       }
 
       graph.add(fact)
@@ -176,18 +187,40 @@ private struct ResolutionAccumulator {
 }
 
 private struct FactKey: Hashable {
-  let personAID: UUID
-  let personBID: UUID
+  let firstPersonID: UUID
+  let secondPersonID: UUID
   let kind: RelationshipKind
-  let personARole: RelationshipRole
-  let personBRole: RelationshipRole
+  let firstPersonRole: RelationshipRole
+  let secondPersonRole: RelationshipRole
 
   init(_ fact: RelationshipFact) {
-    self.personAID = fact.personAID
-    self.personBID = fact.personBID
     self.kind = fact.kind
-    self.personARole = fact.personARole
-    self.personBRole = fact.personBRole
+    if fact.personAID.uuidString <= fact.personBID.uuidString {
+      self.firstPersonID = fact.personAID
+      self.secondPersonID = fact.personBID
+      self.firstPersonRole = fact.personARole
+      self.secondPersonRole = fact.personBRole
+    } else {
+      self.firstPersonID = fact.personBID
+      self.secondPersonID = fact.personAID
+      self.firstPersonRole = fact.personBRole
+      self.secondPersonRole = fact.personARole
+    }
+  }
+}
+
+private struct FactPairKey: Hashable {
+  let firstPersonID: UUID
+  let secondPersonID: UUID
+
+  init(_ lhs: UUID, _ rhs: UUID) {
+    if lhs.uuidString <= rhs.uuidString {
+      self.firstPersonID = lhs
+      self.secondPersonID = rhs
+    } else {
+      self.firstPersonID = rhs
+      self.secondPersonID = lhs
+    }
   }
 }
 
@@ -499,7 +532,7 @@ private func childLabel(for gender: RelationshipGender) -> String {
   case .female:
     return "女儿"
   case .unknown:
-    return "孩子"
+    return "子女"
   }
 }
 
@@ -680,6 +713,17 @@ private func labelPriority(for kind: RelationshipKind) -> Int {
 }
 
 private let inferredLabelPriority = 6
+
+extension RelationshipKind {
+  fileprivate var isKinship: Bool {
+    switch self {
+    case .parentChild, .sibling, .spouse:
+      return true
+    case .friend, .classmate, .coworker:
+      return false
+    }
+  }
+}
 
 extension Array where Element: Hashable {
   fileprivate func deduplicated() -> [Element] {
