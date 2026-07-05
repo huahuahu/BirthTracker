@@ -194,6 +194,140 @@ struct RelationshipResolverTests {
     #expect(targetResolution.diagnostics == [.missingEndpoint])
     #expect(targetResolution.hasMissingEndpoint)
   }
+
+  @Test("Sibling facts share known parents and enable three generation inference")
+  func siblingFactsShareKnownParentsAndEnableThreeGenerationInference() throws {
+    let childID = id(1)
+    let fatherID = id(2)
+    let motherID = id(3)
+    let paternalGrandfatherID = id(4)
+    let paternalGrandmotherID = id(5)
+    let maternalGrandfatherID = id(6)
+    let maternalGrandmotherID = id(7)
+    let uncleID = id(8)
+    let auntID = id(9)
+    let cousinID = id(10)
+    let siblingID = id(11)
+    let nephewID = id(12)
+    let grandchildID = id(13)
+    let daughterID = id(14)
+
+    let people = [
+      person(childID, birthday: birthday(1995), gender: .male),
+      person(fatherID, birthday: birthday(1965), gender: .male),
+      person(motherID, birthday: birthday(1968), gender: .female),
+      person(paternalGrandfatherID, gender: .male),
+      person(paternalGrandmotherID, gender: .female),
+      person(maternalGrandfatherID, gender: .male),
+      person(maternalGrandmotherID, gender: .female),
+      person(uncleID, gender: .male),
+      person(auntID, gender: .female),
+      person(cousinID, birthday: birthday(1992), gender: .female),
+      person(siblingID, gender: .male),
+      person(nephewID, gender: .male),
+      person(grandchildID, gender: .female),
+      person(daughterID, gender: .female),
+    ]
+    let facts = [
+      fact(id: id(301), a: fatherID, b: childID, kind: .parentChild, aRole: .parent, bRole: .child),
+      fact(id: id(302), a: motherID, b: childID, kind: .parentChild, aRole: .parent, bRole: .child),
+      fact(id: id(303), a: paternalGrandfatherID, b: fatherID, kind: .parentChild, aRole: .parent, bRole: .child),
+      fact(id: id(304), a: paternalGrandmotherID, b: fatherID, kind: .parentChild, aRole: .parent, bRole: .child),
+      fact(id: id(305), a: maternalGrandfatherID, b: motherID, kind: .parentChild, aRole: .parent, bRole: .child),
+      fact(id: id(306), a: maternalGrandmotherID, b: motherID, kind: .parentChild, aRole: .parent, bRole: .child),
+      fact(id: id(307), a: fatherID, b: uncleID, kind: .sibling, aRole: .sibling, bRole: .sibling),
+      fact(id: id(308), a: motherID, b: auntID, kind: .sibling, aRole: .sibling, bRole: .sibling),
+      fact(id: id(309), a: uncleID, b: cousinID, kind: .parentChild, aRole: .parent, bRole: .child),
+      fact(id: id(310), a: siblingID, b: childID, kind: .sibling, aRole: .sibling, bRole: .sibling),
+      fact(id: id(311), a: siblingID, b: nephewID, kind: .parentChild, aRole: .parent, bRole: .child),
+      fact(id: id(312), a: childID, b: daughterID, kind: .parentChild, aRole: .parent, bRole: .child),
+      fact(id: id(313), a: daughterID, b: grandchildID, kind: .parentChild, aRole: .parent, bRole: .child),
+    ]
+
+    let resolutions = RelationshipResolver.resolve(people: people, facts: facts, perspectivePersonID: childID)
+
+    #expect(resolution(paternalGrandfatherID, in: resolutions).primaryLabel == "爷爷")
+    #expect(resolution(paternalGrandmotherID, in: resolutions).primaryLabel == "奶奶")
+    #expect(resolution(maternalGrandfatherID, in: resolutions).primaryLabel == "外公")
+    #expect(resolution(maternalGrandmotherID, in: resolutions).primaryLabel == "外婆")
+    #expect(resolution(uncleID, in: resolutions).primaryLabel == "叔伯")
+    #expect(resolution(auntID, in: resolutions).primaryLabel == "姨妈")
+    #expect(resolution(cousinID, in: resolutions).primaryLabel == "堂姐")
+    #expect(resolution(nephewID, in: resolutions).primaryLabel == "侄子")
+    #expect(resolution(grandchildID, in: resolutions).primaryLabel == "孙女")
+  }
+
+  @Test("Unknown gender and missing birthdays fall back to neutral kinship labels")
+  func unknownGenderAndMissingBirthdaysFallBackToNeutralKinshipLabels() throws {
+    let childID = id(1)
+    let parentID = id(2)
+    let grandparentID = id(3)
+    let siblingID = id(4)
+    let cousinID = id(5)
+    let people = [
+      person(childID),
+      person(parentID),
+      person(grandparentID),
+      person(siblingID),
+      person(cousinID),
+    ]
+    let facts = [
+      fact(id: id(401), a: parentID, b: childID, kind: .parentChild, aRole: .parent, bRole: .child),
+      fact(id: id(402), a: grandparentID, b: parentID, kind: .parentChild, aRole: .parent, bRole: .child),
+      fact(id: id(403), a: parentID, b: siblingID, kind: .sibling, aRole: .sibling, bRole: .sibling),
+      fact(id: id(404), a: siblingID, b: cousinID, kind: .parentChild, aRole: .parent, bRole: .child),
+    ]
+
+    let resolutions = RelationshipResolver.resolve(people: people, facts: facts, perspectivePersonID: childID)
+
+    #expect(resolution(grandparentID, in: resolutions).primaryLabel == "祖父母")
+    #expect(resolution(siblingID, in: resolutions).primaryLabel == "叔伯姑姨")
+    #expect(resolution(cousinID, in: resolutions).primaryLabel == "堂表亲")
+  }
+
+  @Test("Direct child label stays primary when perspective also has known parents")
+  func directChildLabelStaysPrimaryWhenPerspectiveAlsoHasKnownParents() throws {
+    let currentID = id(1)
+    let parentID = id(2)
+    let childID = id(3)
+    let people = [
+      person(currentID),
+      person(parentID),
+      person(childID, gender: .female),
+    ]
+    let facts = [
+      fact(id: id(501), a: parentID, b: currentID, kind: .parentChild, aRole: .parent, bRole: .child),
+      fact(id: id(502), a: currentID, b: childID, kind: .parentChild, aRole: .parent, bRole: .child),
+    ]
+
+    let resolutions = RelationshipResolver.resolve(people: people, facts: facts, perspectivePersonID: currentID)
+
+    #expect(resolution(childID, in: resolutions).primaryLabel == "女儿")
+    #expect(resolution(childID, in: resolutions).additionalLabels.contains("孙女") == false)
+  }
+
+  @Test("Cousin label falls back when lineage gender is unknown even with birthdays")
+  func cousinLabelFallsBackWhenLineageGenderIsUnknownEvenWithBirthdays() throws {
+    let currentID = id(1)
+    let parentID = id(2)
+    let parentSiblingID = id(3)
+    let cousinID = id(4)
+    let people = [
+      person(currentID, birthday: birthday(1995)),
+      person(parentID),
+      person(parentSiblingID, gender: .male),
+      person(cousinID, birthday: birthday(1990), gender: .female),
+    ]
+    let facts = [
+      fact(id: id(601), a: parentID, b: currentID, kind: .parentChild, aRole: .parent, bRole: .child),
+      fact(id: id(602), a: parentID, b: parentSiblingID, kind: .sibling, aRole: .sibling, bRole: .sibling),
+      fact(id: id(603), a: parentSiblingID, b: cousinID, kind: .parentChild, aRole: .parent, bRole: .child),
+    ]
+
+    let resolutions = RelationshipResolver.resolve(people: people, facts: facts, perspectivePersonID: currentID)
+
+    #expect(resolution(cousinID, in: resolutions).primaryLabel == "堂表亲")
+  }
 }
 
 private func id(_ value: Int) -> UUID {
@@ -213,6 +347,29 @@ private func person(
   gender: RelationshipGender = .unknown
 ) -> RelationshipPersonInput {
   RelationshipPersonInput(id: id, birthday: birthday, relationshipGender: gender)
+}
+
+private func fact(
+  id: UUID,
+  a personAID: UUID,
+  b personBID: UUID,
+  kind: RelationshipKind,
+  aRole: RelationshipRole,
+  bRole: RelationshipRole,
+  isPrimaryFromA: Bool = false,
+  isPrimaryFromB: Bool = false,
+  createdAt: Date = Date()
+) -> RelationshipFact {
+  fact(
+    id: id,
+    personAID: personAID,
+    personBID: personBID,
+    kind: kind,
+    aRole: aRole,
+    bRole: bRole,
+    isPrimaryFromA: isPrimaryFromA,
+    isPrimaryFromB: isPrimaryFromB,
+    createdAt: createdAt)
 }
 
 private func fact(
