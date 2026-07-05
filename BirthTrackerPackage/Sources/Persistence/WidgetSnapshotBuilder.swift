@@ -6,24 +6,30 @@ public enum WidgetSnapshotBuilder {
     from people: [TrackedPerson],
     after referenceDate: Date = .now
   ) -> [WidgetPersonSnapshot] {
-    let birthdays =
+    let summaries =
       people
-      .compactMap { $0.upcomingBirthday(after: referenceDate) }
+      .map { PersonBirthdaySummary.make(for: $0, referenceDate: referenceDate) }
+      .filter { $0.nextBirthdayDate != nil }
       .sorted { lhs, rhs in
-        if lhs.date == rhs.date {
-          lhs.personName.localizedStandardCompare(rhs.personName) == .orderedAscending
-        } else {
-          lhs.date < rhs.date
+        guard let lhsDate = lhs.nextBirthdayDate, let rhsDate = rhs.nextBirthdayDate else {
+          return lhs.personName.localizedStandardCompare(rhs.personName) == .orderedAscending
         }
+        if lhsDate == rhsDate {
+          return lhs.personName.localizedStandardCompare(rhs.personName) == .orderedAscending
+        }
+        return lhsDate < rhsDate
       }
 
-    return birthdays.enumerated().map { index, birthday in
-      WidgetPersonSnapshot(
-        personID: birthday.id,
-        displayName: birthday.personName,
-        nextBirthdayDate: birthday.date,
-        age: birthday.age,
-        calendarKind: birthday.calendarKind,
+    return summaries.enumerated().compactMap { index, summary in
+      guard let nextBirthdayDate = summary.nextBirthdayDate else { return nil }
+      return WidgetPersonSnapshot(
+        personID: summary.personID,
+        displayName: summary.personName,
+        nextBirthdayDate: nextBirthdayDate,
+        age: summary.nextAge,
+        birthDuration: summary.birthDuration,
+        daysUntilNextBirthday: summary.daysUntilNextBirthday,
+        calendarKind: summary.calendarKind,
         generatedAt: referenceDate,
         sortIndex: index)
     }
