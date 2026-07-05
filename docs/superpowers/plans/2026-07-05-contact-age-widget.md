@@ -18,7 +18,7 @@
 - Use SFSafeSymbols typed APIs or existing `SFSymbol.*.rawValue` patterns instead of raw SF Symbol strings.
 - Run `make check` after code changes.
 - Before the first `xcodebuildmcp` build/test call in an implementation session, call `xcodebuildmcp-session_show_defaults`; if defaults are missing, set `projectPath` to the repo-root absolute path for `BirthTracker.xcodeproj`, `scheme` to `BirthTracker`, and use the simulator defaults from `.xcodebuildmcp/config.yaml`.
-- When implementing the Widget UI, preview the Widget and capture evidence with xcodebuildmcp. Prefer a simulator/home-screen preview with screenshot; if WidgetKit home-screen insertion is not available in the active tooling, build the Widget previews and capture the best available simulator screenshot, then report the limitation explicitly.
+- When implementing the Widget UI, use the Xcode MCP preview-specific tool/action to preview `ContactAgeWidget`, then capture evidence. Screenshots are evidence for the preview, not a substitute for invoking the preview tool. If the preview-specific tool is not surfaced in the active runtime, stop and report that tooling gap instead of silently falling back to screenshots only.
 - If SwiftPM/Xcode fails with `safe.bareRepository is 'explicit'`, rerun that command with `GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0=safe.bareRepository GIT_CONFIG_VALUE_0=all`.
 - Network fetch/install commands must use the local proxy environment required by the repository instructions.
 
@@ -1581,18 +1581,22 @@ Use xcodebuildmcp:
 
 Expected: Build succeeds for `BirthTracker` and embedded `BirthTrackerWidget`.
 
-- [ ] **Step 6: Preview the contact age Widget**
+- [ ] **Step 6: Preview the contact age Widget with the Xcode MCP preview tool**
 
-Use xcodebuildmcp to preview the Widget visually after the build succeeds.
+Use the Xcode MCP preview-specific tool/action after the build succeeds. The preview invocation must target `ContactAgeWidget` and cover these preview states from `ContactAgeWidget.swift`:
+
+- `duration small`
+- `days medium`
+- `missing year`
 
 ```text
-1. xcodebuildmcp-open_sim
-2. xcodebuildmcp-screenshot with returnFormat: path
-3. If the active tooling can add or focus the Widget on the simulator home screen, show `ContactAgeWidget` in both `durationComponents` and `totalDays` states and capture screenshots.
-4. If the active tooling cannot insert a Widget into the home screen, use the Widget SwiftUI previews as the visual source of truth, keep the Xcode build evidence from Step 5, capture the best available simulator screenshot, and write the limitation in the Task 5 report.
+1. Invoke the Xcode MCP preview-specific tool/action for `Sources/BirthTrackerWidget/ContactAgeWidget.swift`.
+2. Preview `ContactAgeWidget` using the `duration small`, `days medium`, and `missing year` SwiftUI preview names.
+3. Capture preview evidence with the preview tool output and screenshot path(s) when the tool provides them.
+4. If the preview-specific tool/action is not listed by the active Xcode MCP runtime, stop Task 5 as DONE_WITH_CONCERNS or BLOCKED and report the missing tool explicitly; do not replace this step with `xcodebuildmcp-screenshot` alone.
 ```
 
-Expected: The Task 5 report includes screenshot path(s) or a clear limitation explaining why a real home-screen Widget preview could not be captured with available tooling.
+Expected: The Task 5 report includes the Xcode MCP preview tool/action used, preview state names, and evidence path(s) or output. Screenshot-only evidence does not satisfy this step unless it was produced by the preview-specific flow.
 
 - [ ] **Step 7: Commit Task 5**
 
