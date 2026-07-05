@@ -8,21 +8,31 @@ public enum RelationshipResolver {
     facts: [RelationshipFact],
     perspectivePersonID: UUID
   ) -> [RelationshipResolution] {
+    resolveWithDiagnostics(
+      people: people,
+      facts: facts,
+      perspectivePersonID: perspectivePersonID
+    ).resolutions
+  }
+
+  public static func resolveWithDiagnostics(
+    people: [RelationshipPersonInput],
+    facts: [RelationshipFact],
+    perspectivePersonID: UUID
+  ) -> RelationshipResolverResult {
     let peopleByID = Dictionary(uniqueKeysWithValues: people.map { ($0.id, $0) })
     var accumulators = Dictionary(
       uniqueKeysWithValues:
         people
         .filter { $0.id != perspectivePersonID }
         .map { ($0.id, ResolutionAccumulator(targetPersonID: $0.id)) })
-    var seenFactKeys = Set<FactKey>()
     var kinshipKindsByPair: [FactPairKey: Set<RelationshipKind>] = [:]
     var parentChildDirectionsByPair: [FactPairKey: ParentChildDirection] = [:]
+    var resolverDiagnostics = Set<RelationshipResolutionDiagnostic>()
+    var directInferredKindsByTarget: [UUID: Set<InferredRelationshipKind>] = [:]
     var graph = KinshipGraph(peopleIDs: Set(people.map(\.id)))
 
-    for fact in facts.sorted(by: factSortPrecedes) {
-      let key = FactKey(fact)
-      guard seenFactKeys.insert(key).inserted else { continue }
-
+    for fact in deduplicatedFacts(facts.sorted(by: factSortPrecedes)) {
       let personAExists = peopleByID[fact.personAID] != nil
       let personBExists = peopleByID[fact.personBID] != nil
       if !personAExists && !personBExists {
@@ -32,6 +42,8 @@ public enum RelationshipResolver {
         let knownID = personAExists ? fact.personAID : fact.personBID
         if knownID != perspectivePersonID {
           accumulators[knownID]?.addDiagnostic(RelationshipResolutionDiagnostic.missingEndpoint)
+        } else {
+          resolverDiagnostics.insert(.missingEndpoint)
         }
         continue
       }
@@ -71,10 +83,14 @@ public enum RelationshipResolver {
         LabelCandidate(
           label: directLabel(for: directContext),
           isPrimary: directContext.isPrimary,
-          factID: fact.id,
+          factID: directContext.factID,
+          primaryFactID: directContext.primaryFactID,
           kind: directContext.kind,
           priority: labelPriority(for: directContext.kind),
-          createdAt: fact.createdAt))
+          createdAt: directContext.createdAt))
+      if let inferredKind = directContext.inferredRelationshipKind {
+        directInferredKindsByTarget[directContext.target.id, default: []].insert(inferredKind)
+      }
     }
 
     graph.propagateKnownParentsAcrossSiblingGroups()
@@ -82,13 +98,62 @@ public enum RelationshipResolver {
       graph: graph,
       peopleByID: peopleByID,
       perspectivePersonID: perspectivePersonID,
+      directInferredKindsByTarget: directInferredKindsByTarget,
       accumulators: &accumulators)
 
-    return
+    let resolutions =
       people
       .filter { $0.id != perspectivePersonID }
       .compactMap { accumulators[$0.id]?.resolution }
       .sorted { $0.targetPersonID.uuidString < $1.targetPersonID.uuidString }
+    return RelationshipResolverResult(resolutions: resolutions, diagnostics: resolverDiagnostics)
+  }
+}
+
+private struct CanonicalRelationshipFact {
+  let id: UUID
+  let personAID: UUID
+  let personBID: UUID
+  let kind: RelationshipKind
+  let personARole: RelationshipRole
+  let personBRole: RelationshipRole
+  var isPrimaryFromPersonA: Bool
+  var isPrimaryFromPersonB: Bool
+  var primaryFactIDFromPersonA: UUID?
+  var primaryFactIDFromPersonB: UUID?
+  let createdAt: Date
+
+  init(_ fact: RelationshipFact) {
+    self.id = fact.id
+    self.personAID = fact.personAID
+    self.personBID = fact.personBID
+    self.kind = fact.kind
+    self.personARole = fact.personARole
+    self.personBRole = fact.personBRole
+    self.isPrimaryFromPersonA = fact.isPrimaryFromPersonA
+    self.isPrimaryFromPersonB = fact.isPrimaryFromPersonB
+    self.primaryFactIDFromPersonA = fact.isPrimaryFromPersonA ? fact.id : nil
+    self.primaryFactIDFromPersonB = fact.isPrimaryFromPersonB ? fact.id : nil
+    self.createdAt = fact.createdAt
+  }
+
+  mutating func mergePrimaryPreferences(from fact: RelationshipFact) {
+    if fact.isPrimaryFromPersonA {
+      mergePrimaryPreference(fromPersonID: fact.personAID, factID: fact.id)
+    }
+    if fact.isPrimaryFromPersonB {
+      mergePrimaryPreference(fromPersonID: fact.personBID, factID: fact.id)
+    }
+  }
+
+  private mutating func mergePrimaryPreference(fromPersonID: UUID, factID: UUID) {
+    if fromPersonID == personAID {
+      isPrimaryFromPersonA = true
+      primaryFactIDFromPersonA = primaryFactIDFromPersonA ?? factID
+    } else if fromPersonID == personBID {
+      isPrimaryFromPersonB = true
+      primaryFactIDFromPersonB = primaryFactIDFromPersonB ?? factID
+    }
   }
 }
 
@@ -98,9 +163,12 @@ private struct DirectRelationshipContext {
   let kind: RelationshipKind
   let targetRole: RelationshipRole
   let isPrimary: Bool
+  let factID: UUID
+  let primaryFactID: UUID?
+  let createdAt: Date
 
   init?(
-    fact: RelationshipFact,
+    fact: CanonicalRelationshipFact,
     peopleByID: [UUID: RelationshipPersonInput],
     perspectivePersonID: UUID
   ) {
@@ -111,13 +179,39 @@ private struct DirectRelationshipContext {
       self.kind = fact.kind
       self.targetRole = fact.personBRole
       self.isPrimary = fact.isPrimaryFromPersonA
+      self.factID = fact.id
+      self.primaryFactID = fact.primaryFactIDFromPersonA
+      self.createdAt = fact.createdAt
     } else if fact.personBID == perspectivePersonID, let target = peopleByID[fact.personAID] {
       self.perspective = perspective
       self.target = target
       self.kind = fact.kind
       self.targetRole = fact.personARole
       self.isPrimary = fact.isPrimaryFromPersonB
+      self.factID = fact.id
+      self.primaryFactID = fact.primaryFactIDFromPersonB
+      self.createdAt = fact.createdAt
     } else {
+      return nil
+    }
+  }
+
+  var inferredRelationshipKind: InferredRelationshipKind? {
+    switch kind {
+    case .parentChild:
+      switch targetRole {
+      case .parent:
+        return .parent
+      case .child:
+        return .child
+      case .sibling, .spouse, .friend, .classmate, .coworker:
+        return nil
+      }
+    case .sibling:
+      return .sibling
+    case .spouse:
+      return .spouse
+    case .friend, .classmate, .coworker:
       return nil
     }
   }
@@ -135,6 +229,7 @@ private struct LabelCandidate: Equatable {
     label: String,
     isPrimary: Bool,
     factID: UUID,
+    primaryFactID: UUID? = nil,
     kind: RelationshipKind,
     priority: Int,
     createdAt: Date
@@ -143,7 +238,7 @@ private struct LabelCandidate: Equatable {
     self.isPrimary = isPrimary
     var paths: [RelationshipInferencePath] = []
     if isPrimary {
-      paths.append(.primaryPreference(factID: factID))
+      paths.append(.primaryPreference(factID: primaryFactID ?? factID))
     }
     paths.append(kind.isKinship ? .direct(factID: factID, kind: kind) : .social(factID: factID, kind: kind))
     self.inferencePaths = paths
@@ -189,15 +284,17 @@ private struct ResolutionAccumulator {
     let primaryCandidate =
       primaryCandidates.sorted(by: primaryCandidateSortPrecedes).first
       ?? candidates.sorted(by: candidateSortPrecedes).first
+    let sortedCandidates =
+      [primaryCandidate].compactMap { $0 }
+      + candidates.sorted(by: candidateSortPrecedes).filter { $0 != primaryCandidate }
     let additionalLabels =
-      candidates
-      .sorted(by: candidateSortPrecedes)
+      sortedCandidates
       .filter { $0 != primaryCandidate }
+      .filter { $0.label != primaryCandidate?.label }
       .map(\.label)
       .deduplicated()
     let inferencePaths =
-      candidates
-      .sorted(by: candidateSortPrecedes)
+      sortedCandidates
       .flatMap(\.inferencePaths)
       .deduplicated()
 
@@ -208,6 +305,23 @@ private struct ResolutionAccumulator {
       inferencePaths: inferencePaths,
       diagnostics: diagnostics)
   }
+}
+
+private func deduplicatedFacts(_ facts: [RelationshipFact]) -> [CanonicalRelationshipFact] {
+  var factsByKey: [FactKey: Int] = [:]
+  var deduplicatedFacts: [CanonicalRelationshipFact] = []
+
+  for fact in facts {
+    let key = FactKey(fact)
+    if let index = factsByKey[key] {
+      deduplicatedFacts[index].mergePrimaryPreferences(from: fact)
+    } else {
+      factsByKey[key] = deduplicatedFacts.count
+      deduplicatedFacts.append(CanonicalRelationshipFact(fact))
+    }
+  }
+
+  return deduplicatedFacts
 }
 
 private struct FactKey: Hashable {
@@ -248,11 +362,16 @@ private struct FactPairKey: Hashable {
   }
 }
 
+private struct ParentChildRelationKey: Hashable {
+  let parentID: UUID
+  let childID: UUID
+}
+
 private struct ParentChildDirection: Equatable {
   let parentID: UUID
   let childID: UUID
 
-  init?(_ fact: RelationshipFact) {
+  init?(_ fact: CanonicalRelationshipFact) {
     if fact.personARole == .parent, fact.personBRole == .child {
       self.parentID = fact.personAID
       self.childID = fact.personBID
@@ -269,19 +388,23 @@ private struct KinshipGraph {
   private(set) var parentsByChild: [UUID: Set<UUID>] = [:]
   private(set) var childrenByParent: [UUID: Set<UUID>] = [:]
   private(set) var spousesByPerson: [UUID: Set<UUID>] = [:]
+  private var inferredParentSourcesByRelation: [ParentChildRelationKey: Set<UUID>] = [:]
+  private var siblingEdgesByPerson: [UUID: Set<UUID>] = [:]
   private var siblingGroups: UnionFind
 
   init(peopleIDs: Set<UUID>) {
     siblingGroups = UnionFind(peopleIDs)
   }
 
-  mutating func add(_ fact: RelationshipFact) {
+  mutating func add(_ fact: CanonicalRelationshipFact) {
     switch fact.kind {
     case .parentChild:
       addParentChildFact(fact)
     case .sibling:
       guard fact.personARole == .sibling, fact.personBRole == .sibling else { return }
       siblingGroups.union(fact.personAID, fact.personBID)
+      siblingEdgesByPerson[fact.personAID, default: []].insert(fact.personBID)
+      siblingEdgesByPerson[fact.personBID, default: []].insert(fact.personAID)
     case .spouse:
       guard fact.personARole == .spouse, fact.personBRole == .spouse else { return }
       spousesByPerson[fact.personAID, default: []].insert(fact.personBID)
@@ -293,12 +416,20 @@ private struct KinshipGraph {
 
   mutating func propagateKnownParentsAcrossSiblingGroups() {
     for group in siblingGroups.groups() where group.count > 1 {
-      let knownParents = group.reduce(into: Set<UUID>()) { parents, member in
-        parents.formUnion(parentsByChild[member, default: []])
+      let parentSourcesByParentID = group.reduce(into: [UUID: Set<UUID>]()) { sources, member in
+        for parent in parentsByChild[member, default: []] {
+          sources[parent, default: []].insert(member)
+        }
       }
 
       for member in group {
-        for parent in knownParents where parent != member {
+        for (parent, sourceMembers) in parentSourcesByParentID where parent != member {
+          if parentsByChild[member, default: []].contains(parent) == false {
+            inferredParentSourcesByRelation[
+              ParentChildRelationKey(parentID: parent, childID: member),
+              default: []
+            ].formUnion(sourceMembers.subtracting([member]))
+          }
           parentsByChild[member, default: []].insert(parent)
           childrenByParent[parent, default: []].insert(member)
         }
@@ -318,7 +449,31 @@ private struct KinshipGraph {
     siblingGroups.group(containing: personID).subtracting([personID])
   }
 
-  private mutating func addParentChildFact(_ fact: RelationshipFact) {
+  func inferredParentViaPersonIDs(parentID: UUID, childID: UUID) -> [UUID] {
+    inferredParentSourcesByRelation[
+      ParentChildRelationKey(parentID: parentID, childID: childID),
+      default: []
+    ].sortedByUUIDString()
+  }
+
+  func inferredSiblingViaPersonIDs(_ personID: UUID, siblingID: UUID) -> [UUID] {
+    if siblingEdgesByPerson[personID, default: []].contains(siblingID) {
+      return []
+    }
+
+    let commonDirectSiblings = siblingEdgesByPerson[personID, default: []]
+      .intersection(siblingEdgesByPerson[siblingID, default: []])
+    if commonDirectSiblings.isEmpty == false {
+      return commonDirectSiblings.sortedByUUIDString()
+    }
+
+    return siblings(of: personID)
+      .intersection(siblings(of: siblingID))
+      .subtracting([personID, siblingID])
+      .sortedByUUIDString()
+  }
+
+  private mutating func addParentChildFact(_ fact: CanonicalRelationshipFact) {
     if fact.personARole == .parent, fact.personBRole == .child {
       addParent(fact.personAID, child: fact.personBID)
     } else if fact.personBRole == .parent, fact.personARole == .child {
@@ -413,6 +568,7 @@ private func addInferenceCandidates(
   graph: KinshipGraph,
   peopleByID: [UUID: RelationshipPersonInput],
   perspectivePersonID: UUID,
+  directInferredKindsByTarget: [UUID: Set<InferredRelationshipKind>],
   accumulators: inout [UUID: ResolutionAccumulator]
 ) {
   guard let perspective = peopleByID[perspectivePersonID] else { return }
@@ -421,8 +577,12 @@ private func addInferenceCandidates(
     peopleByID: peopleByID,
     perspective: perspective,
     perspectivePersonID: perspectivePersonID,
-    perspectiveParents: graph.parents(of: perspectivePersonID))
+    perspectiveParents: graph.parents(of: perspectivePersonID),
+    directInferredKindsByTarget: directInferredKindsByTarget)
 
+  addParentCandidates(context: context, accumulators: &accumulators)
+  addChildCandidates(context: context, accumulators: &accumulators)
+  addSiblingCandidates(context: context, accumulators: &accumulators)
   addGrandparentCandidates(context: context, accumulators: &accumulators)
   addGrandchildCandidates(context: context, accumulators: &accumulators)
   let lineageParentIDsByParentSiblingID = addParentSiblingCandidates(context: context, accumulators: &accumulators)
@@ -439,6 +599,67 @@ private struct InferenceContext {
   let perspective: RelationshipPersonInput
   let perspectivePersonID: UUID
   let perspectiveParents: Set<UUID>
+  let directInferredKindsByTarget: [UUID: Set<InferredRelationshipKind>]
+
+  func hasDirectCandidate(targetID: UUID, kind: InferredRelationshipKind) -> Bool {
+    directInferredKindsByTarget[targetID, default: []].contains(kind)
+  }
+}
+
+private func addParentCandidates(
+  context: InferenceContext,
+  accumulators: inout [UUID: ResolutionAccumulator]
+) {
+  for parentID in context.perspectiveParents.sortedByUUIDString()
+  where context.hasDirectCandidate(targetID: parentID, kind: .parent) == false {
+    guard let parent = context.peopleByID[parentID] else { continue }
+    accumulators[parentID]?.addCandidate(
+      LabelCandidate(
+        inferredLabel: parentLabel(for: parent.relationshipGender),
+        kind: .parent,
+        viaPersonIDs: context.graph.inferredParentViaPersonIDs(
+          parentID: parentID,
+          childID: context.perspectivePersonID),
+        priority: inferredLabelPriority))
+  }
+}
+
+private func addChildCandidates(
+  context: InferenceContext,
+  accumulators: inout [UUID: ResolutionAccumulator]
+) {
+  for childID in context.graph.children(of: context.perspectivePersonID).sortedByUUIDString() {
+    guard childID != context.perspectivePersonID else { continue }
+    let hasDirectChildCandidate = context.hasDirectCandidate(targetID: childID, kind: .child)
+    guard hasDirectChildCandidate == false else { continue }
+    guard let child = context.peopleByID[childID] else { continue }
+    accumulators[childID]?.addCandidate(
+      LabelCandidate(
+        inferredLabel: childLabel(for: child.relationshipGender),
+        kind: .child,
+        viaPersonIDs: context.graph.inferredParentViaPersonIDs(
+          parentID: context.perspectivePersonID,
+          childID: childID),
+        priority: inferredLabelPriority))
+  }
+}
+
+private func addSiblingCandidates(
+  context: InferenceContext,
+  accumulators: inout [UUID: ResolutionAccumulator]
+) {
+  for siblingID in context.graph.siblings(of: context.perspectivePersonID).sortedByUUIDString()
+  where context.hasDirectCandidate(targetID: siblingID, kind: .sibling) == false {
+    guard let sibling = context.peopleByID[siblingID] else { continue }
+    accumulators[siblingID]?.addCandidate(
+      LabelCandidate(
+        inferredLabel: siblingLabel(perspective: context.perspective, target: sibling),
+        kind: .sibling,
+        viaPersonIDs: context.graph.inferredSiblingViaPersonIDs(
+          context.perspectivePersonID,
+          siblingID: siblingID),
+        priority: inferredLabelPriority))
+  }
 }
 
 private func addGrandparentCandidates(
@@ -465,12 +686,13 @@ private func addGrandchildCandidates(
   accumulators: inout [UUID: ResolutionAccumulator]
 ) {
   for childID in context.graph.children(of: context.perspectivePersonID).sortedByUUIDString() {
+    guard let child = context.peopleByID[childID] else { continue }
     for grandchildID in context.graph.children(of: childID).sortedByUUIDString()
     where grandchildID != context.perspectivePersonID {
       guard let grandchild = context.peopleByID[grandchildID] else { continue }
       accumulators[grandchildID]?.addCandidate(
         LabelCandidate(
-          inferredLabel: grandchildLabel(for: grandchild.relationshipGender),
+          inferredLabel: grandchildLabel(child: child, grandchild: grandchild),
           kind: .grandchild,
           viaPersonIDs: [childID],
           priority: inferredLabelPriority))
@@ -610,13 +832,22 @@ private func grandparentLabel(
   }
 }
 
-private func grandchildLabel(for gender: RelationshipGender) -> String {
-  switch gender {
-  case .male:
+private func grandchildLabel(
+  child: RelationshipPersonInput,
+  grandchild: RelationshipPersonInput
+) -> String {
+  switch (child.relationshipGender, grandchild.relationshipGender) {
+  case (.male, .male):
     return "孙子"
-  case .female:
+  case (.male, .female):
     return "孙女"
-  case .unknown:
+  case (.female, .male):
+    return "外孙"
+  case (.female, .female):
+    return "外孙女"
+  case (.female, .unknown):
+    return "外孙辈"
+  case (.male, .unknown), (.unknown, _):
     return "孙辈"
   }
 }
@@ -768,15 +999,15 @@ private func labelPriority(for kind: RelationshipKind) -> Int {
   case .sibling:
     return 2
   case .friend:
-    return 3
-  case .classmate:
     return 4
-  case .coworker:
+  case .classmate:
     return 5
+  case .coworker:
+    return 6
   }
 }
 
-private let inferredLabelPriority = 6
+private let inferredLabelPriority = 3
 
 extension RelationshipKind {
   fileprivate var isKinship: Bool {

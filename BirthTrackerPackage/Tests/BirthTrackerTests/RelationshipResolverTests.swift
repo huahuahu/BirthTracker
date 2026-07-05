@@ -256,7 +256,7 @@ struct RelationshipResolverTests {
     #expect(resolution(auntID, in: resolutions).primaryLabel == "姨妈")
     #expect(resolution(cousinID, in: resolutions).primaryLabel == "堂姐")
     #expect(resolution(nephewID, in: resolutions).primaryLabel == "侄子")
-    #expect(resolution(grandchildID, in: resolutions).primaryLabel == "孙女")
+    #expect(resolution(grandchildID, in: resolutions).primaryLabel == "外孙女")
     #expect(
       resolution(paternalGrandfatherID, in: resolutions).inferencePaths == [
         .inferred(kind: .grandparent, viaPersonIDs: [fatherID])
@@ -385,6 +385,216 @@ extension RelationshipResolverTests {
     #expect(result.primaryLabel == "朋友")
     #expect(result.additionalLabels.isEmpty)
     #expect(result.inferencePaths.count == 1)
+  }
+
+  @Test("Duplicate facts merge directional primary preferences")
+  func duplicateFactsMergeDirectionalPrimaryPreferences() throws {
+    let perspectiveID = id(1)
+    let classmateID = id(2)
+    let people = [person(perspectiveID), person(classmateID)]
+    let duplicateWithoutPrimary = fact(
+      id: id(511),
+      a: perspectiveID,
+      b: classmateID,
+      kind: .classmate,
+      aRole: .classmate,
+      bRole: .classmate,
+      createdAt: Date(timeIntervalSince1970: 100))
+    let duplicateWithPrimary = fact(
+      id: id(512),
+      a: perspectiveID,
+      b: classmateID,
+      kind: .classmate,
+      aRole: .classmate,
+      bRole: .classmate,
+      isPrimaryFromA: true,
+      createdAt: Date(timeIntervalSince1970: 200))
+
+    let result = resolution(
+      classmateID,
+      in: RelationshipResolver.resolve(
+        people: people,
+        facts: [duplicateWithoutPrimary, duplicateWithPrimary],
+        perspectivePersonID: perspectiveID))
+
+    #expect(result.primaryLabel == "同学")
+    #expect(
+      result.inferencePaths == [
+        .primaryPreference(factID: id(512)),
+        .social(factID: id(511), kind: .classmate),
+      ])
+  }
+
+  @Test("Reversed duplicate facts merge primary preferences by person")
+  func reversedDuplicateFactsMergePrimaryPreferencesByPerson() throws {
+    let perspectiveID = id(1)
+    let classmateID = id(2)
+    let people = [person(perspectiveID), person(classmateID)]
+    let canonicalDuplicate = fact(
+      id: id(513),
+      a: perspectiveID,
+      b: classmateID,
+      kind: .classmate,
+      aRole: .classmate,
+      bRole: .classmate,
+      createdAt: Date(timeIntervalSince1970: 100))
+    let reversedDuplicateWithPrimary = fact(
+      id: id(514),
+      a: classmateID,
+      b: perspectiveID,
+      kind: .classmate,
+      aRole: .classmate,
+      bRole: .classmate,
+      isPrimaryFromB: true,
+      createdAt: Date(timeIntervalSince1970: 200))
+
+    let fromPerspective = resolution(
+      classmateID,
+      in: RelationshipResolver.resolve(
+        people: people,
+        facts: [canonicalDuplicate, reversedDuplicateWithPrimary],
+        perspectivePersonID: perspectiveID))
+    let fromClassmate = resolution(
+      perspectiveID,
+      in: RelationshipResolver.resolve(
+        people: people,
+        facts: [canonicalDuplicate, reversedDuplicateWithPrimary],
+        perspectivePersonID: classmateID))
+
+    #expect(
+      fromPerspective.inferencePaths == [
+        .primaryPreference(factID: id(514)),
+        .social(factID: id(513), kind: .classmate),
+      ])
+    #expect(
+      fromClassmate.inferencePaths == [
+        .social(factID: id(513), kind: .classmate)
+      ])
+  }
+
+  @Test("Sibling graph produces first order inferred family labels")
+  func siblingGraphProducesFirstOrderInferredFamilyLabels() throws {
+    let parentID = id(1)
+    let olderChildID = id(2)
+    let middleChildID = id(3)
+    let youngerChildID = id(4)
+    let people = [
+      person(parentID, gender: .female),
+      person(olderChildID, birthday: birthday(1990), gender: .male),
+      person(middleChildID, birthday: birthday(1993), gender: .female),
+      person(youngerChildID, birthday: birthday(1996), gender: .male),
+    ]
+    let facts = [
+      fact(id: id(521), a: parentID, b: olderChildID, kind: .parentChild, aRole: .parent, bRole: .child),
+      fact(id: id(522), a: olderChildID, b: middleChildID, kind: .sibling, aRole: .sibling, bRole: .sibling),
+      fact(id: id(523), a: middleChildID, b: youngerChildID, kind: .sibling, aRole: .sibling, bRole: .sibling),
+    ]
+
+    let fromOlderChild = RelationshipResolver.resolve(
+      people: people,
+      facts: facts,
+      perspectivePersonID: olderChildID)
+    let fromMiddleChild = RelationshipResolver.resolve(
+      people: people,
+      facts: facts,
+      perspectivePersonID: middleChildID)
+    let fromParent = RelationshipResolver.resolve(
+      people: people,
+      facts: facts,
+      perspectivePersonID: parentID)
+
+    #expect(resolution(youngerChildID, in: fromOlderChild).primaryLabel == "弟弟")
+    #expect(
+      resolution(youngerChildID, in: fromOlderChild).inferencePaths.contains(
+        .inferred(kind: .sibling, viaPersonIDs: [middleChildID])))
+    #expect(resolution(parentID, in: fromMiddleChild).primaryLabel == "母亲")
+    #expect(
+      resolution(parentID, in: fromMiddleChild).inferencePaths.contains(
+        .inferred(kind: .parent, viaPersonIDs: [olderChildID])))
+    #expect(resolution(middleChildID, in: fromParent).primaryLabel == "女儿")
+    #expect(
+      resolution(middleChildID, in: fromParent).inferencePaths.contains(
+        .inferred(kind: .child, viaPersonIDs: [olderChildID])))
+  }
+
+  @Test("Inferred kinship wins over social labels without an explicit primary")
+  func inferredKinshipWinsOverSocialLabelsWithoutExplicitPrimary() throws {
+    let perspectiveID = id(1)
+    let parentID = id(2)
+    let uncleID = id(3)
+    let cousinID = id(4)
+    let people = [
+      person(perspectiveID, birthday: birthday(1995), gender: .male),
+      person(parentID, gender: .male),
+      person(uncleID, gender: .male),
+      person(cousinID, birthday: birthday(1990), gender: .female),
+    ]
+    let facts = [
+      fact(id: id(531), a: parentID, b: perspectiveID, kind: .parentChild, aRole: .parent, bRole: .child),
+      fact(id: id(532), a: parentID, b: uncleID, kind: .sibling, aRole: .sibling, bRole: .sibling),
+      fact(id: id(533), a: uncleID, b: cousinID, kind: .parentChild, aRole: .parent, bRole: .child),
+      fact(id: id(534), a: perspectiveID, b: cousinID, kind: .classmate, aRole: .classmate, bRole: .classmate),
+    ]
+
+    let result = resolution(
+      cousinID,
+      in: RelationshipResolver.resolve(people: people, facts: facts, perspectivePersonID: perspectiveID))
+
+    #expect(result.primaryLabel == "堂姐")
+    #expect(result.additionalLabels.contains("同学"))
+  }
+
+  @Test("Explicit primary social label still wins over inferred kinship")
+  func explicitPrimarySocialLabelStillWinsOverInferredKinship() throws {
+    let perspectiveID = id(1)
+    let parentID = id(2)
+    let uncleID = id(3)
+    let cousinID = id(4)
+    let people = [
+      person(perspectiveID, birthday: birthday(1995), gender: .male),
+      person(parentID, gender: .male),
+      person(uncleID, gender: .male),
+      person(cousinID, birthday: birthday(1990), gender: .female),
+    ]
+    let facts = [
+      fact(id: id(541), a: parentID, b: perspectiveID, kind: .parentChild, aRole: .parent, bRole: .child),
+      fact(id: id(542), a: parentID, b: uncleID, kind: .sibling, aRole: .sibling, bRole: .sibling),
+      fact(id: id(543), a: uncleID, b: cousinID, kind: .parentChild, aRole: .parent, bRole: .child),
+      fact(
+        id: id(544),
+        a: perspectiveID,
+        b: cousinID,
+        kind: .classmate,
+        aRole: .classmate,
+        bRole: .classmate,
+        isPrimaryFromA: true),
+    ]
+
+    let result = resolution(
+      cousinID,
+      in: RelationshipResolver.resolve(people: people, facts: facts, perspectivePersonID: perspectiveID))
+
+    #expect(result.primaryLabel == "同学")
+    #expect(result.additionalLabels.contains("堂姐"))
+  }
+
+  @Test("Perspective missing endpoint is exposed as resolver diagnostic")
+  func perspectiveMissingEndpointIsExposedAsResolverDiagnostic() throws {
+    let perspectiveID = id(1)
+    let targetID = id(2)
+    let missingID = id(999)
+    let people = [person(perspectiveID), person(targetID)]
+    let facts = [
+      fact(id: id(551), a: perspectiveID, b: missingID, kind: .friend, aRole: .friend, bRole: .friend)
+    ]
+
+    let result = RelationshipResolver.resolveWithDiagnostics(
+      people: people,
+      facts: facts,
+      perspectivePersonID: perspectiveID)
+
+    #expect(result.diagnostics == [.missingEndpoint])
+    #expect(result.resolutions.map(\.targetPersonID) == [targetID])
   }
 
   @Test("Facts with missing endpoints mark known participants and are ignored for inference")
