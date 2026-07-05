@@ -49,12 +49,22 @@ public struct PeopleTimelineView: View {
         if !people.isEmpty {
           Section(L10n.Timeline.people) {
             ForEach(people) { person in
-              VStack(alignment: .leading, spacing: 4) {
-                Text(person.name)
-                  .font(.headline)
-                Text(person.calendarKind.localizedTitle)
-                  .font(.subheadline)
-                  .foregroundStyle(.secondary)
+              NavigationLink {
+                PersonDetailView(
+                  person: person,
+                  calendarKinds: BirthdayCalendarKind.selectionKinds(from: enabledCalendarKinds)
+                ) { person, state in
+                  try state.apply(to: person)
+                  try saveModelContextAndPersistWidgetSnapshots()
+                }
+              } label: {
+                VStack(alignment: .leading, spacing: 4) {
+                  Text(person.name)
+                    .font(.headline)
+                  Text(person.calendarKind.localizedTitle)
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                }
               }
             }
             .onDelete(perform: deletePeople)
@@ -78,16 +88,10 @@ public struct PeopleTimelineView: View {
         }
       }
       .sheet(isPresented: $isAddingPerson) {
-        PersonFormView(calendarKinds: BirthdayCalendarKind.selectionKinds(from: enabledCalendarKinds)) { formState in
-          let person = try formState.makeTrackedPerson()
+        PersonFormView(calendarKinds: BirthdayCalendarKind.selectionKinds(from: enabledCalendarKinds)) { state in
+          let person = try state.makeTrackedPerson()
           modelContext.insert(person)
-          do {
-            try modelContext.save()
-            persistWidgetSnapshots(for: people + [person])
-          } catch {
-            modelContext.rollback()
-            throw error
-          }
+          try saveModelContextAndPersistWidgetSnapshots(for: people + [person])
         }
       }
       .onAppear {
@@ -120,6 +124,17 @@ public struct PeopleTimelineView: View {
       sync: {
         persistWidgetSnapshots(for: remainingPeople)
       })
+  }
+
+  private func saveModelContextAndPersistWidgetSnapshots(for people: [TrackedPerson]? = nil) throws {
+    do {
+      try modelContext.save()
+    } catch {
+      modelContext.rollback()
+      throw error
+    }
+
+    persistWidgetSnapshots(for: people)
   }
 
   private func persistWidgetSnapshots(for people: [TrackedPerson]? = nil) {
