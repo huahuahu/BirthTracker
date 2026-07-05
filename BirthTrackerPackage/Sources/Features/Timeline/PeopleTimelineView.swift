@@ -78,15 +78,16 @@ public struct PeopleTimelineView: View {
         }
       }
       .sheet(isPresented: $isAddingPerson) {
-        PersonFormView(calendarKinds: BirthdayCalendarKind.selectionKinds(from: enabledCalendarKinds)) { person in
+        PersonFormView(calendarKinds: BirthdayCalendarKind.selectionKinds(from: enabledCalendarKinds)) { formState in
+          let person = try formState.makeTrackedPerson()
           modelContext.insert(person)
-          WidgetSnapshotSyncGate.runAfterSuccessfulSave(
-            save: {
-              try modelContext.save()
-            },
-            sync: {
-              persistWidgetSnapshots(for: people + [person])
-            })
+          do {
+            try modelContext.save()
+            persistWidgetSnapshots(for: people + [person])
+          } catch {
+            modelContext.rollback()
+            throw error
+          }
         }
       }
       .onAppear {
