@@ -18,6 +18,7 @@
 - Use SFSafeSymbols typed APIs or existing `SFSymbol.*.rawValue` patterns instead of raw SF Symbol strings.
 - Run `make check` after code changes.
 - Before the first `xcodebuildmcp` build/test call in an implementation session, call `xcodebuildmcp-session_show_defaults`; if defaults are missing, set `projectPath` to the repo-root absolute path for `BirthTracker.xcodeproj`, `scheme` to `BirthTracker`, and use the simulator defaults from `.xcodebuildmcp/config.yaml`.
+- When implementing the Widget UI, preview the Widget and capture evidence with xcodebuildmcp. Prefer a simulator/home-screen preview with screenshot; if WidgetKit home-screen insertion is not available in the active tooling, build the Widget previews and capture the best available simulator screenshot, then report the limitation explicitly.
 - If SwiftPM/Xcode fails with `safe.bareRepository is 'explicit'`, rerun that command with `GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0=safe.bareRepository GIT_CONFIG_VALUE_0=all`.
 - Network fetch/install commands must use the local proxy environment required by the repository instructions.
 
@@ -1580,7 +1581,20 @@ Use xcodebuildmcp:
 
 Expected: Build succeeds for `BirthTracker` and embedded `BirthTrackerWidget`.
 
-- [ ] **Step 6: Commit Task 5**
+- [ ] **Step 6: Preview the contact age Widget**
+
+Use xcodebuildmcp to preview the Widget visually after the build succeeds.
+
+```text
+1. xcodebuildmcp-open_sim
+2. xcodebuildmcp-screenshot with returnFormat: path
+3. If the active tooling can add or focus the Widget on the simulator home screen, show `ContactAgeWidget` in both `durationComponents` and `totalDays` states and capture screenshots.
+4. If the active tooling cannot insert a Widget into the home screen, use the Widget SwiftUI previews as the visual source of truth, keep the Xcode build evidence from Step 5, capture the best available simulator screenshot, and write the limitation in the Task 5 report.
+```
+
+Expected: The Task 5 report includes screenshot path(s) or a clear limitation explaining why a real home-screen Widget preview could not be captured with available tooling.
+
+- [ ] **Step 7: Commit Task 5**
 
 ```bash
 git add Sources/BirthTrackerWidget/ToggleContactAgeFormatIntent.swift Sources/BirthTrackerWidget/ContactAgeWidget.swift Sources/BirthTrackerWidget/BirthTrackerWidgetBundle.swift
