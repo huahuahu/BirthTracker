@@ -144,17 +144,34 @@ public enum L10n {
   }
 
   public enum Widget {
+    public static let ageFormatDuration = LocalizedStringResource(
+      "widget.contact.age.format.duration", bundle: .atURL(Bundle.module.bundleURL))
+    public static let ageFormatTotalDays = LocalizedStringResource(
+      "widget.contact.age.format.total.days", bundle: .atURL(Bundle.module.bundleURL))
     public static let choosePerson = LocalizedStringResource("Choose Person", bundle: .atURL(Bundle.module.bundleURL))
     public static let choosePersonDescription = LocalizedStringResource(
       "Choose which person's birthday this widget shows.", bundle: .atURL(Bundle.module.bundleURL))
+    public static let contactAge = LocalizedStringResource("Contact Age", bundle: .atURL(Bundle.module.bundleURL))
+    public static let contactAgeChoosePerson = LocalizedStringResource(
+      "Choose a person to show their age.", bundle: .atURL(Bundle.module.bundleURL))
+    public static let contactAgeDescription = LocalizedStringResource(
+      "Track one person's current age. Tap to switch formats.", bundle: .atURL(Bundle.module.bundleURL))
+    public static let contactAgeNeedsBirthYear = LocalizedStringResource(
+      "Add a birth year to show age.", bundle: .atURL(Bundle.module.bundleURL))
+    public static let contactAgeTapToSwitch = LocalizedStringResource(
+      "Tap to switch format", bundle: .atURL(Bundle.module.bundleURL))
     public static let description = LocalizedStringResource(
       "See the next birthdays at a glance.", bundle: .atURL(Bundle.module.bundleURL))
+    public static let noBirthdayRecorded = LocalizedStringResource(
+      "No birthday recorded", bundle: .atURL(Bundle.module.bundleURL))
     public static let noUpcomingBirthdays = LocalizedStringResource(
       "No upcoming birthdays", bundle: .atURL(Bundle.module.bundleURL))
     public static let person = LocalizedStringResource("Person", bundle: .atURL(Bundle.module.bundleURL))
     public static let selectedPersonUnavailable = LocalizedStringResource(
       "Selected person is no longer available.", bundle: .atURL(Bundle.module.bundleURL))
     public static let title = LocalizedStringResource("Birthdays", bundle: .atURL(Bundle.module.bundleURL))
+    public static let toggleAgeFormat = LocalizedStringResource(
+      "Toggle Age Format", bundle: .atURL(Bundle.module.bundleURL))
     public static let upcomingBirthdays = LocalizedStringResource(
       "Upcoming Birthdays", bundle: .atURL(Bundle.module.bundleURL))
 
@@ -162,6 +179,18 @@ public enum L10n {
       let format = L10n.string(
         LocalizedStringResource("widget.birth.duration.format", bundle: .atURL(Bundle.module.bundleURL)))
       return String.localizedStringWithFormat(format, years, months, days)
+    }
+
+    public static func contactAgeDuration(_ years: Int, _ months: Int, _ days: Int) -> String {
+      let format = L10n.string(
+        LocalizedStringResource("widget.contact.age.duration.format", bundle: .atURL(Bundle.module.bundleURL)))
+      return String.localizedStringWithFormat(format, years, months, days)
+    }
+
+    public static func contactAgeTotalDays(_ days: Int) -> String {
+      let format = L10n.string(
+        LocalizedStringResource("widget.contact.age.total.days.format", bundle: .atURL(Bundle.module.bundleURL)))
+      return String.localizedStringWithFormat(format, days)
     }
   }
 }
