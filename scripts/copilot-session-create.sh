@@ -54,7 +54,13 @@ run_xcode_build_server() {
   fi
 
   echo "copilot-session-create: generating xcode-build-server config."
-  (cd "$WORKSPACE_PATH" && xcode-build-server config -project BirthTracker.xcodeproj -scheme BirthTracker)
+  (
+    cd "$WORKSPACE_PATH" &&
+      xcode-build-server config \
+        -workspace BirthTracker.xcodeproj/project.xcworkspace \
+        -scheme BirthTracker \
+        --build_root "$WORKSPACE_PATH/AIOutput/DerivedData"
+  )
 
   if [ ! -f "$WORKSPACE_PATH/buildServer.json" ]; then
     echo "error: xcode-build-server did not generate buildServer.json." >&2
@@ -62,6 +68,114 @@ run_xcode_build_server() {
   fi
 
   echo "copilot-session-create: generated buildServer.json."
+}
+
+read_build_server_value() {
+  plutil -extract "$1" raw -o - "$WORKSPACE_PATH/buildServer.json"
+}
+
+read_xcodebuildmcp_session_default() {
+  if [ ! -f "$WORKSPACE_PATH/.xcodebuildmcp/config.yaml" ]; then
+    return 0
+  fi
+
+  awk -v key="$1:" '$1 == key { print $2; exit }' "$WORKSPACE_PATH/.xcodebuildmcp/config.yaml"
+}
+
+hash_text() {
+  if command -v md5 >/dev/null 2>&1; then
+    printf '%s' "$1" | md5 -q
+  elif command -v md5sum >/dev/null 2>&1; then
+    printf '%s' "$1" | md5sum | awk '{ print $1 }'
+  else
+    echo "error: md5 or md5sum is required to compute xcode-build-server cache paths." >&2
+    exit 127
+  fi
+}
+
+build_server_compile_file_path() {
+  CACHE_ROOT_KEY="$(printf '%s' "$WORKSPACE_PATH" | sed 's#/#-#g')"
+  BUILD_ROOT_HASH="$(hash_text "$BUILD_ROOT")"
+  echo "$HOME/Library/Caches/xcode-build-server/$CACHE_ROOT_KEY/compile_file-$BUILD_SCHEME-$BUILD_ROOT_HASH"
+}
+
+run_xcodebuild() {
+  if ! command -v xcodebuild >/dev/null 2>&1; then
+    echo "error: xcodebuild is required to build BirthTracker." >&2
+    exit 127
+  fi
+
+  if ! command -v plutil >/dev/null 2>&1; then
+    echo "error: plutil is required to read buildServer.json." >&2
+    exit 127
+  fi
+
+  if ! BUILD_WORKSPACE="$(read_build_server_value workspace)"; then
+    echo "error: buildServer.json is missing a workspace value." >&2
+    exit 1
+  fi
+
+  if ! BUILD_SCHEME="$(read_build_server_value scheme)"; then
+    echo "error: buildServer.json is missing a scheme value." >&2
+    exit 1
+  fi
+
+  if ! BUILD_ROOT="$(read_build_server_value build_root)"; then
+    echo "error: buildServer.json is missing a build_root value." >&2
+    exit 1
+  fi
+
+  if [ -z "$BUILD_WORKSPACE" ] || [ -z "$BUILD_SCHEME" ] || [ -z "$BUILD_ROOT" ]; then
+    echo "error: buildServer.json has empty workspace, scheme, or build_root values." >&2
+    exit 1
+  fi
+
+  if [ "$BUILD_ROOT" != "$WORKSPACE_PATH/AIOutput/DerivedData" ]; then
+    echo "error: refusing to clean unexpected build root: $BUILD_ROOT" >&2
+    exit 1
+  fi
+
+  echo "copilot-session-create: cleaning stale DerivedData."
+  rm -rf "$BUILD_ROOT"
+
+  BUILD_DESTINATION="generic/platform=iOS Simulator"
+  if SIMULATOR_ID="$(read_xcodebuildmcp_session_default simulatorId)" && [ -n "$SIMULATOR_ID" ]; then
+    BUILD_DESTINATION="platform=iOS Simulator,id=$SIMULATOR_ID"
+  fi
+
+  RESULT_BUNDLE_PATH="$WORKSPACE_PATH/AIOutput/BuildServer.xcresult"
+  rm -rf "$RESULT_BUNDLE_PATH"
+
+  COMPILE_FILE="$(build_server_compile_file_path)"
+  mkdir -p "$(dirname "$COMPILE_FILE")"
+  rm -f "$COMPILE_FILE" "$COMPILE_FILE.lock"
+
+  echo "copilot-session-create: building BirthTracker for iOS Simulator."
+  (
+    cd "$WORKSPACE_PATH" &&
+      xcodebuild \
+        GCC_GENERATE_DEBUGGING_SYMBOLS=YES \
+        ONLY_ACTIVE_ARCH=YES \
+        COMPILER_INDEX_STORE_ENABLE=YES \
+        -workspace "$BUILD_WORKSPACE" \
+        -scheme "$BUILD_SCHEME" \
+        -configuration Debug \
+        -destination "$BUILD_DESTINATION" \
+        -resultBundlePath "$RESULT_BUNDLE_PATH" \
+        -allowProvisioningUpdates \
+        -derivedDataPath "$BUILD_ROOT" \
+        CODE_SIGNING_ALLOWED=NO \
+        build-for-testing
+  )
+  echo "copilot-session-create: built BirthTracker for iOS Simulator."
+
+  echo "copilot-session-create: generating xcode-build-server compile cache."
+  (cd "$WORKSPACE_PATH" && xcode-build-server parse -s "$BUILD_ROOT" -o "$COMPILE_FILE" --scheme "$BUILD_SCHEME")
+  if [ ! -s "$COMPILE_FILE" ]; then
+    echo "error: xcode-build-server did not generate compile cache." >&2
+    exit 1
+  fi
+  echo "copilot-session-create: generated xcode-build-server compile cache."
 }
 
 TARGET_DIR="$WORKSPACE_PATH/Config"
@@ -86,3 +200,4 @@ fi
 
 run_xcodegen
 run_xcode_build_server
+run_xcodebuild
