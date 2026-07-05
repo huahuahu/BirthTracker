@@ -3,6 +3,8 @@ import Testing
 
 @testable import Models
 
+// swiftlint:disable file_length
+
 @Suite("Relationship resolver")
 struct RelationshipResolverTests {
   @Test("Direct family and social relationships resolve from the current perspective")
@@ -255,6 +257,26 @@ struct RelationshipResolverTests {
     #expect(resolution(cousinID, in: resolutions).primaryLabel == "堂姐")
     #expect(resolution(nephewID, in: resolutions).primaryLabel == "侄子")
     #expect(resolution(grandchildID, in: resolutions).primaryLabel == "孙女")
+    #expect(
+      resolution(paternalGrandfatherID, in: resolutions).inferencePaths == [
+        .inferred(kind: .grandparent, viaPersonIDs: [fatherID])
+      ])
+    #expect(
+      resolution(uncleID, in: resolutions).inferencePaths == [
+        .inferred(kind: .parentSibling, viaPersonIDs: [fatherID])
+      ])
+    #expect(
+      resolution(nephewID, in: resolutions).inferencePaths == [
+        .inferred(kind: .siblingChild, viaPersonIDs: [siblingID])
+      ])
+    #expect(
+      resolution(cousinID, in: resolutions).inferencePaths == [
+        .inferred(kind: .cousin, viaPersonIDs: [fatherID, uncleID])
+      ])
+    #expect(
+      resolution(grandchildID, in: resolutions).inferencePaths == [
+        .inferred(kind: .grandchild, viaPersonIDs: [daughterID])
+      ])
   }
 
   @Test("Unknown gender and missing birthdays fall back to neutral kinship labels")
@@ -284,7 +306,9 @@ struct RelationshipResolverTests {
     #expect(resolution(siblingID, in: resolutions).primaryLabel == "叔伯姑姨")
     #expect(resolution(cousinID, in: resolutions).primaryLabel == "堂表亲")
   }
+}
 
+extension RelationshipResolverTests {
   @Test("Direct child label stays primary when perspective also has known parents")
   func directChildLabelStaysPrimaryWhenPerspectiveAlsoHasKnownParents() throws {
     let currentID = id(1)
@@ -411,6 +435,172 @@ extension RelationshipResolverTests {
     #expect(result.hasConflict)
     #expect(result.primaryLabel == "子女")
   }
+
+  @Test("Birth order compares era for era-based calendars")
+  func birthOrderComparesEraForEraBasedCalendars() throws {
+    let earlierChineseBirthday = birthday(10, calendarKind: .chinese, era: 78)
+    let laterChineseBirthday = birthday(1, calendarKind: .chinese, era: 79)
+    let missingEraChineseBirthday = birthday(10, calendarKind: .chinese)
+    let gregorianOlderBirthday = birthday(1990)
+    let gregorianYoungerBirthday = birthday(1992)
+    let gregorianBirthdayWithEra = birthday(1990, calendarKind: .gregorian, era: 1)
+
+    #expect(earlierChineseBirthday.birthOrderCompared(to: laterChineseBirthday) == .older)
+    #expect(laterChineseBirthday.birthOrderCompared(to: earlierChineseBirthday) == .younger)
+    #expect(earlierChineseBirthday.birthOrderCompared(to: earlierChineseBirthday) == .sameAge)
+    #expect(missingEraChineseBirthday.birthOrderCompared(to: laterChineseBirthday) == nil)
+    #expect(missingEraChineseBirthday.birthOrderCompared(to: missingEraChineseBirthday) == nil)
+    #expect(gregorianOlderBirthday.birthOrderCompared(to: gregorianYoungerBirthday) == .older)
+    #expect(gregorianBirthdayWithEra.birthOrderCompared(to: gregorianOlderBirthday) == nil)
+  }
+
+  @Test("Relationship inference paths preserve direct social primary and inferred provenance")
+  func relationshipInferencePathsPreserveDirectSocialPrimaryAndInferredProvenance() throws {
+    let perspectiveID = id(1)
+    let parentID = id(2)
+    let friendID = id(3)
+    let classmateID = id(4)
+    let grandparentID = id(5)
+    let people = [
+      person(perspectiveID),
+      person(parentID),
+      person(friendID),
+      person(classmateID),
+      person(grandparentID),
+    ]
+    let parentFact = fact(
+      id: id(801),
+      a: parentID,
+      b: perspectiveID,
+      kind: .parentChild,
+      aRole: .parent,
+      bRole: .child)
+    let friendFact = fact(
+      id: id(802),
+      a: perspectiveID,
+      b: friendID,
+      kind: .friend,
+      aRole: .friend,
+      bRole: .friend)
+    let primaryClassmateFact = fact(
+      id: id(803),
+      a: perspectiveID,
+      b: classmateID,
+      kind: .classmate,
+      aRole: .classmate,
+      bRole: .classmate,
+      isPrimaryFromA: true)
+    let grandparentFact = fact(
+      id: id(804),
+      a: grandparentID,
+      b: parentID,
+      kind: .parentChild,
+      aRole: .parent,
+      bRole: .child)
+
+    let result = RelationshipResolver.resolve(
+      people: people,
+      facts: [parentFact, friendFact, primaryClassmateFact, grandparentFact],
+      perspectivePersonID: perspectiveID)
+
+    #expect(
+      resolution(parentID, in: result).inferencePaths == [
+        .direct(factID: id(801), kind: .parentChild)
+      ])
+    #expect(
+      resolution(friendID, in: result).inferencePaths == [
+        .social(factID: id(802), kind: .friend)
+      ])
+    #expect(
+      resolution(classmateID, in: result).inferencePaths == [
+        .primaryPreference(factID: id(803)),
+        .social(factID: id(803), kind: .classmate),
+      ])
+    #expect(
+      resolution(grandparentID, in: result).inferencePaths == [
+        .inferred(kind: .grandparent, viaPersonIDs: [parentID])
+      ])
+  }
+
+  @Test("Opposite parent child directions for the same pair mark conflict")
+  func oppositeParentChildDirectionsForSamePairMarkConflict() throws {
+    let perspectiveID = id(1)
+    let targetID = id(2)
+    let people = [person(perspectiveID), person(targetID)]
+    let facts = [
+      fact(
+        id: id(901),
+        a: perspectiveID,
+        b: targetID,
+        kind: .parentChild,
+        aRole: .parent,
+        bRole: .child),
+      fact(
+        id: id(902),
+        a: targetID,
+        b: perspectiveID,
+        kind: .parentChild,
+        aRole: .parent,
+        bRole: .child),
+    ]
+
+    let result = resolution(
+      targetID,
+      in: RelationshipResolver.resolve(people: people, facts: facts, perspectivePersonID: perspectiveID))
+
+    #expect(result.hasConflict)
+  }
+
+  @Test("Cousin neutral fallback preserves known lineage side")
+  func cousinNeutralFallbackPreservesKnownLineageSide() throws {
+    let cases: [(RelationshipGender, RelationshipGender, String)] = [
+      (.male, .male, "堂兄弟姐妹"),
+      (.male, .female, "姑表兄弟姐妹"),
+      (.female, .male, "舅表兄弟姐妹"),
+      (.female, .female, "姨表兄弟姐妹"),
+    ]
+
+    for (index, testCase) in cases.enumerated() {
+      let base = 1_000 + index * 10
+      let perspectiveID = id(base + 1)
+      let parentID = id(base + 2)
+      let parentSiblingID = id(base + 3)
+      let cousinID = id(base + 4)
+      let people = [
+        person(perspectiveID),
+        person(parentID, gender: testCase.0),
+        person(parentSiblingID, gender: testCase.1),
+        person(cousinID),
+      ]
+      let facts = [
+        fact(
+          id: id(base + 5),
+          a: parentID,
+          b: perspectiveID,
+          kind: .parentChild,
+          aRole: .parent,
+          bRole: .child),
+        fact(
+          id: id(base + 6),
+          a: parentID,
+          b: parentSiblingID,
+          kind: .sibling,
+          aRole: .sibling,
+          bRole: .sibling),
+        fact(
+          id: id(base + 7),
+          a: parentSiblingID,
+          b: cousinID,
+          kind: .parentChild,
+          aRole: .parent,
+          bRole: .child),
+      ]
+
+      let result = RelationshipResolver.resolve(people: people, facts: facts, perspectivePersonID: perspectiveID)
+
+      #expect(resolution(cousinID, in: result).primaryLabel == testCase.2)
+    }
+  }
 }
 
 private func id(_ value: Int) -> UUID {
@@ -420,8 +610,14 @@ private func id(_ value: Int) -> UUID {
   return uuid
 }
 
-private func birthday(_ year: Int, _ month: Int = 1, _ day: Int = 1) -> RelationshipBirthday {
-  RelationshipBirthday(calendarKind: .gregorian, year: year, month: month, day: day)
+private func birthday(
+  _ year: Int,
+  _ month: Int = 1,
+  _ day: Int = 1,
+  calendarKind: BirthdayCalendarKind = .gregorian,
+  era: Int? = nil
+) -> RelationshipBirthday {
+  RelationshipBirthday(calendarKind: calendarKind, era: era, year: year, month: month, day: day)
 }
 
 private func person(

@@ -32,10 +32,33 @@ public struct RelationshipBirthday: Equatable, Sendable {
 
   public func birthOrderCompared(to other: RelationshipBirthday) -> RelationshipBirthOrder? {
     guard calendarKind == other.calendarKind, let year, let otherYear = other.year else { return nil }
-    let lhs = [year, month, day]
-    let rhs = [otherYear, other.month, other.day]
+    let lhs: [Int]
+    let rhs: [Int]
+    switch (era, other.era) {
+    case (let lhsEra?, let rhsEra?):
+      lhs = [lhsEra, year, month, day]
+      rhs = [rhsEra, otherYear, other.month, other.day]
+    case (nil, nil):
+      guard calendarKind.requiresEraForReliableBirthOrder == false else { return nil }
+      lhs = [year, month, day]
+      rhs = [otherYear, other.month, other.day]
+    case (_?, nil), (nil, _?):
+      return nil
+    }
+
     if lhs == rhs { return .sameAge }
     return lhs.lexicographicallyPrecedes(rhs) ? .older : .younger
+  }
+}
+
+extension BirthdayCalendarKind {
+  fileprivate var requiresEraForReliableBirthOrder: Bool {
+    switch self {
+    case .chinese:
+      return true
+    case .gregorian, .buddhist, .hebrew, .islamicUmmAlQura:
+      return false
+    }
   }
 }
 

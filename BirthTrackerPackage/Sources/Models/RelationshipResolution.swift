@@ -37,6 +37,22 @@ public enum RelationshipResolutionDiagnostic: Hashable, Sendable {
   case conflict
 }
 
+public enum InferredRelationshipKind: String, Hashable, Sendable {
+  case parent
+  case child
+  case spouse
+  case sibling
+  case grandparent
+  case grandchild
+  case parentSibling
+  case siblingChild
+  case cousin
+  case social
+}
+
 public enum RelationshipInferencePath: Hashable, Sendable {
-  case direct(factID: UUID)
+  case primaryPreference(factID: UUID)
+  case direct(factID: UUID, kind: RelationshipKind)
+  case inferred(kind: InferredRelationshipKind, viaPersonIDs: [UUID])
+  case social(factID: UUID, kind: RelationshipKind)
 }

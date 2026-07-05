@@ -16,6 +16,7 @@ public enum RelationshipResolver {
         .map { ($0.id, ResolutionAccumulator(targetPersonID: $0.id)) })
     var seenFactKeys = Set<FactKey>()
     var kinshipKindsByPair: [FactPairKey: Set<RelationshipKind>] = [:]
+    var parentChildDirectionsByPair: [FactPairKey: ParentChildDirection] = [:]
     var graph = KinshipGraph(peopleIDs: Set(people.map(\.id)))
 
     for fact in facts.sorted(by: factSortPrecedes) {
@@ -43,6 +44,16 @@ public enum RelationshipResolver {
           accumulators[fact.personBID]?.addDiagnostic(.conflict)
         }
         kinshipKindsByPair[pairKey, default: []].insert(fact.kind)
+
+        if fact.kind == .parentChild, let direction = ParentChildDirection(fact) {
+          let hasOppositeDirection = parentChildDirectionsByPair[pairKey].map { $0 != direction } ?? false
+          if hasOppositeDirection {
+            accumulators[fact.personAID]?.addDiagnostic(.conflict)
+            accumulators[fact.personBID]?.addDiagnostic(.conflict)
+          } else {
+            parentChildDirectionsByPair[pairKey] = direction
+          }
+        }
       }
 
       graph.add(fact)
@@ -61,6 +72,7 @@ public enum RelationshipResolver {
           label: directLabel(for: directContext),
           isPrimary: directContext.isPrimary,
           factID: fact.id,
+          kind: directContext.kind,
           priority: labelPriority(for: directContext.kind),
           createdAt: fact.createdAt))
     }
@@ -114,24 +126,36 @@ private struct DirectRelationshipContext {
 private struct LabelCandidate: Equatable {
   let label: String
   let isPrimary: Bool
-  let inferencePath: RelationshipInferencePath?
+  let inferencePaths: [RelationshipInferencePath]
   let priority: Int
   let createdAt: Date
   let sortKey: String
 
-  init(label: String, isPrimary: Bool, factID: UUID, priority: Int, createdAt: Date) {
+  init(
+    label: String,
+    isPrimary: Bool,
+    factID: UUID,
+    kind: RelationshipKind,
+    priority: Int,
+    createdAt: Date
+  ) {
     self.label = label
     self.isPrimary = isPrimary
-    self.inferencePath = .direct(factID: factID)
+    var paths: [RelationshipInferencePath] = []
+    if isPrimary {
+      paths.append(.primaryPreference(factID: factID))
+    }
+    paths.append(kind.isKinship ? .direct(factID: factID, kind: kind) : .social(factID: factID, kind: kind))
+    self.inferencePaths = paths
     self.priority = priority
     self.createdAt = createdAt
     self.sortKey = factID.uuidString
   }
 
-  init(inferredLabel label: String, priority: Int) {
+  init(inferredLabel label: String, kind: InferredRelationshipKind, viaPersonIDs: [UUID], priority: Int) {
     self.label = label
     self.isPrimary = false
-    self.inferencePath = nil
+    self.inferencePaths = [.inferred(kind: kind, viaPersonIDs: viaPersonIDs)]
     self.priority = priority
     self.createdAt = .distantFuture
     self.sortKey = label
@@ -174,7 +198,7 @@ private struct ResolutionAccumulator {
     let inferencePaths =
       candidates
       .sorted(by: candidateSortPrecedes)
-      .compactMap(\.inferencePath)
+      .flatMap(\.inferencePaths)
       .deduplicated()
 
     return RelationshipResolution(
@@ -220,6 +244,23 @@ private struct FactPairKey: Hashable {
     } else {
       self.firstPersonID = rhs
       self.secondPersonID = lhs
+    }
+  }
+}
+
+private struct ParentChildDirection: Equatable {
+  let parentID: UUID
+  let childID: UUID
+
+  init?(_ fact: RelationshipFact) {
+    if fact.personARole == .parent, fact.personBRole == .child {
+      self.parentID = fact.personAID
+      self.childID = fact.personBID
+    } else if fact.personBRole == .parent, fact.personARole == .child {
+      self.parentID = fact.personBID
+      self.childID = fact.personAID
+    } else {
+      return nil
     }
   }
 }
@@ -384,9 +425,12 @@ private func addInferenceCandidates(
 
   addGrandparentCandidates(context: context, accumulators: &accumulators)
   addGrandchildCandidates(context: context, accumulators: &accumulators)
-  let parentSiblingIDs = addParentSiblingCandidates(context: context, accumulators: &accumulators)
+  let lineageParentIDsByParentSiblingID = addParentSiblingCandidates(context: context, accumulators: &accumulators)
   addSiblingChildCandidates(context: context, accumulators: &accumulators)
-  addCousinCandidates(context: context, parentSiblingIDs: parentSiblingIDs, accumulators: &accumulators)
+  addCousinCandidates(
+    context: context,
+    lineageParentIDsByParentSiblingID: lineageParentIDsByParentSiblingID,
+    accumulators: &accumulators)
 }
 
 private struct InferenceContext {
@@ -409,6 +453,8 @@ private func addGrandparentCandidates(
       accumulators[grandparentID]?.addCandidate(
         LabelCandidate(
           inferredLabel: grandparentLabel(parent: parent, grandparent: grandparent),
+          kind: .grandparent,
+          viaPersonIDs: [parentID],
           priority: inferredLabelPriority))
     }
   }
@@ -425,6 +471,8 @@ private func addGrandchildCandidates(
       accumulators[grandchildID]?.addCandidate(
         LabelCandidate(
           inferredLabel: grandchildLabel(for: grandchild.relationshipGender),
+          kind: .grandchild,
+          viaPersonIDs: [childID],
           priority: inferredLabelPriority))
     }
   }
@@ -433,21 +481,23 @@ private func addGrandchildCandidates(
 private func addParentSiblingCandidates(
   context: InferenceContext,
   accumulators: inout [UUID: ResolutionAccumulator]
-) -> Set<UUID> {
-  var parentSiblingIDs = Set<UUID>()
+) -> [UUID: UUID] {
+  var lineageParentIDsByParentSiblingID: [UUID: UUID] = [:]
   for parentID in context.perspectiveParents.sortedByUUIDString() {
     guard let parent = context.peopleByID[parentID] else { continue }
     for parentSiblingID in context.graph.siblings(of: parentID).sortedByUUIDString()
     where parentSiblingID != context.perspectivePersonID {
       guard let parentSibling = context.peopleByID[parentSiblingID] else { continue }
-      parentSiblingIDs.insert(parentSiblingID)
+      lineageParentIDsByParentSiblingID[parentSiblingID] = parentID
       accumulators[parentSiblingID]?.addCandidate(
         LabelCandidate(
           inferredLabel: parentSiblingLabel(parent: parent, parentSibling: parentSibling),
+          kind: .parentSibling,
+          viaPersonIDs: [parentID],
           priority: inferredLabelPriority))
     }
   }
-  return parentSiblingIDs
+  return lineageParentIDsByParentSiblingID
 }
 
 private func addSiblingChildCandidates(
@@ -462,6 +512,8 @@ private func addSiblingChildCandidates(
       accumulators[siblingChildID]?.addCandidate(
         LabelCandidate(
           inferredLabel: siblingChildLabel(sibling: sibling, siblingChild: siblingChild),
+          kind: .siblingChild,
+          viaPersonIDs: [siblingID],
           priority: inferredLabelPriority))
     }
   }
@@ -469,14 +521,15 @@ private func addSiblingChildCandidates(
 
 private func addCousinCandidates(
   context: InferenceContext,
-  parentSiblingIDs: Set<UUID>,
+  lineageParentIDsByParentSiblingID: [UUID: UUID],
   accumulators: inout [UUID: ResolutionAccumulator]
 ) {
-  for parentSiblingID in parentSiblingIDs.sortedByUUIDString() {
+  for parentSiblingID in lineageParentIDsByParentSiblingID.keys.sortedByUUIDString() {
     guard let parentSibling = context.peopleByID[parentSiblingID] else { continue }
     addCousins(
       for: parentSibling,
       parentSiblingID: parentSiblingID,
+      lineageParentID: lineageParentIDsByParentSiblingID[parentSiblingID],
       context: context,
       accumulators: &accumulators)
   }
@@ -485,9 +538,11 @@ private func addCousinCandidates(
 private func addCousins(
   for parentSibling: RelationshipPersonInput,
   parentSiblingID: UUID,
+  lineageParentID: UUID?,
   context: InferenceContext,
   accumulators: inout [UUID: ResolutionAccumulator]
 ) {
+  let lineageParent = lineageParentID.flatMap { context.peopleByID[$0] }
   for cousinID in context.graph.children(of: parentSiblingID).sortedByUUIDString()
   where cousinID != context.perspectivePersonID {
     guard let cousin = context.peopleByID[cousinID] else { continue }
@@ -495,23 +550,13 @@ private func addCousins(
       LabelCandidate(
         inferredLabel: cousinLabel(
           perspective: context.perspective,
-          lineageParent: lineageParent(for: parentSiblingID, context: context),
+          lineageParent: lineageParent,
           parentSibling: parentSibling,
           cousin: cousin),
+        kind: .cousin,
+        viaPersonIDs: [lineageParentID, parentSiblingID].compactMap { $0 },
         priority: inferredLabelPriority))
   }
-}
-
-private func lineageParent(
-  for parentSiblingID: UUID,
-  context: InferenceContext
-) -> RelationshipPersonInput? {
-  context.perspectiveParents
-    .sortedByUUIDString()
-    .compactMap { parentID -> RelationshipPersonInput? in
-      context.graph.siblings(of: parentID).contains(parentSiblingID) ? context.peopleByID[parentID] : nil
-    }
-    .first
 }
 
 private func parentLabel(for gender: RelationshipGender) -> String {
@@ -628,13 +673,14 @@ private func cousinLabel(
 
   let isTang = lineageParent.relationshipGender == .male && parentSibling.relationshipGender == .male
   let prefix = isTang ? "堂" : "表"
+  let neutralLabel = neutralCousinLabel(lineageParent: lineageParent, parentSibling: parentSibling)
 
   guard
     let perspectiveBirthday = perspective.birthday,
     let cousinBirthday = cousin.birthday,
     let birthOrder = cousinBirthday.birthOrderCompared(to: perspectiveBirthday)
   else {
-    return "堂表亲"
+    return neutralLabel
   }
 
   switch (birthOrder, cousin.relationshipGender) {
@@ -647,6 +693,24 @@ private func cousinLabel(
   case (.younger, .female):
     return "\(prefix)妹"
   case (.sameAge, _), (_, .unknown):
+    return neutralLabel
+  }
+}
+
+private func neutralCousinLabel(
+  lineageParent: RelationshipPersonInput,
+  parentSibling: RelationshipPersonInput
+) -> String {
+  switch (lineageParent.relationshipGender, parentSibling.relationshipGender) {
+  case (.male, .male):
+    return "堂兄弟姐妹"
+  case (.male, .female):
+    return "姑表兄弟姐妹"
+  case (.female, .male):
+    return "舅表兄弟姐妹"
+  case (.female, .female):
+    return "姨表兄弟姐妹"
+  case (_, .unknown), (.unknown, _):
     return "堂表亲"
   }
 }
