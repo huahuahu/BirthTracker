@@ -31,6 +31,7 @@ public enum WidgetSnapshotBuilder {
         displayName: summary.personName,
         nextBirthdayDate: summary.nextBirthdayDate,
         age: summary.nextAge,
+        birthDate: summary.birthDate,
         birthDuration: summary.birthDuration,
         daysUntilNextBirthday: summary.daysUntilNextBirthday,
         totalBirthDays: summary.totalBirthDays,

@@ -71,7 +71,7 @@ public enum WidgetSnapshotStore {
     if let container {
       activeContainer = container
     } else {
-      activeContainer = try makeContainer(allowsSave: false)
+      activeContainer = try makeContainer(allowsSave: true)
     }
 
     let context = ModelContext(activeContainer)
@@ -91,7 +91,7 @@ public enum WidgetSnapshotStore {
     if let container {
       activeContainer = container
     } else {
-      activeContainer = try makeContainer(allowsSave: false)
+      activeContainer = try makeContainer(allowsSave: true)
     }
 
     let context = ModelContext(activeContainer)

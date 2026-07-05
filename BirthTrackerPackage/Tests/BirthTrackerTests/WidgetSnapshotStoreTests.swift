@@ -17,12 +17,14 @@ struct WidgetSnapshotStoreTests {
     let jamieID = UUID()
     let generatedAt = Date(timeIntervalSince1970: 1_799_999_000)
     let alexBirthday = Date(timeIntervalSince1970: 1_800_000_000)
+    let alexBirthDate = Date(timeIntervalSince1970: 661_003_200)
     let jamieBirthday = Date(timeIntervalSince1970: 1_799_999_500)
     let alex = WidgetPersonSnapshot(
       personID: alexID,
       displayName: "Alex Chen",
       nextBirthdayDate: alexBirthday,
       age: 36,
+      birthDate: alexBirthDate,
       birthDuration: PersonBirthdaySummary.BirthDuration(years: 35, months: 11, days: 20),
       daysUntilNextBirthday: 12,
       totalBirthDays: 13_140,
@@ -47,8 +49,10 @@ struct WidgetSnapshotStoreTests {
     #expect(snapshots[0].upcomingBirthday?.personName == "Jamie Lin")
     #expect(snapshots[0].upcomingBirthday?.date == jamieBirthday)
     #expect(snapshots[1].birthDuration == PersonBirthdaySummary.BirthDuration(years: 35, months: 11, days: 20))
+    #expect(snapshots[1].birthDate == alexBirthDate)
     #expect(snapshots[1].daysUntilNextBirthday == 12)
     #expect(snapshots[1].totalBirthDays == 13_140)
+    #expect(snapshots[1].schemaVersion == 4)
     #expect(snapshots[1].upcomingBirthday?.birthDuration == snapshots[1].birthDuration)
   }
 
@@ -123,6 +127,7 @@ struct WidgetSnapshotStoreTests {
 
     #expect(snapshot.personID == personID)
     #expect(snapshot.age == 2)
+    #expect(snapshot.birthDate == summaryBirthDate(year: 2024, month: 7, day: 5))
     #expect(snapshot.birthDuration == PersonBirthdaySummary.BirthDuration(years: 1, months: 9, days: 26))
     #expect(snapshot.daysUntilNextBirthday == 65)
     #expect(snapshot.totalBirthDays == 665)
@@ -142,6 +147,7 @@ struct WidgetSnapshotStoreTests {
 
     #expect(snapshot.personID == personID)
     #expect(snapshot.nextBirthdayDate == nil)
+    #expect(snapshot.birthDate == nil)
     #expect(snapshot.birthDuration == nil)
     #expect(snapshot.totalBirthDays == nil)
     #expect(snapshot.upcomingBirthday == nil)
@@ -223,5 +229,20 @@ struct WidgetSnapshotStoreTests {
 
     #expect(syncCalled)
     #expect(reportCalled == false)
+  }
+
+  @Test("Snapshot backed widget reload kinds include birthday list and contact age")
+  func snapshotBackedWidgetReloadKindsIncludeBirthdayListAndContactAge() {
+    #expect(
+      BirthTrackerWidgetKind.snapshotBackedKinds == [
+        BirthTrackerWidgetKind.upcomingBirthdays,
+        BirthTrackerWidgetKind.contactAge,
+      ])
+  }
+
+  private func summaryBirthDate(year: Int, month: Int, day: Int) -> Date? {
+    var calendar = Calendar(identifier: .gregorian)
+    calendar.timeZone = .autoupdatingCurrent
+    return calendar.date(from: DateComponents(year: year, month: month, day: day, hour: 12))
   }
 }

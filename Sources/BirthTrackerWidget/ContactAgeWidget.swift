@@ -23,6 +23,7 @@ struct ContactAgeProvider: AppIntentTimelineProvider {
         displayName: "Taylor",
         nextBirthdayDate: .now.addingTimeInterval(86_400),
         age: 3,
+        birthDate: .now.addingTimeInterval(-82_512_000),
         birthDuration: PersonBirthdaySummary.BirthDuration(years: 2, months: 3, days: 4),
         daysUntilNextBirthday: 120,
         totalBirthDays: 825,
@@ -38,15 +39,19 @@ struct ContactAgeProvider: AppIntentTimelineProvider {
   }
 
   func timeline(for configuration: SelectPersonIntent, in context: Context) async -> Timeline<ContactAgeEntry> {
-    let entry = loadEntry(for: configuration.person?.id)
-    let refreshDate = Calendar.current.date(byAdding: .hour, value: 6, to: .now) ?? .now.addingTimeInterval(21_600)
+    let entryDate = Date.now
+    let entry = loadEntry(for: configuration.person?.id, date: entryDate)
+    let refreshDate = nextRefreshDate(after: entryDate)
     return Timeline(entries: [entry], policy: .after(refreshDate))
   }
 
-  private func loadEntry(for selectedPersonID: UUID?) -> ContactAgeEntry {
+  private func loadEntry(
+    for selectedPersonID: UUID?,
+    date: Date = .now
+  ) -> ContactAgeEntry {
     guard let selectedPersonID else {
       return ContactAgeEntry(
-        date: .now,
+        date: date,
         snapshot: nil,
         displayFormat: .durationComponents,
         selectedPersonUnavailable: false)
@@ -55,7 +60,7 @@ struct ContactAgeProvider: AppIntentTimelineProvider {
     do {
       guard let snapshot = try WidgetSnapshotStore.fetchPerson(id: selectedPersonID) else {
         return ContactAgeEntry(
-          date: .now,
+          date: date,
           snapshot: nil,
           displayFormat: .durationComponents,
           selectedPersonUnavailable: true)
@@ -63,18 +68,29 @@ struct ContactAgeProvider: AppIntentTimelineProvider {
 
       let formatStore = try ContactAgeFormatPreferenceStore.appGroup()
       return ContactAgeEntry(
-        date: snapshot.generatedAt,
+        date: date,
         snapshot: snapshot,
         displayFormat: formatStore.format(for: selectedPersonID),
         selectedPersonUnavailable: false)
     } catch {
       logger.error("Unable to load contact age entry: \(error.localizedDescription)")
       return ContactAgeEntry(
-        date: .now,
+        date: date,
         snapshot: nil,
         displayFormat: .durationComponents,
         selectedPersonUnavailable: false)
     }
+  }
+
+  private func nextRefreshDate(
+    after date: Date,
+    calendar: Calendar = .current
+  ) -> Date {
+    let nextDayStart = calendar.date(
+      byAdding: .day,
+      value: 1,
+      to: calendar.startOfDay(for: date))
+    return nextDayStart?.addingTimeInterval(60) ?? date.addingTimeInterval(3_600)
   }
 }
 
@@ -158,14 +174,23 @@ private struct ContactAgeWidgetView: View {
   }
 
   private func ageText(for snapshot: WidgetPersonSnapshot) -> String? {
+    guard let metrics = contactAgeMetrics(for: snapshot) else { return nil }
+
     switch entry.displayFormat {
     case .durationComponents:
-      guard let duration = snapshot.birthDuration else { return nil }
-      return L10n.Widget.contactAgeDuration(duration.years, duration.months, duration.days)
+      return L10n.Widget.contactAgeDuration(
+        metrics.birthDuration.years,
+        metrics.birthDuration.months,
+        metrics.birthDuration.days)
     case .totalDays:
-      guard let totalBirthDays = snapshot.totalBirthDays else { return nil }
-      return L10n.Widget.contactAgeTotalDays(totalBirthDays)
+      return L10n.Widget.contactAgeTotalDays(metrics.totalBirthDays)
     }
+  }
+
+  private func contactAgeMetrics(for snapshot: WidgetPersonSnapshot) -> ContactAgeSnapshotMetrics? {
+    ContactAgeSnapshotMetrics.make(
+      snapshot: snapshot,
+      referenceDate: entry.date)
   }
 
   private var formatLabel: LocalizedStringResource {
@@ -195,6 +220,7 @@ private struct ContactAgeWidgetView: View {
       displayName: "Taylor",
       nextBirthdayDate: .now.addingTimeInterval(86_400),
       age: 3,
+      birthDate: .now.addingTimeInterval(-82_512_000),
       birthDuration: PersonBirthdaySummary.BirthDuration(years: 2, months: 3, days: 4),
       daysUntilNextBirthday: 120,
       totalBirthDays: 825,
@@ -215,6 +241,7 @@ private struct ContactAgeWidgetView: View {
       displayName: "Taylor",
       nextBirthdayDate: .now.addingTimeInterval(86_400),
       age: 3,
+      birthDate: .now.addingTimeInterval(-82_512_000),
       birthDuration: PersonBirthdaySummary.BirthDuration(years: 2, months: 3, days: 4),
       daysUntilNextBirthday: 120,
       totalBirthDays: 825,

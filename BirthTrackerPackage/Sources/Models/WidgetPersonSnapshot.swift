@@ -2,7 +2,7 @@ import Foundation
 import SwiftData
 
 public enum WidgetSnapshotSchema {
-  public static let currentVersion = 3
+  public static let currentVersion = 4
 }
 
 public struct WidgetPersonSnapshot: Equatable, Identifiable, Sendable {
@@ -16,6 +16,8 @@ public struct WidgetPersonSnapshot: Equatable, Identifiable, Sendable {
   public var nextBirthdayDate: Date?
   /// 下一次生日时的年龄；未知出生年份时为空。
   public var age: Int?
+  /// 完整出生日期；未知出生年份时为空。
+  public var birthDate: Date?
   /// 已经出生的年/月/日；未知出生年份时为空。
   public var birthDuration: PersonBirthdaySummary.BirthDuration?
   /// 距离下一次生日的天数。
@@ -36,6 +38,7 @@ public struct WidgetPersonSnapshot: Equatable, Identifiable, Sendable {
     displayName: String,
     nextBirthdayDate: Date?,
     age: Int?,
+    birthDate: Date? = nil,
     birthDuration: PersonBirthdaySummary.BirthDuration? = nil,
     daysUntilNextBirthday: Int? = nil,
     totalBirthDays: Int? = nil,
@@ -48,6 +51,7 @@ public struct WidgetPersonSnapshot: Equatable, Identifiable, Sendable {
     self.displayName = displayName
     self.nextBirthdayDate = nextBirthdayDate
     self.age = age
+    self.birthDate = birthDate
     self.birthDuration = birthDuration
     self.daysUntilNextBirthday = daysUntilNextBirthday
     self.totalBirthDays = totalBirthDays
@@ -71,6 +75,7 @@ public struct WidgetPersonSnapshot: Equatable, Identifiable, Sendable {
       displayName: record.displayName,
       nextBirthdayDate: record.nextBirthdayDate,
       age: record.age,
+      birthDate: record.birthDate,
       birthDuration: birthDuration,
       daysUntilNextBirthday: record.daysUntilNextBirthday,
       totalBirthDays: record.totalBirthDays,
@@ -104,6 +109,8 @@ public final class WidgetPersonSnapshotRecord {
   public var nextBirthdayDate: Date?
   /// 下一次生日时的年龄；未知出生年份时为空。
   public var age: Int?
+  /// 完整出生日期；未知出生年份时为空。
+  public var birthDate: Date?
   /// 已经出生的年份数；未知出生年份时为空。
   public var birthDurationYears: Int?
   /// 已经出生的月份余数；未知出生年份时为空。
@@ -128,6 +135,7 @@ public final class WidgetPersonSnapshotRecord {
     displayName = snapshot.displayName
     nextBirthdayDate = snapshot.nextBirthdayDate
     age = snapshot.age
+    birthDate = snapshot.birthDate
     birthDurationYears = snapshot.birthDuration?.years
     birthDurationMonths = snapshot.birthDuration?.months
     birthDurationDays = snapshot.birthDuration?.days
