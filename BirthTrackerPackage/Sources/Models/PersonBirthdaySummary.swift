@@ -20,6 +20,7 @@ public struct PersonBirthdaySummary: Equatable, Sendable {
   public var birthDuration: BirthDuration?
   public var nextBirthdayDate: Date?
   public var daysUntilNextBirthday: Int?
+  public var totalBirthDays: Int?
   public var nextAge: Int?
 
   public init(
@@ -30,6 +31,7 @@ public struct PersonBirthdaySummary: Equatable, Sendable {
     birthDuration: BirthDuration?,
     nextBirthdayDate: Date?,
     daysUntilNextBirthday: Int?,
+    totalBirthDays: Int?,
     nextAge: Int?
   ) {
     self.personID = personID
@@ -39,6 +41,7 @@ public struct PersonBirthdaySummary: Equatable, Sendable {
     self.birthDuration = birthDuration
     self.nextBirthdayDate = nextBirthdayDate
     self.daysUntilNextBirthday = daysUntilNextBirthday
+    self.totalBirthDays = totalBirthDays
     self.nextAge = nextAge
   }
 
@@ -55,6 +58,7 @@ public struct PersonBirthdaySummary: Equatable, Sendable {
         birthDuration: nil,
         nextBirthdayDate: nil,
         daysUntilNextBirthday: nil,
+        totalBirthDays: nil,
         nextAge: nil)
     }
 
@@ -71,6 +75,7 @@ public struct PersonBirthdaySummary: Equatable, Sendable {
       birthDuration: birthDate.map { birthDuration(from: $0, to: referenceDate, calendar: calendar) },
       nextBirthdayDate: nextBirthdayDate,
       daysUntilNextBirthday: nextBirthdayDate.map { daysUntil($0, from: referenceDate, calendar: calendar) },
+      totalBirthDays: birthDate.map { totalBirthDays(from: $0, to: referenceDate, calendar: calendar) },
       nextAge: nextBirthdayDate.flatMap { BirthdayCalculator.age(on: $0, for: birthday) })
   }
 
@@ -103,6 +108,18 @@ public struct PersonBirthdaySummary: Equatable, Sendable {
       years: max(0, components.year ?? 0),
       months: max(0, components.month ?? 0),
       days: max(0, components.day ?? 0))
+  }
+
+  private static func totalBirthDays(
+    from birthDate: Date,
+    to referenceDate: Date,
+    calendar: Calendar
+  ) -> Int {
+    let birthStart = calendar.startOfDay(for: birthDate)
+    let referenceStart = calendar.startOfDay(for: referenceDate)
+    guard birthStart <= referenceStart else { return 0 }
+
+    return max(0, calendar.dateComponents([.day], from: birthStart, to: referenceStart).day ?? 0)
   }
 
   private static func daysUntil(
