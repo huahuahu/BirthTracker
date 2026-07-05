@@ -5,5 +5,6 @@ import WidgetKit
 struct BirthTrackerWidgetBundle: WidgetBundle {
   var body: some Widget {
     UpcomingBirthdaysWidget()
+    ContactAgeWidget()
   }
 }
