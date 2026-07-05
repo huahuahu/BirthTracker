@@ -18,7 +18,7 @@
 
 - `App` 负责 root view 和 App 依赖装配。
 - `Features` 负责 SwiftUI 页面，例如时间线、人物编辑和设置页。
-- `Models` 负责领域模型，包括生日、被记录的人、日历类型、Widget 快照记录和生日计算。
+- `Models` 负责领域模型，包括生日、被记录的人、关系事实、纯 Swift 关系称谓 resolver、Widget 快照记录和生日计算。
 - `Persistence` 负责 SwiftData 容器、App Group 访问、Widget 专用 SwiftData store 和 Widget 持久化常量。
 - `DesignSystem` 负责共享的 UI 相邻设置，例如外观模式和已选日历类型。
 - `TestingSupport` 负责测试 fixture、内存持久化辅助逻辑和 debug 数据。

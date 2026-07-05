@@ -13,21 +13,35 @@ public final class TrackedPerson {
   /// 删除人物会级联删除生日；删除生日只会清空这里，不会删除人物。
   @Relationship(deleteRule: .cascade, inverse: \Birthday.person)
   public var birthday: Birthday?
+  /// 称谓推断使用的性别原始值；默认 unknown 以兼容 CloudKit 迁移。
+  public var relationshipGenderRawValue: String = RelationshipGender.unknown.rawValue
   /// 记录创建时间。
   public var createdAt: Date = Date()
   /// 记录最后更新时间，需要由写入逻辑显式维护。
   public var updatedAt: Date = Date()
 
-  public init(id: UUID = UUID(), name: String, birthday: Birthday? = nil, notes: String = "") {
+  public init(
+    id: UUID = UUID(),
+    name: String,
+    birthday: Birthday? = nil,
+    notes: String = "",
+    relationshipGender: RelationshipGender = .unknown
+  ) {
     self.id = id
     self.name = name
     self.notes = notes
     self.birthday = birthday
+    self.relationshipGenderRawValue = relationshipGender.rawValue
     birthday?.person = self
   }
 }
 
 extension TrackedPerson {
+  public var relationshipGender: RelationshipGender {
+    get { RelationshipGender(rawValue: relationshipGenderRawValue) ?? .unknown }
+    set { relationshipGenderRawValue = newValue.rawValue }
+  }
+
   public var calendarKind: BirthdayCalendarKind {
     birthday?.calendarKind ?? .gregorian
   }
