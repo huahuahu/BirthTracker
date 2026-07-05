@@ -35,9 +35,61 @@ public enum L10n {
     public static let addBirthday = LocalizedStringResource("Add Birthday", bundle: .atURL(Bundle.module.bundleURL))
     public static let birthDate = LocalizedStringResource("Birth date", bundle: .atURL(Bundle.module.bundleURL))
     public static let birthday = LocalizedStringResource("Birthday", bundle: .atURL(Bundle.module.bundleURL))
+    public static let editPerson = LocalizedStringResource("Edit Person", bundle: .atURL(Bundle.module.bundleURL))
+    public static let knownBirthYear = LocalizedStringResource(
+      "Known birth year", bundle: .atURL(Bundle.module.bundleURL))
     public static let name = LocalizedStringResource("Name", bundle: .atURL(Bundle.module.bundleURL))
+    public static let nameRequired = LocalizedStringResource(
+      "Name is required.", bundle: .atURL(Bundle.module.bundleURL))
     public static let notes = LocalizedStringResource("Notes", bundle: .atURL(Bundle.module.bundleURL))
     public static let person = LocalizedStringResource("Person", bundle: .atURL(Bundle.module.bundleURL))
+    public static let relationshipGender = LocalizedStringResource(
+      "Relationship gender", bundle: .atURL(Bundle.module.bundleURL))
+    public static let saveFailedTitle = LocalizedStringResource(
+      "Unable to Save", bundle: .atURL(Bundle.module.bundleURL))
+  }
+
+  public enum PersonDetail {
+    public static let bornFor = LocalizedStringResource("Born for", bundle: .atURL(Bundle.module.bundleURL))
+    public static let birthDate = LocalizedStringResource("Birth date", bundle: .atURL(Bundle.module.bundleURL))
+    public static let contactDetails = LocalizedStringResource(
+      "Contact Details", bundle: .atURL(Bundle.module.bundleURL))
+    public static let daysUntilBirthday = LocalizedStringResource(
+      "Days until birthday", bundle: .atURL(Bundle.module.bundleURL))
+    public static let edit = LocalizedStringResource("Edit", bundle: .atURL(Bundle.module.bundleURL))
+    public static let nextAge = LocalizedStringResource("Next age", bundle: .atURL(Bundle.module.bundleURL))
+    public static let noBirthday = LocalizedStringResource(
+      "No birthday recorded", bundle: .atURL(Bundle.module.bundleURL))
+    public static let noNotes = LocalizedStringResource("No notes", bundle: .atURL(Bundle.module.bundleURL))
+    public static let notes = LocalizedStringResource("Notes", bundle: .atURL(Bundle.module.bundleURL))
+    public static let widgetPreview = LocalizedStringResource("Widget preview", bundle: .atURL(Bundle.module.bundleURL))
+
+    public static func birthDuration(_ years: Int, _ months: Int, _ days: Int) -> String {
+      let format = L10n.string(
+        LocalizedStringResource("person.detail.birth.duration.format", bundle: .atURL(Bundle.module.bundleURL)))
+      return String.localizedStringWithFormat(format, years, months, days)
+    }
+
+    public static func daysUntilBirthday(_ days: Int) -> String {
+      let format = L10n.string(
+        LocalizedStringResource("person.detail.days.until.birthday.format", bundle: .atURL(Bundle.module.bundleURL)))
+      return String.localizedStringWithFormat(format, days)
+    }
+
+    public static func nextAge(_ age: Int) -> String {
+      let format = L10n.string(
+        LocalizedStringResource("person.detail.next.age.format", bundle: .atURL(Bundle.module.bundleURL)))
+      return String.localizedStringWithFormat(format, age)
+    }
+  }
+
+  public enum RelationshipGender {
+    public static let female = LocalizedStringResource(
+      "relationship.gender.female", bundle: .atURL(Bundle.module.bundleURL))
+    public static let male = LocalizedStringResource(
+      "relationship.gender.male", bundle: .atURL(Bundle.module.bundleURL))
+    public static let unknown = LocalizedStringResource(
+      "relationship.gender.unknown", bundle: .atURL(Bundle.module.bundleURL))
   }
 
   public enum Settings {
@@ -105,5 +157,11 @@ public enum L10n {
     public static let title = LocalizedStringResource("Birthdays", bundle: .atURL(Bundle.module.bundleURL))
     public static let upcomingBirthdays = LocalizedStringResource(
       "Upcoming Birthdays", bundle: .atURL(Bundle.module.bundleURL))
+
+    public static func birthDuration(_ years: Int, _ months: Int, _ days: Int) -> String {
+      let format = L10n.string(
+        LocalizedStringResource("widget.birth.duration.format", bundle: .atURL(Bundle.module.bundleURL)))
+      return String.localizedStringWithFormat(format, years, months, days)
+    }
   }
 }

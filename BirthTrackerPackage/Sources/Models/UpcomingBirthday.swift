@@ -11,12 +11,26 @@ public struct UpcomingBirthday: Codable, Identifiable, Equatable, Sendable {
   public var age: Int?
   /// 该生日使用的日历系统。
   public var calendarKind: BirthdayCalendarKind
+  /// 已经出生的年/月/日；未知出生年份时为空。
+  public var birthDuration: PersonBirthdaySummary.BirthDuration?
+  /// 距离下一次生日的天数；无法计算提醒日期时为空。
+  public var daysUntilNextBirthday: Int?
 
-  public init(id: UUID, personName: String, date: Date, age: Int?, calendarKind: BirthdayCalendarKind) {
+  public init(
+    id: UUID,
+    personName: String,
+    date: Date,
+    age: Int?,
+    calendarKind: BirthdayCalendarKind,
+    birthDuration: PersonBirthdaySummary.BirthDuration? = nil,
+    daysUntilNextBirthday: Int? = nil
+  ) {
     self.id = id
     self.personName = personName
     self.date = date
     self.age = age
     self.calendarKind = calendarKind
+    self.birthDuration = birthDuration
+    self.daysUntilNextBirthday = daysUntilNextBirthday
   }
 }

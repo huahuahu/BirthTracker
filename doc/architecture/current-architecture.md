@@ -18,7 +18,7 @@
 
 - `App` 负责 root view 和 App 依赖装配。
 - `Features` 负责 SwiftUI 页面，例如时间线、人物编辑和设置页。
-- `Models` 负责领域模型，包括生日、被记录的人、关系事实、纯 Swift 关系称谓 resolver、Widget 快照记录和生日计算。
+- `Models` 负责领域模型，包括生日、被记录的人、关系事实、纯 Swift 关系称谓 resolver、联系人生日摘要 display model、Widget 快照记录和生日计算。
 - `Persistence` 负责 SwiftData 容器、App Group 访问、Widget 专用 SwiftData store 和 Widget 持久化常量。
 - `DesignSystem` 负责共享的 UI 相邻设置，例如外观模式和已选日历类型。
 - `TestingSupport` 负责测试 fixture、内存持久化辅助逻辑和 debug 数据。
@@ -36,6 +36,7 @@
 - 面向 Widget 共享的模型和持久化常量放在 package 模块里，而不是 App-only 代码里。
 - App 和 Widget 配置使用 `Config/Project.xcconfig` 里的占位符，以及已提交的 entitlement 模板。
 - App 将主 SwiftData 数据库中的人物转换成扁平快照，并写入 App Group 中独立的 Widget SwiftData store。
+- App 和 Widget 通过 `PersonBirthdaySummary` 共享“已经出生多久”“距离下次生日”等生日摘要语义；Widget 仍只读取扁平快照字段，不复用 App 的 SwiftUI 详情页。
 - Widget extension 使用 `AppIntentConfiguration` 支持每个小组件实例选择一个联系人。
 - Widget store 是派生缓存，不启用 CloudKit，不替代主数据库。
 

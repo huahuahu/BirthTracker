@@ -79,6 +79,9 @@ struct UpcomingBirthdaysWidget: Widget {
 }
 
 private struct UpcomingBirthdaysWidgetView: View {
+  @Environment(\.widgetFamily)
+  private var family
+
   let entry: UpcomingBirthdaysEntry
 
   var body: some View {
@@ -95,7 +98,7 @@ private struct UpcomingBirthdaysWidgetView: View {
           .font(.caption)
           .foregroundStyle(.secondary)
       } else {
-        ForEach(entry.birthdays.prefix(3)) { birthday in
+        ForEach(entry.birthdays.prefix(visibleBirthdayLimit)) { birthday in
           VStack(alignment: .leading, spacing: 2) {
             Text(birthday.personName)
               .font(.subheadline.weight(.semibold))
@@ -103,11 +106,21 @@ private struct UpcomingBirthdaysWidgetView: View {
             Text(birthday.date, format: .dateTime.month(.abbreviated).day())
               .font(.caption)
               .foregroundStyle(.secondary)
+            if let duration = birthday.birthDuration {
+              Text(L10n.Widget.birthDuration(duration.years, duration.months, duration.days))
+                .font(.caption2)
+                .foregroundStyle(.secondary)
+                .lineLimit(1)
+            }
           }
         }
       }
     }
     .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+  }
+
+  private var visibleBirthdayLimit: Int {
+    family == .systemSmall ? 2 : 3
   }
 }
 
@@ -117,7 +130,30 @@ private struct UpcomingBirthdaysWidgetView: View {
   UpcomingBirthdaysEntry(
     date: .now,
     birthdays: [
-      UpcomingBirthday(id: UUID(), personName: "Taylor", date: .now, age: 30, calendarKind: .gregorian)
+      UpcomingBirthday(
+        id: UUID(),
+        personName: "Taylor",
+        date: .now,
+        age: 30,
+        calendarKind: .gregorian,
+        birthDuration: PersonBirthdaySummary.BirthDuration(years: 2, months: 0, days: 0),
+        daysUntilNextBirthday: 30),
+      UpcomingBirthday(
+        id: UUID(),
+        personName: "Jordan",
+        date: .now.addingTimeInterval(172_800),
+        age: 28,
+        calendarKind: .gregorian,
+        birthDuration: PersonBirthdaySummary.BirthDuration(years: 1, months: 3, days: 4),
+        daysUntilNextBirthday: 32),
+      UpcomingBirthday(
+        id: UUID(),
+        personName: "Morgan",
+        date: .now.addingTimeInterval(259_200),
+        age: 34,
+        calendarKind: .gregorian,
+        birthDuration: PersonBirthdaySummary.BirthDuration(years: 0, months: 8, days: 12),
+        daysUntilNextBirthday: 30),
     ],
     selectedPersonUnavailable: false)
 }
@@ -128,7 +164,14 @@ private struct UpcomingBirthdaysWidgetView: View {
   UpcomingBirthdaysEntry(
     date: .now,
     birthdays: [
-      UpcomingBirthday(id: UUID(), personName: "Taylor", date: .now, age: 30, calendarKind: .gregorian)
+      UpcomingBirthday(
+        id: UUID(),
+        personName: "Taylor",
+        date: .now,
+        age: 30,
+        calendarKind: .gregorian,
+        birthDuration: PersonBirthdaySummary.BirthDuration(years: 2, months: 0, days: 0),
+        daysUntilNextBirthday: 30)
     ],
     selectedPersonUnavailable: false)
 }
@@ -139,7 +182,14 @@ private struct UpcomingBirthdaysWidgetView: View {
 //  UpcomingBirthdaysEntry(
 //    date: .now,
 //    birthdays: [
-//      UpcomingBirthday(id: UUID(), personName: "Taylor", date: .now, age: 30, calendarKind: .gregorian)
+//      UpcomingBirthday(
+//        id: UUID(),
+//        personName: "Taylor",
+//        date: .now,
+//        age: 30,
+//        calendarKind: .gregorian,
+//        birthDuration: PersonBirthdaySummary.BirthDuration(years: 2, months: 0, days: 0),
+//        daysUntilNextBirthday: 30)
 //    ],
 //    selectedPersonUnavailable: false)
 // }
@@ -151,7 +201,14 @@ private struct UpcomingBirthdaysWidgetView: View {
 //  UpcomingBirthdaysEntry(
 //    date: .now,
 //    birthdays: [
-//      UpcomingBirthday(id: UUID(), personName: "Taylor", date: .now, age: 30, calendarKind: .gregorian)
+//      UpcomingBirthday(
+//        id: UUID(),
+//        personName: "Taylor",
+//        date: .now,
+//        age: 30,
+//        calendarKind: .gregorian,
+//        birthDuration: PersonBirthdaySummary.BirthDuration(years: 2, months: 0, days: 0),
+//        daysUntilNextBirthday: 30)
 //    ],
 //    selectedPersonUnavailable: false)
 // }

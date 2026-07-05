@@ -35,3 +35,13 @@ extension DebugStorageMode {
     }
   }
 }
+
+extension RelationshipGender {
+  var localizedTitle: LocalizedStringResource {
+    switch self {
+    case .female: L10n.RelationshipGender.female
+    case .male: L10n.RelationshipGender.male
+    case .unknown: L10n.RelationshipGender.unknown
+    }
+  }
+}
