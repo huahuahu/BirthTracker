@@ -2,7 +2,7 @@ import Foundation
 import SwiftData
 
 public enum WidgetSnapshotSchema {
-  public static let currentVersion = 2
+  public static let currentVersion = 3
 }
 
 public struct WidgetPersonSnapshot: Equatable, Identifiable, Sendable {
@@ -12,14 +12,16 @@ public struct WidgetPersonSnapshot: Equatable, Identifiable, Sendable {
   public var personID: UUID
   /// Widget 中展示的人物名称。
   public var displayName: String
-  /// 下一次生日日期。
-  public var nextBirthdayDate: Date
+  /// 下一次生日日期；未记录生日时为空。
+  public var nextBirthdayDate: Date?
   /// 下一次生日时的年龄；未知出生年份时为空。
   public var age: Int?
   /// 已经出生的年/月/日；未知出生年份时为空。
   public var birthDuration: PersonBirthdaySummary.BirthDuration?
   /// 距离下一次生日的天数。
   public var daysUntilNextBirthday: Int?
+  /// 已经出生的总天数；未知出生年份时为空。
+  public var totalBirthDays: Int?
   /// 该生日使用的日历系统。
   public var calendarKind: BirthdayCalendarKind
   /// 快照数据结构版本，用于后续兼容升级。
@@ -32,10 +34,11 @@ public struct WidgetPersonSnapshot: Equatable, Identifiable, Sendable {
   public init(
     personID: UUID,
     displayName: String,
-    nextBirthdayDate: Date,
+    nextBirthdayDate: Date?,
     age: Int?,
     birthDuration: PersonBirthdaySummary.BirthDuration? = nil,
     daysUntilNextBirthday: Int? = nil,
+    totalBirthDays: Int? = nil,
     calendarKind: BirthdayCalendarKind,
     schemaVersion: Int = WidgetSnapshotSchema.currentVersion,
     generatedAt: Date,
@@ -47,6 +50,7 @@ public struct WidgetPersonSnapshot: Equatable, Identifiable, Sendable {
     self.age = age
     self.birthDuration = birthDuration
     self.daysUntilNextBirthday = daysUntilNextBirthday
+    self.totalBirthDays = totalBirthDays
     self.calendarKind = calendarKind
     self.schemaVersion = schemaVersion
     self.generatedAt = generatedAt
@@ -69,14 +73,17 @@ public struct WidgetPersonSnapshot: Equatable, Identifiable, Sendable {
       age: record.age,
       birthDuration: birthDuration,
       daysUntilNextBirthday: record.daysUntilNextBirthday,
+      totalBirthDays: record.totalBirthDays,
       calendarKind: BirthdayCalendarKind(rawValue: record.calendarKindRawValue) ?? .gregorian,
       schemaVersion: record.schemaVersion,
       generatedAt: record.generatedAt,
       sortIndex: record.sortIndex)
   }
 
-  public var upcomingBirthday: UpcomingBirthday {
-    UpcomingBirthday(
+  public var upcomingBirthday: UpcomingBirthday? {
+    guard let nextBirthdayDate else { return nil }
+
+    return UpcomingBirthday(
       id: personID,
       personName: displayName,
       date: nextBirthdayDate,
@@ -93,8 +100,8 @@ public final class WidgetPersonSnapshotRecord {
   public var personID: UUID = UUID()
   /// Widget 中展示的人物名称。
   public var displayName: String = ""
-  /// 下一次生日日期。
-  public var nextBirthdayDate: Date = Date()
+  /// 下一次生日日期；未记录生日时为空。
+  public var nextBirthdayDate: Date?
   /// 下一次生日时的年龄；未知出生年份时为空。
   public var age: Int?
   /// 已经出生的年份数；未知出生年份时为空。
@@ -105,6 +112,8 @@ public final class WidgetPersonSnapshotRecord {
   public var birthDurationDays: Int?
   /// 距离下一次生日的天数。
   public var daysUntilNextBirthday: Int?
+  /// 已经出生的总天数；未知出生年份时为空。
+  public var totalBirthDays: Int?
   /// 生日日历类型原始值，持久化时保存 enum rawValue。
   public var calendarKindRawValue: String = BirthdayCalendarKind.gregorian.rawValue
   /// 快照数据结构版本，用于后续兼容升级。
@@ -123,6 +132,7 @@ public final class WidgetPersonSnapshotRecord {
     birthDurationMonths = snapshot.birthDuration?.months
     birthDurationDays = snapshot.birthDuration?.days
     daysUntilNextBirthday = snapshot.daysUntilNextBirthday
+    totalBirthDays = snapshot.totalBirthDays
     calendarKindRawValue = snapshot.calendarKind.rawValue
     schemaVersion = snapshot.schemaVersion
     generatedAt = snapshot.generatedAt

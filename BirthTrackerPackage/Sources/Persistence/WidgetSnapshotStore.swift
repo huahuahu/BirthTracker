@@ -78,7 +78,6 @@ public enum WidgetSnapshotStore {
     let descriptor = FetchDescriptor<WidgetPersonSnapshotRecord>(
       sortBy: [
         SortDescriptor(\.sortIndex),
-        SortDescriptor(\.nextBirthdayDate),
         SortDescriptor(\.displayName),
       ])
     return try context.fetch(descriptor).map(WidgetPersonSnapshot.init(record:))

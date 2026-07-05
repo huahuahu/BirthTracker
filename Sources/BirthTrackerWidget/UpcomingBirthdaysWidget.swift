@@ -47,16 +47,17 @@ struct UpcomingBirthdaysProvider: AppIntentTimelineProvider {
 
         return UpcomingBirthdaysEntry(
           date: snapshot.generatedAt,
-          birthdays: [snapshot.upcomingBirthday],
+          birthdays: snapshot.upcomingBirthday.map { [$0] } ?? [],
           selectedPersonUnavailable: false)
       }
 
       let snapshots = try WidgetSnapshotStore.fetchAll()
       return UpcomingBirthdaysEntry(
         date: snapshots.first?.generatedAt ?? .now,
-        birthdays: snapshots.prefix(8).map(\.upcomingBirthday),
+        birthdays: Array(snapshots.compactMap(\.upcomingBirthday).prefix(8)),
         selectedPersonUnavailable: false)
     } catch {
+      logger.error("Unable to load upcoming birthdays entry: \(error.localizedDescription)")
       return UpcomingBirthdaysEntry(date: .now, birthdays: [], selectedPersonUnavailable: false)
     }
   }

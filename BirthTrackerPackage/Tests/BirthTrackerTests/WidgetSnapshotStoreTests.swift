@@ -25,6 +25,7 @@ struct WidgetSnapshotStoreTests {
       age: 36,
       birthDuration: PersonBirthdaySummary.BirthDuration(years: 35, months: 11, days: 20),
       daysUntilNextBirthday: 12,
+      totalBirthDays: 13_140,
       calendarKind: .gregorian,
       generatedAt: generatedAt,
       sortIndex: 1)
@@ -43,11 +44,12 @@ struct WidgetSnapshotStoreTests {
     #expect(snapshots.map(\.personID) == [jamieID, alexID])
     #expect(snapshots[0].displayName == "Jamie Lin")
     #expect(snapshots[0].schemaVersion == WidgetSnapshotSchema.currentVersion)
-    #expect(snapshots[0].upcomingBirthday.personName == "Jamie Lin")
-    #expect(snapshots[0].upcomingBirthday.date == jamieBirthday)
+    #expect(snapshots[0].upcomingBirthday?.personName == "Jamie Lin")
+    #expect(snapshots[0].upcomingBirthday?.date == jamieBirthday)
     #expect(snapshots[1].birthDuration == PersonBirthdaySummary.BirthDuration(years: 35, months: 11, days: 20))
     #expect(snapshots[1].daysUntilNextBirthday == 12)
-    #expect(snapshots[1].upcomingBirthday.birthDuration == snapshots[1].birthDuration)
+    #expect(snapshots[1].totalBirthDays == 13_140)
+    #expect(snapshots[1].upcomingBirthday?.birthDuration == snapshots[1].birthDuration)
   }
 
   @Test("Widget store rebuild removes stale people")
@@ -80,12 +82,13 @@ struct WidgetSnapshotStoreTests {
     #expect(try WidgetSnapshotStore.fetchPerson(id: keptID, in: container)?.displayName == "Kept Person")
   }
 
-  @Test("Widget snapshot builder sorts people by next birthday")
-  func widgetSnapshotBuilderSortsPeopleByNextBirthday() throws {
+  @Test("Widget snapshot builder sorts dated birthdays before undated people")
+  func widgetSnapshotBuilderSortsDatedBirthdaysBeforeUndatedPeople() throws {
     let calendar = Calendar(identifier: .gregorian)
     let referenceDate = try #require(calendar.date(from: DateComponents(year: 2026, month: 1, day: 1)))
     let laterPersonID = UUID()
     let earlierPersonID = UUID()
+    let noBirthdayPersonID = UUID()
     let laterPerson = TrackedPerson(
       id: laterPersonID,
       name: "Later Birthday",
@@ -94,13 +97,14 @@ struct WidgetSnapshotStoreTests {
       id: earlierPersonID,
       name: "Earlier Birthday",
       birthday: Birthday(calendarKind: .gregorian, year: 1990, month: 2, day: 1))
+    let noBirthdayPerson = TrackedPerson(id: noBirthdayPersonID, name: "No Birthday")
 
     let snapshots = WidgetSnapshotBuilder.makeSnapshots(
-      from: [laterPerson, earlierPerson],
+      from: [noBirthdayPerson, laterPerson, earlierPerson],
       after: referenceDate)
 
-    #expect(snapshots.map(\.personID) == [earlierPersonID, laterPersonID])
-    #expect(snapshots.map(\.sortIndex) == [0, 1])
+    #expect(snapshots.map(\.personID) == [earlierPersonID, laterPersonID, noBirthdayPersonID])
+    #expect(snapshots.map(\.sortIndex) == [0, 1, 2])
     #expect(snapshots.allSatisfy { $0.generatedAt == referenceDate })
   }
 
@@ -121,8 +125,26 @@ struct WidgetSnapshotStoreTests {
     #expect(snapshot.age == 2)
     #expect(snapshot.birthDuration == PersonBirthdaySummary.BirthDuration(years: 1, months: 9, days: 26))
     #expect(snapshot.daysUntilNextBirthday == 65)
-    #expect(snapshot.upcomingBirthday.birthDuration == snapshot.birthDuration)
-    #expect(snapshot.upcomingBirthday.daysUntilNextBirthday == 65)
+    #expect(snapshot.totalBirthDays == 665)
+    #expect(snapshot.upcomingBirthday?.birthDuration == snapshot.birthDuration)
+    #expect(snapshot.upcomingBirthday?.daysUntilNextBirthday == 65)
+  }
+
+  @Test("Widget snapshot builder carries people without birthdays")
+  func widgetSnapshotBuilderCarriesPeopleWithoutBirthdays() throws {
+    let calendar = Calendar(identifier: .gregorian)
+    let referenceDate = try #require(calendar.date(from: DateComponents(year: 2026, month: 5, day: 1, hour: 10)))
+    let personID = UUID()
+    let person = TrackedPerson(id: personID, name: "No Birthday")
+
+    let snapshot = try #require(
+      WidgetSnapshotBuilder.makeSnapshots(from: [person], after: referenceDate).first)
+
+    #expect(snapshot.personID == personID)
+    #expect(snapshot.nextBirthdayDate == nil)
+    #expect(snapshot.birthDuration == nil)
+    #expect(snapshot.totalBirthDays == nil)
+    #expect(snapshot.upcomingBirthday == nil)
   }
 
   @Test("Widget snapshot sync is skipped when save fails")
