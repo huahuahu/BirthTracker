@@ -47,7 +47,7 @@
 - Modify `BirthTrackerPackage/Sources/Features/Timeline/PeopleTimelineView.swift`
   - Turn person rows into navigation links.
   - Insert new people and edit existing people via `PersonFormState`.
-  - Refresh Widget snapshots after successful saves.
+  - Save SwiftData directly from form closures so save failures throw back to the Sheet, then refresh Widget snapshots after successful saves.
 - Modify `BirthTrackerPackage/Sources/Features/Support/LocalizedTitles.swift`
   - Add localized titles for `RelationshipGender`.
 - Modify `BirthTrackerPackage/Sources/Localization/L10n.swift`
@@ -1624,7 +1624,8 @@ git commit -m "Add contact detail page" -m "Co-authored-by: Copilot App <2235562
   - `PersonFormState.apply(to:updatedAt:)`
 - Produces:
   - Person rows navigate to detail pages.
-  - Add and edit saves refresh Widget snapshots after SwiftData saves.
+  - Add and edit saves throw SwiftData failures back to `PersonFormView`, keeping the Sheet open.
+  - Widget snapshots refresh only after SwiftData saves successfully.
 
 - [ ] **Step 1: Update the add person sheet save closure**
 
@@ -1635,18 +1636,31 @@ In `PeopleTimelineView`, replace the existing `.sheet(isPresented:)` body with:
         PersonFormView(calendarKinds: BirthdayCalendarKind.selectionKinds(from: enabledCalendarKinds)) { state in
           let person = try state.makeTrackedPerson()
           modelContext.insert(person)
-          WidgetSnapshotSyncGate.runAfterSuccessfulSave(
-            save: {
-              try modelContext.save()
-            },
-            sync: {
-              persistWidgetSnapshots(for: people + [person])
-            })
+          try saveModelContextAndPersistWidgetSnapshots(for: people + [person])
         }
       }
 ```
 
-- [ ] **Step 2: Turn people rows into navigation links**
+- [ ] **Step 2: Add a throwing save helper**
+
+Add this helper near `persistWidgetSnapshots(for:)`:
+
+```swift
+  private func saveModelContextAndPersistWidgetSnapshots(for people: [TrackedPerson]? = nil) throws {
+    do {
+      try modelContext.save()
+    } catch {
+      modelContext.rollback()
+      throw error
+    }
+
+    persistWidgetSnapshots(for: people)
+  }
+```
+
+This helper is intentionally separate from `WidgetSnapshotSyncGate.runAfterSuccessfulSave` because form save closures must throw save failures back to `PersonFormView` so the edit Sheet can remain open.
+
+- [ ] **Step 3: Turn people rows into navigation links**
 
 Replace the `ForEach(people)` body inside `Section(L10n.Timeline.people)` with:
 
@@ -1657,13 +1671,7 @@ Replace the `ForEach(people)` body inside `Section(L10n.Timeline.people)` with:
                   calendarKinds: BirthdayCalendarKind.selectionKinds(from: enabledCalendarKinds)
                 ) { person, state in
                   try state.apply(to: person)
-                  WidgetSnapshotSyncGate.runAfterSuccessfulSave(
-                    save: {
-                      try modelContext.save()
-                    },
-                    sync: {
-                      persistWidgetSnapshots()
-                    })
+                  try saveModelContextAndPersistWidgetSnapshots()
                 }
               } label: {
                 VStack(alignment: .leading, spacing: 4) {
@@ -1678,7 +1686,7 @@ Replace the `ForEach(people)` body inside `Section(L10n.Timeline.people)` with:
 
 Keep `.onDelete(perform: deletePeople)` attached to the `ForEach`.
 
-- [ ] **Step 3: Run package tests**
+- [ ] **Step 4: Run package tests**
 
 Run:
 
@@ -1689,7 +1697,7 @@ swift test
 
 Expected: PASS for all package tests.
 
-- [ ] **Step 4: Commit Task 7**
+- [ ] **Step 5: Commit Task 7**
 
 ```bash
 git add BirthTrackerPackage/Sources/Features/Timeline/PeopleTimelineView.swift
