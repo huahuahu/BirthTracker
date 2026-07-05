@@ -12,32 +12,24 @@ struct RelationshipStoreTests {
   func relationshipModelsRoundTripInMainSchema() throws {
     let container = try PersistenceFixtures.makeInMemoryContainer()
     let context = ModelContext(container)
-    let parentID = UUID()
-    let childID = UUID()
+    let parentID = try #require(UUID(uuidString: "00000000-0000-0000-0000-000000000001"))
+    let childID = try #require(UUID(uuidString: "FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF"))
     let timestamp = Date(timeIntervalSince1970: 1_800_000_000)
-    let fact = RelationshipFact(
+    let store = RelationshipStore(context: context, now: { timestamp })
+    let fact = try store.createFact(
       personAID: parentID,
       personBID: childID,
       kind: .parentChild,
       personARole: .parent,
       personBRole: .child,
-      notes: "Father and child",
-      createdAt: timestamp,
-      updatedAt: timestamp)
-    let preference = RelationshipDisplayPreference(
+      notes: "Father and child")
+    _ = try store.setPrimaryDisplayFact(
       perspectivePersonID: childID,
       targetPersonID: parentID,
-      primaryFactID: fact.id,
-      createdAt: timestamp,
-      updatedAt: timestamp)
-
-    context.insert(fact)
-    context.insert(preference)
-    try context.save()
+      primaryFactID: fact.id)
 
     let verificationContext = ModelContext(container)
     let facts = try verificationContext.fetch(FetchDescriptor<RelationshipFact>())
-    let preferences = try verificationContext.fetch(FetchDescriptor<RelationshipDisplayPreference>())
 
     let fetchedFact = try #require(facts.first)
     #expect(fetchedFact.personAID == parentID)
@@ -48,13 +40,8 @@ struct RelationshipStoreTests {
     #expect(fetchedFact.notes == "Father and child")
     #expect(fetchedFact.createdAt == timestamp)
     #expect(fetchedFact.updatedAt == timestamp)
-
-    let fetchedPreference = try #require(preferences.first)
-    #expect(fetchedPreference.perspectivePersonID == childID)
-    #expect(fetchedPreference.targetPersonID == parentID)
-    #expect(fetchedPreference.primaryFactID == fact.id)
-    #expect(fetchedPreference.createdAt == timestamp)
-    #expect(fetchedPreference.updatedAt == timestamp)
+    #expect(fetchedFact.isPrimaryFromPersonA == false)
+    #expect(fetchedFact.isPrimaryFromPersonB)
   }
 
   @Test("Store creates facts with normalized endpoints and service timestamps")
@@ -132,9 +119,9 @@ struct RelationshipStoreTests {
     }
   }
 
-  @Test("Display preferences are directional and update timestamps through the store")
+  @Test("Primary display flags are directional and update timestamps through the store")
   @MainActor
-  func displayPreferencesAreDirectionalAndTimestamped() throws {
+  func primaryDisplayFlagsAreDirectionalAndTimestamped() throws {
     let container = try PersistenceFixtures.makeInMemoryContainer()
     let context = ModelContext(container)
     let firstTimestamp = Date(timeIntervalSince1970: 1_800_000_000)
@@ -159,28 +146,33 @@ struct RelationshipStoreTests {
       personARole: .friend,
       personBRole: .friend)
 
-    let firstPreference = try store.setDisplayPreference(
+    let firstPrimaryFact = try store.setPrimaryDisplayFact(
       perspectivePersonID: personAID,
       targetPersonID: personBID,
       primaryFactID: firstFact.id)
-    let reversePreference = try store.setDisplayPreference(
+    #expect(firstPrimaryFact.id == firstFact.id)
+    #expect(firstFact.isPrimary(from: personAID))
+    #expect(firstFact.updatedAt == thirdTimestamp)
+
+    let reversePrimaryFact = try store.setPrimaryDisplayFact(
       perspectivePersonID: personBID,
       targetPersonID: personAID,
       primaryFactID: secondFact.id)
-    let updatedPreference = try store.setDisplayPreference(
+    #expect(reversePrimaryFact.id == secondFact.id)
+    #expect(secondFact.isPrimary(from: personBID))
+    #expect(secondFact.updatedAt == fourthTimestamp)
+
+    let updatedPrimaryFact = try store.setPrimaryDisplayFact(
       perspectivePersonID: personAID,
       targetPersonID: personBID,
       primaryFactID: secondFact.id)
 
-    #expect(firstPreference.id == updatedPreference.id)
-    #expect(updatedPreference.primaryFactID == secondFact.id)
-    #expect(updatedPreference.createdAt == thirdTimestamp)
-    #expect(updatedPreference.updatedAt == fifthTimestamp)
-    #expect(reversePreference.perspectivePersonID == personBID)
-    #expect(reversePreference.targetPersonID == personAID)
-    #expect(reversePreference.primaryFactID == secondFact.id)
-    #expect(reversePreference.createdAt == fourthTimestamp)
-    #expect(reversePreference.updatedAt == fourthTimestamp)
+    #expect(updatedPrimaryFact.id == secondFact.id)
+    #expect(firstFact.isPrimary(from: personAID) == false)
+    #expect(firstFact.updatedAt == fifthTimestamp)
+    #expect(secondFact.isPrimary(from: personAID))
+    #expect(secondFact.isPrimary(from: personBID))
+    #expect(secondFact.updatedAt == fifthTimestamp)
   }
 
   @Test("Store rejects role combinations that do not match relationship kind")
@@ -257,9 +249,9 @@ struct RelationshipStoreTests {
     #expect(storedFact.notes == "Original")
   }
 
-  @Test("Display preference rejects missing and unrelated primary facts")
+  @Test("Primary display selection rejects missing and unrelated primary facts")
   @MainActor
-  func displayPreferenceRejectsMissingAndUnrelatedPrimaryFacts() throws {
+  func primaryDisplaySelectionRejectsMissingAndUnrelatedPrimaryFacts() throws {
     let container = try PersistenceFixtures.makeInMemoryContainer()
     let context = ModelContext(container)
     let store = RelationshipStore(context: context, now: { Date(timeIntervalSince1970: 1_800_000_000) })
@@ -275,7 +267,7 @@ struct RelationshipStoreTests {
       personBRole: .friend)
 
     #expect(throws: RelationshipStoreError.factNotFound(missingFactID)) {
-      _ = try store.setDisplayPreference(
+      _ = try store.setPrimaryDisplayFact(
         perspectivePersonID: personAID,
         targetPersonID: personBID,
         primaryFactID: missingFactID)
@@ -287,16 +279,16 @@ struct RelationshipStoreTests {
         perspectivePersonID: personAID,
         targetPersonID: unrelatedPersonID)
     ) {
-      _ = try store.setDisplayPreference(
+      _ = try store.setPrimaryDisplayFact(
         perspectivePersonID: personAID,
         targetPersonID: unrelatedPersonID,
         primaryFactID: fact.id)
     }
   }
 
-  @Test("Deleting person references removes facts and preferences")
+  @Test("Deleting person references removes facts and their primary display flags")
   @MainActor
-  func deletingPersonReferencesRemovesFactsAndPreferences() throws {
+  func deletingPersonReferencesRemovesFactsAndTheirPrimaryDisplayFlags() throws {
     let container = try PersistenceFixtures.makeInMemoryContainer()
     let context = ModelContext(container)
     let store = RelationshipStore(context: context, now: { Date(timeIntervalSince1970: 1_800_000_000) })
@@ -315,11 +307,11 @@ struct RelationshipStoreTests {
       kind: .coworker,
       personARole: .coworker,
       personBRole: .coworker)
-    _ = try store.setDisplayPreference(
+    _ = try store.setPrimaryDisplayFact(
       perspectivePersonID: removedPersonID,
       targetPersonID: keptPersonID,
       primaryFactID: removedFact.id)
-    _ = try store.setDisplayPreference(
+    _ = try store.setPrimaryDisplayFact(
       perspectivePersonID: keptPersonID,
       targetPersonID: unrelatedPersonID,
       primaryFactID: keptFact.id)
@@ -327,12 +319,9 @@ struct RelationshipStoreTests {
     try store.deleteReferences(toPersonID: removedPersonID)
 
     let facts = try context.fetch(FetchDescriptor<RelationshipFact>())
-    let preferences = try context.fetch(FetchDescriptor<RelationshipDisplayPreference>())
     #expect(facts.count == 1)
     #expect(facts.first?.id == keptFact.id)
-    #expect(preferences.count == 1)
-    #expect(preferences.first?.perspectivePersonID == keptPersonID)
-    #expect(preferences.first?.targetPersonID == unrelatedPersonID)
+    #expect(facts.first?.isPrimary(from: keptPersonID) == true)
   }
 
 }

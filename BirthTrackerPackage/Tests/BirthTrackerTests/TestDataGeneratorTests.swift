@@ -45,7 +45,7 @@ struct TestDataGeneratorTests {
       kind: .friend,
       personARole: .friend,
       personBRole: .friend)
-    _ = try relationshipStore.setDisplayPreference(
+    _ = try relationshipStore.setPrimaryDisplayFact(
       perspectivePersonID: existingPerson.id,
       targetPersonID: relatedPerson.id,
       primaryFactID: fact.id)
@@ -55,7 +55,6 @@ struct TestDataGeneratorTests {
     let verificationContext = ModelContext(container)
     let people = try verificationContext.fetch(FetchDescriptor<TrackedPerson>())
     let facts = try verificationContext.fetch(FetchDescriptor<RelationshipFact>())
-    let preferences = try verificationContext.fetch(FetchDescriptor<RelationshipDisplayPreference>())
     #expect(people.count == 3)
     #expect(people.contains { $0.name == "Existing Person" } == false)
     #expect(people.contains { $0.name == "Related Person" } == false)
@@ -63,7 +62,6 @@ struct TestDataGeneratorTests {
     #expect(people.contains { $0.name == "Jamie Lin" })
     #expect(people.contains { $0.name == "Morgan Lee" })
     #expect(facts.isEmpty)
-    #expect(preferences.isEmpty)
   }
 
   @Test("Reset does not save unrelated pending inserts in the caller context")

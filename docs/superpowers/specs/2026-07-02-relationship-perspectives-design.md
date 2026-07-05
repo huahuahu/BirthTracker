@@ -54,13 +54,17 @@ BirthTracker 的核心目标仍然很简单：记录生日、查看生日、提�
 - `kindRawValue`
 - `personARoleRawValue`
 - `personBRoleRawValue`
+- `isPrimaryFromPersonA`
+- `isPrimaryFromPersonB`
 - `notes`
 - `createdAt`
 - `updatedAt`
 
-`personA` 和 `personB` 只是这条关系事实的两个端点槽位，不表示方向、主从、年龄或视角。关系语义由 `kindRawValue` 和两端 role 决定：例如 parent-child fact 中，`personA` 可以是 parent、`personB` 可以是 child；也可以反过来，只要对应 role 写清楚即可。方向性的“从 A 看 B 主显示什么关系”不放在这里，而是放在 `RelationshipDisplayPreference`。
+`personA` 和 `personB` 是这条关系事实的两个稳定端点槽位，不表示年龄或默认视角。关系语义由 `kindRawValue` 和两端 role 决定：例如 parent-child fact 中，`personA` 可以是 parent、`personB` 可以是 child；也可以反过来，只要对应 role 写清楚即可。
 
-`createdAt` 在创建 fact 时写入一次。`updatedAt` 不依赖 SwiftData 自动维护；所有新增、修改关系类型、调整两端 role、编辑 notes 的操作都必须通过关系写入服务完成，由服务在保存前显式设置为当前时间。
+方向性的“从 A 看 B 是否优先展示这条关系”直接保存在 `RelationshipFact` 上：`isPrimaryFromPersonA` 表示端点 A 作为视角看端点 B 时，这条 fact 是否为主显示关系；`isPrimaryFromPersonB` 表示端点 B 作为视角看端点 A 时是否为主显示关系。同一对人有多条 fact 时，关系写入服务负责保证每个方向最多只有一条 fact 被标为 primary。
+
+`createdAt` 在创建 fact 时写入一次。`updatedAt` 不依赖 SwiftData 自动维护；所有新增、修改关系类型、调整两端 role、编辑 notes、切换 primary 标记的操作都必须通过关系写入服务完成，由服务在保存前显式设置为当前时间。
 
 关系类型分为两组：
 
@@ -77,23 +81,6 @@ BirthTracker 的核心目标仍然很简单：记录生日、查看生日、提�
 
 对称关系按 UUID 排序规范化两端，避免 A-B 和 B-A 两种重复写法。由于 CloudKit 不支持 unique constraint，去重必须在应用服务层和 resolver 内存层完成。
 
-### RelationshipDisplayPreference
-
-`RelationshipDisplayPreference` 保存方向性的主显示关系偏好，也作为 SwiftData `@Model` 存储。
-
-字段：
-
-- `id`
-- `perspectivePersonID`
-- `targetPersonID`
-- `primaryFactID`
-- `createdAt`
-- `updatedAt`
-
-`createdAt` 在创建 preference 时写入一次。`updatedAt` 不依赖 SwiftData 自动维护；所有修改主关系、切换 `primaryFactID` 或清除主关系偏好的操作都必须通过关系写入服务完成，由服务在保存前显式设置为当前时间。
-
-`perspectivePersonID -> targetPersonID` 是有方向的。A 看 B 可以选择 sibling 作为主关系，B 看 A 可以选择 classmate 作为主关系。`primaryFactID` 指向某条显式 `RelationshipFact` 的 UUID；如果该 fact 因同步延迟或删除而不存在，系统回退到自动选择的主关系。
-
 第一版不需要自由文本自定义称谓。中文称谓由 resolver 根据事实、视角、生日和称谓性别生成。
 
 ## RelationshipResolver
@@ -104,7 +91,6 @@ BirthTracker 的核心目标仍然很简单：记录生日、查看生日、提�
 
 - 所有已加载的人
 - 所有 `RelationshipFact`
-- 所有 `RelationshipDisplayPreference`
 - 当前 `perspectivePersonID`
 
 输出：
@@ -127,7 +113,7 @@ BirthTracker 的核心目标仍然很简单：记录生日、查看生日、提�
 
 ### 主称谓优先级
 
-1. 有效的方向性 `RelationshipDisplayPreference`
+1. 当前视角方向上被标记为 primary 的 `RelationshipFact`
 1. 直接亲属事实
 1. 三代内推断亲属关系
 1. 社交关系
@@ -190,11 +176,10 @@ BirthTracker 的核心目标仍然很简单：记录生日、查看生日、提�
 ## 数据一致性与错误处理
 
 - 新增关系事实前，服务层按规范化 person pair、kind 和 roles 做应用层去重。
-- `RelationshipFact` 和 `RelationshipDisplayPreference` 只能通过关系写入服务创建或修改；该服务负责统一设置 `createdAt` 和 `updatedAt`，避免各个 UI 调用点漏更新。
-- 删除 Person 时，服务层先删除引用该 person UUID 的 `RelationshipFact` 和 `RelationshipDisplayPreference`，再删除 Person。
+- `RelationshipFact` 和关系写入服务同在 `Models` 模块；UI 只能读取公开字段，并通过写入服务创建或修改关系。该服务负责统一设置 `createdAt` 和 `updatedAt`，避免各个 UI 调用点漏更新。
+- 删除 Person 时，服务层先删除引用该 person UUID 的 `RelationshipFact`，再删除 Person。
 - SwiftData 保存失败必须提示用户，不做静默成功。
 - CloudKit 同步延迟导致 fact 只同步到一端 Person 时，resolver 暂时忽略该 fact，并在详情或 debug 信息中标记缺失端点。
-- preference 指向的 fact 不存在时，resolver 回退到自动主关系。
 - 重复 fact 在 resolver 内存层去重，避免重复标签。
 - 冲突事实不会自动修复；resolver 返回冲突标记，由 UI 引导用户检查关系。
 
@@ -204,8 +189,8 @@ BirthTracker 的核心目标仍然很简单：记录生日、查看生日、提�
 
 - `RelationshipFact` 可以 round-trip。
 - 同一对人可以保存多条不同类型 fact。
-- `RelationshipDisplayPreference` 可以按方向保存 A→B 和 B→A 的不同主关系。
-- 删除 Person 会清理引用该 person UUID 的 facts 和 preferences。
+- `RelationshipFact` 可以按方向保存 A→B 和 B→A 的不同 primary 标记。
+- 删除 Person 会清理引用该 person UUID 的 facts。
 - 保存失败会向调用层抛出或返回错误。
 
 ### Resolver 单元测试

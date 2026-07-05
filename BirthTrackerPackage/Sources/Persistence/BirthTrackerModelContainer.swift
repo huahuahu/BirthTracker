@@ -23,8 +23,8 @@ public enum DebugStorageMode: String, CaseIterable, Identifiable, Sendable {
 public enum BirthTrackerModelContainer {
   public static let schema = Schema([
     TrackedPerson.self,
+    Birthday.self,
     RelationshipFact.self,
-    RelationshipDisplayPreference.self,
   ])
 
   public static func make() throws -> ModelContainer {

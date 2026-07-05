@@ -1,5 +1,4 @@
 import Foundation
-import Models
 import SwiftData
 
 public enum RelationshipStoreError: Error, Equatable {
@@ -110,13 +109,15 @@ public struct RelationshipStore {
       throw RelationshipStoreError.duplicateFact
     }
 
-    fact.personAID = normalized.personAID
-    fact.personBID = normalized.personBID
-    fact.kind = kind
-    fact.personARole = normalized.personARole
-    fact.personBRole = normalized.personBRole
-    fact.notes = notes
-    fact.updatedAt = now()
+    let timestamp = now()
+    fact.replaceDetails(
+      personAID: normalized.personAID,
+      personBID: normalized.personBID,
+      kind: kind,
+      personARole: normalized.personARole,
+      personBRole: normalized.personBRole,
+      updatedAt: timestamp)
+    fact.replaceNotes(notes, updatedAt: timestamp)
     try context.save()
     return fact
   }
@@ -124,58 +125,41 @@ public struct RelationshipStore {
   @discardableResult
   public func updateNotes(factID: UUID, notes: String) throws -> RelationshipFact {
     let fact = try fetchFact(id: factID)
-    fact.notes = notes
-    fact.updatedAt = now()
+    fact.replaceNotes(notes, updatedAt: now())
     try context.save()
     return fact
   }
 
   @discardableResult
-  public func setDisplayPreference(
+  public func setPrimaryDisplayFact(
     perspectivePersonID: UUID,
     targetPersonID: UUID,
     primaryFactID: UUID
-  ) throws -> RelationshipDisplayPreference {
-    try validatePrimaryFact(
+  ) throws -> RelationshipFact {
+    let primaryFact = try validatePrimaryFact(
       primaryFactID,
       connects: perspectivePersonID,
       and: targetPersonID)
-
     let timestamp = now()
-
-    if let existingPreference = try fetchDisplayPreference(
-      perspectivePersonID: perspectivePersonID,
-      targetPersonID: targetPersonID
-    ) {
-      existingPreference.primaryFactID = primaryFactID
-      existingPreference.updatedAt = timestamp
-      try context.save()
-      return existingPreference
+    let relatedFacts = try fetchFacts(
+      connecting: perspectivePersonID,
+      and: targetPersonID)
+    for fact in relatedFacts {
+      _ = fact.setPrimary(fact.id == primaryFactID, from: perspectivePersonID, updatedAt: timestamp)
     }
-
-    let preference = RelationshipDisplayPreference(
-      perspectivePersonID: perspectivePersonID,
-      targetPersonID: targetPersonID,
-      primaryFactID: primaryFactID,
-      createdAt: timestamp,
-      updatedAt: timestamp
-    )
-    context.insert(preference)
     try context.save()
-    return preference
+    return primaryFact
   }
 
-  public func clearDisplayPreference(perspectivePersonID: UUID, targetPersonID: UUID) throws {
-    guard
-      let preference = try fetchDisplayPreference(
-        perspectivePersonID: perspectivePersonID,
-        targetPersonID: targetPersonID
-      )
-    else {
-      return
+  public func clearPrimaryDisplayFact(perspectivePersonID: UUID, targetPersonID: UUID) throws {
+    let timestamp = now()
+    let relatedFacts = try fetchFacts(
+      connecting: perspectivePersonID,
+      and: targetPersonID)
+    for fact in relatedFacts {
+      _ = fact.setPrimary(false, from: perspectivePersonID, updatedAt: timestamp)
     }
 
-    context.delete(preference)
     try context.save()
   }
 
@@ -190,17 +174,6 @@ public struct RelationshipStore {
       }
     )
     let deletedFacts = try context.fetch(factsDescriptor)
-    let deletedFactIDs = Set(deletedFacts.map(\.id))
-    let preferencesDescriptor = FetchDescriptor<RelationshipDisplayPreference>()
-
-    for preference in try context.fetch(preferencesDescriptor) {
-      let referencesDeletedPerson = preference.perspectivePersonID == personID || preference.targetPersonID == personID
-      let referencesDeletedFact = preference.primaryFactID.map(deletedFactIDs.contains) == true
-
-      if referencesDeletedPerson || referencesDeletedFact {
-        context.delete(preference)
-      }
-    }
 
     for fact in deletedFacts {
       context.delete(fact)
@@ -250,21 +223,6 @@ public struct RelationshipStore {
     return try context.fetch(descriptor).first
   }
 
-  private func fetchDisplayPreference(
-    perspectivePersonID: UUID,
-    targetPersonID: UUID
-  ) throws -> RelationshipDisplayPreference? {
-    var descriptor = FetchDescriptor<RelationshipDisplayPreference>(
-      predicate: #Predicate<RelationshipDisplayPreference> { preference in
-        preference.perspectivePersonID == perspectivePersonID
-          && preference.targetPersonID == targetPersonID
-      }
-    )
-    descriptor.fetchLimit = 1
-
-    return try context.fetch(descriptor).first
-  }
-
   private func validateRoleCombination(
     kind: RelationshipKind,
     personARole: RelationshipRole,
@@ -299,18 +257,28 @@ public struct RelationshipStore {
     _ primaryFactID: UUID,
     connects perspectivePersonID: UUID,
     and targetPersonID: UUID
-  ) throws {
+  ) throws -> RelationshipFact {
     let primaryFact = try fetchFact(id: primaryFactID)
-    let connectsRequestedPair =
-      (primaryFact.personAID == perspectivePersonID && primaryFact.personBID == targetPersonID)
-      || (primaryFact.personAID == targetPersonID && primaryFact.personBID == perspectivePersonID)
 
-    guard connectsRequestedPair else {
+    guard primaryFact.connects(perspectivePersonID, and: targetPersonID) else {
       throw RelationshipStoreError.unrelatedPrimaryFact(
         primaryFactID: primaryFactID,
         perspectivePersonID: perspectivePersonID,
         targetPersonID: targetPersonID)
     }
+
+    return primaryFact
+  }
+
+  private func fetchFacts(connecting firstPersonID: UUID, and secondPersonID: UUID) throws -> [RelationshipFact] {
+    let descriptor = FetchDescriptor<RelationshipFact>(
+      predicate: #Predicate<RelationshipFact> { fact in
+        (fact.personAID == firstPersonID && fact.personBID == secondPersonID)
+          || (fact.personAID == secondPersonID && fact.personBID == firstPersonID)
+      }
+    )
+
+    return try context.fetch(descriptor)
   }
 
   private func normalizedEndpointPair(

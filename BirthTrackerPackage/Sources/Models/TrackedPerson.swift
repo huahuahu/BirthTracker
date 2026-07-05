@@ -3,41 +3,39 @@ import SwiftData
 
 @Model
 public final class TrackedPerson {
-  public var id: UUID = UUID()
+  /// 人物的稳定业务标识，用于跨模块引用同一个人。
+  public private(set) var id: UUID = UUID()
+  /// 人物显示名称。
   public var name: String = ""
+  /// 用户记录的备注内容。
   public var notes: String = ""
-  public var calendarKindRawValue: String = BirthdayCalendarKind.gregorian.rawValue
-  public var birthEra: Int?
-  public var birthYear: Int?
-  public var birthMonth: Int = 1
-  public var birthDay: Int = 1
+  /// 人物生日；这是 SwiftData relationship，可以从 Birthday.person 反查所属人物。
+  /// 删除人物会级联删除生日；删除生日只会清空这里，不会删除人物。
+  @Relationship(deleteRule: .cascade, inverse: \Birthday.person)
+  public var birthday: Birthday?
+  /// 记录创建时间。
   public var createdAt: Date = Date()
+  /// 记录最后更新时间，需要由写入逻辑显式维护。
   public var updatedAt: Date = Date()
 
-  public init(id: UUID = UUID(), name: String, birthday: Birthday, notes: String = "") {
+  public init(id: UUID = UUID(), name: String, birthday: Birthday? = nil, notes: String = "") {
     self.id = id
     self.name = name
     self.notes = notes
-    self.calendarKindRawValue = birthday.calendarKind.rawValue
-    self.birthEra = birthday.era
-    self.birthYear = birthday.year
-    self.birthMonth = birthday.month
-    self.birthDay = birthday.day
+    self.birthday = birthday
+    birthday?.person = self
   }
 }
 
 extension TrackedPerson {
   public var calendarKind: BirthdayCalendarKind {
-    get { BirthdayCalendarKind(rawValue: calendarKindRawValue) ?? .gregorian }
-    set { calendarKindRawValue = newValue.rawValue }
-  }
-
-  public var birthday: Birthday {
-    Birthday(calendarKind: calendarKind, era: birthEra, year: birthYear, month: birthMonth, day: birthDay)
+    birthday?.calendarKind ?? .gregorian
   }
 
   public func upcomingBirthday(after referenceDate: Date = .now) -> UpcomingBirthday? {
-    guard let nextDate = BirthdayCalculator.nextOccurrence(for: birthday, after: referenceDate) else { return nil }
+    guard let birthday, let nextDate = BirthdayCalculator.nextOccurrence(for: birthday, after: referenceDate) else {
+      return nil
+    }
 
     return UpcomingBirthday(
       id: id,
