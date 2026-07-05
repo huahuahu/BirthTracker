@@ -61,7 +61,7 @@ let package = Package(
     ),
     .testTarget(
       name: "BirthTrackerPackageTests",
-      dependencies: ["Models", "Persistence", "TestingSupport"],
+      dependencies: ["Features", "Models", "Persistence", "TestingSupport"],
       path: "Tests/BirthTrackerTests"
     ),
   ]

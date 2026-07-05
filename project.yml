@@ -80,6 +80,8 @@ targets:
     dependencies:
       - target: BirthTracker
       - package: BirthTrackerPackage
+        product: Features
+      - package: BirthTrackerPackage
         product: Models
       - package: BirthTrackerPackage
         product: Persistence
