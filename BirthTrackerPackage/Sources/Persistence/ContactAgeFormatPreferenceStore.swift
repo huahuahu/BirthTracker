@@ -1,36 +1,5 @@
 import Foundation
-
-public enum ContactAgeDisplayFormat: String, CaseIterable, Codable, Sendable {
-  case yearMonthDay
-  case monthDay
-  case day
-
-  public var toggled: ContactAgeDisplayFormat {
-    switch self {
-    case .yearMonthDay:
-      .monthDay
-    case .monthDay:
-      .day
-    case .day:
-      .yearMonthDay
-    }
-  }
-
-  static func stored(rawValue: String) -> ContactAgeDisplayFormat? {
-    if let format = ContactAgeDisplayFormat(rawValue: rawValue) {
-      return format
-    }
-
-    switch rawValue {
-    case "durationComponents":
-      return .yearMonthDay
-    case "totalDays":
-      return .day
-    default:
-      return nil
-    }
-  }
-}
+import Models
 
 public struct ContactAgeFormatPreferenceStore {
   public enum StoreError: LocalizedError, Equatable {
@@ -74,8 +43,11 @@ public struct ContactAgeFormatPreferenceStore {
   }
 
   @discardableResult
-  public func toggleFormat(for personID: UUID) -> ContactAgeDisplayFormat {
-    let newFormat = format(for: personID).toggled
+  public func toggleFormat(
+    for personID: UUID,
+    availableFormats: [ContactAgeDisplayFormat] = ContactAgeDisplayFormat.allCases
+  ) -> ContactAgeDisplayFormat {
+    let newFormat = format(for: personID).next(in: availableFormats)
     setFormat(newFormat, for: personID)
     return newFormat
   }

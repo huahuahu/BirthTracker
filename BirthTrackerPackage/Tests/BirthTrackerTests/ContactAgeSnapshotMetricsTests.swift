@@ -17,6 +17,7 @@ struct ContactAgeSnapshotMetricsTests {
     #expect(metrics.birthDuration == PersonBirthdaySummary.BirthDuration(years: 1, months: 9, days: 26))
     #expect(metrics.totalBirthMonthsAndDays == ContactAgeSnapshotMetrics.BirthMonthDayDuration(months: 21, days: 26))
     #expect(metrics.totalBirthDays == 665)
+    #expect(metrics.availableDisplayFormats == [.yearMonthDay, .monthDay, .day])
   }
 
   @Test("Contact age metrics calculate duration and total days on birthday")
@@ -49,6 +50,23 @@ struct ContactAgeSnapshotMetricsTests {
     #expect(metrics.birthDuration == PersonBirthdaySummary.BirthDuration(years: 0, months: 0, days: 0))
     #expect(metrics.totalBirthMonthsAndDays == ContactAgeSnapshotMetrics.BirthMonthDayDuration(months: 0, days: 0))
     #expect(metrics.totalBirthDays == 0)
+    #expect(metrics.availableDisplayFormats == [.day])
+  }
+
+  @Test("Contact age metrics offer month day and day formats before one year")
+  func contactAgeMetricsOfferMonthDayAndDayFormatsBeforeOneYear() throws {
+    let calendar = Calendar(identifier: .gregorian)
+    let birthDate = try #require(calendar.date(from: DateComponents(year: 2026, month: 3, day: 15, hour: 12)))
+    let referenceDate = try #require(calendar.date(from: DateComponents(year: 2026, month: 5, day: 1, hour: 10)))
+
+    let metrics = ContactAgeSnapshotMetrics.make(
+      birthDate: birthDate,
+      calendarKind: .gregorian,
+      referenceDate: referenceDate)
+
+    #expect(metrics.birthDuration == PersonBirthdaySummary.BirthDuration(years: 0, months: 1, days: 16))
+    #expect(metrics.totalBirthMonthsAndDays == ContactAgeSnapshotMetrics.BirthMonthDayDuration(months: 1, days: 16))
+    #expect(metrics.availableDisplayFormats == [.monthDay, .day])
   }
 
   @Test("Contact age metrics fall back to legacy precomputed values")

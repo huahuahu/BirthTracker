@@ -20,6 +20,18 @@ public struct ContactAgeSnapshotMetrics: Equatable, Sendable {
       days: birthDuration.days)
   }
 
+  public var availableDisplayFormats: [ContactAgeDisplayFormat] {
+    if birthDuration.years > 0 {
+      return ContactAgeDisplayFormat.allCases
+    }
+
+    if totalBirthMonthsAndDays.months > 0 {
+      return [.monthDay, .day]
+    }
+
+    return [.day]
+  }
+
   public init(
     birthDuration: PersonBirthdaySummary.BirthDuration,
     totalBirthDays: Int

@@ -1,6 +1,5 @@
 import Foundation
 import Models
-import Persistence
 
 struct ContactAgeDurationFormatter {
   func string(

@@ -1,6 +1,5 @@
 import Localization
 import Models
-import Persistence
 import SFSafeSymbols
 import SwiftUI
 import WidgetKit
@@ -52,21 +51,21 @@ public struct ContactAgeWidgetView: View {
 
       if snapshot.nextBirthdayDate == nil {
         message(L10n.string(L10n.Widget.noBirthdayRecorded))
-      } else if let ageText = ageText(for: snapshot) {
-        Button(intent: ToggleContactAgeFormatIntent(personID: snapshot.personID)) {
-          VStack(alignment: .leading, spacing: 4) {
-            Text(ageText)
-              .font(family == .systemSmall ? .title3.bold() : .title.bold())
-              .monospacedDigit()
-              .lineLimit(2)
-              .minimumScaleFactor(0.7)
-            Text(formatLabel)
-              .font(.caption2)
-              .foregroundStyle(.secondary)
+      } else if
+        let metrics = contactAgeMetrics(for: snapshot),
+        let ageText = ageText(for: metrics)
+      {
+        let resolvedDisplayFormat = displayFormat.resolved(in: metrics.availableDisplayFormats)
+        let canToggleFormat = metrics.availableDisplayFormats.count > 1
+
+        if canToggleFormat {
+          Button(intent: ToggleContactAgeFormatIntent(personID: snapshot.personID)) {
+            ageContent(ageText: ageText, displayFormat: resolvedDisplayFormat)
           }
-          .frame(maxWidth: .infinity, alignment: .leading)
+          .buttonStyle(.plain)
+        } else {
+          ageContent(ageText: ageText, displayFormat: resolvedDisplayFormat)
         }
-        .buttonStyle(.plain)
 
         if family == .systemMedium {
           if let days = snapshot.daysUntilNextBirthday {
@@ -74,9 +73,11 @@ public struct ContactAgeWidgetView: View {
               .font(.caption)
               .foregroundStyle(.secondary)
           }
-          Text(L10n.Widget.contactAgeTapToSwitch)
-            .font(.caption2)
-            .foregroundStyle(.secondary)
+          if canToggleFormat {
+            Text(L10n.Widget.contactAgeTapToSwitch)
+              .font(.caption2)
+              .foregroundStyle(.secondary)
+          }
         }
       } else {
         message(L10n.string(L10n.Widget.contactAgeNeedsBirthYear))
@@ -84,12 +85,29 @@ public struct ContactAgeWidgetView: View {
     }
   }
 
-  private func ageText(for snapshot: WidgetPersonSnapshot) -> String? {
-    guard let metrics = contactAgeMetrics(for: snapshot) else { return nil }
+  private func ageContent(
+    ageText: String,
+    displayFormat: ContactAgeDisplayFormat
+  ) -> some View {
+    VStack(alignment: .leading, spacing: 4) {
+      Text(ageText)
+        .font(family == .systemSmall ? .title3.bold() : .title.bold())
+        .monospacedDigit()
+        .lineLimit(2)
+        .minimumScaleFactor(0.7)
+      Text(formatLabel(for: displayFormat))
+        .font(.caption2)
+        .foregroundStyle(.secondary)
+    }
+    .frame(maxWidth: .infinity, alignment: .leading)
+  }
+
+  private func ageText(for metrics: ContactAgeSnapshotMetrics) -> String? {
+    let resolvedDisplayFormat = displayFormat.resolved(in: metrics.availableDisplayFormats)
 
     return durationFormatter.string(
       for: metrics,
-      displayFormat: displayFormat)
+      displayFormat: resolvedDisplayFormat)
   }
 
   private func contactAgeMetrics(for snapshot: WidgetPersonSnapshot) -> ContactAgeSnapshotMetrics? {
@@ -98,7 +116,7 @@ public struct ContactAgeWidgetView: View {
       referenceDate: date)
   }
 
-  private var formatLabel: LocalizedStringResource {
+  private func formatLabel(for displayFormat: ContactAgeDisplayFormat) -> LocalizedStringResource {
     switch displayFormat {
     case .yearMonthDay:
       L10n.Widget.ageFormatYearMonthDay
