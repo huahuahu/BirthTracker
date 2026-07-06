@@ -70,7 +70,7 @@
       }
     },
     "Toggle Age Format" : {
-      "comment" : "AppIntent title for toggling a contact age Widget between duration and total-days formats.",
+      "comment" : "AppIntent title for cycling a contact age Widget between year/month/day, month/day, and day formats.",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -137,19 +137,36 @@
         }
       }
     },
+    "widget.contact.age.format.month.day" : {
+      "comment" : "Short label for the total-months-and-days contact age format.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "M/D"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "月/日"
+          }
+        }
+      }
+    },
     "widget.contact.age.format.total.days" : {
       "comment" : "Short label for the total-days contact age format.",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Days"
+            "value" : "D"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "总天数"
+            "value" : "日"
           }
         }
       }

@@ -11,7 +11,7 @@ BirthTracker 已有 `UpcomingBirthdaysWidget`，它从 App Group 中的 Widget �
 - 新增独立联系人年龄 Widget，不改变现有即将到来的生日 Widget 的定位。
 - 每个年龄 Widget 选择一个联系人。
 - Widget 默认以年/月/日显示当前年龄，例如“2 年 3 月 4 天”。
-- 用户可在 Widget 内点按主数值区域，在年/月/日与总天数之间切换。
+- 用户可在 Widget 内点按主数值区域，在年/月/日、月/日和日三种格式之间轮换。
 - 格式偏好按联系人保存；同一联系人对应的多个年龄 Widget 会同步切换，不影响其他联系人。
 - 联系人缺少出生年份时仍可选择，但 Widget 显示“需要出生年份”，不展示可切换的年龄数字。
 
@@ -27,7 +27,7 @@ BirthTracker 已有 `UpcomingBirthdaysWidget`，它从 App Group 中的 Widget �
 
 新增 `ContactAgeWidget`，并在 `BirthTrackerWidgetBundle` 中与 `UpcomingBirthdaysWidget` 一起注册。`BirthTrackerWidgetKind` 增加新的 `contactAge` kind，值为 `"ContactAgeWidget"`。
 
-`ContactAgeWidget` 继续使用 `AppIntentConfiguration`。联系人选择复用现有 `SelectPersonIntent`、`WidgetPersonEntity` 和 `WidgetPersonQuery`，因此两个 Widget 共用同一套联系人候选来源。
+`ContactAgeWidget` 继续使用 `AppIntentConfiguration`。联系人选择复用 `SelectPersonIntent`，配置参数只持久化联系人 UUID 字符串；候选列表由 `WidgetPersonOptionsProvider` 从 Widget 快照动态生成，因此两个 Widget 共用同一套联系人候选来源且不持久化 `AppEntity`。
 
 ### 共享模型和快照
 
@@ -39,14 +39,15 @@ BirthTracker 已有 `UpcomingBirthdaysWidget`，它从 App Group 中的 Widget �
 
 新增轻量的 Widget 年龄格式偏好存储，使用 `UserDefaults(suiteName: AppGroup.identifier)`。偏好 key 由联系人 ID 组成，值为：
 
-- `durationComponents`：年/月/日
-- `totalDays`：总天数
+- `yearMonthDay`：年/月/日
+- `monthDay`：总月数 + 剩余天数
+- `day`：总天数
 
-默认值为 `durationComponents`。偏好读取失败时使用默认值；写入失败应按现有错误处理风格记录或显式暴露，不做静默成功。
+默认值为 `yearMonthDay`。偏好读取失败时使用默认值；旧 raw value `durationComponents` 和 `totalDays` 会分别映射到 `yearMonthDay` 和 `day`。写入失败应按现有错误处理风格记录或显式暴露，不做静默成功。
 
 ### 交互 Intent
 
-新增 `ToggleContactAgeFormatIntent`。Widget 内主数值区域使用交互式 `Button(intent:)` 触发该 intent。Intent 接收联系人 ID，读取该联系人的当前格式，切换到另一种格式，写回 App Group 偏好，然后通过 WidgetKit 刷新联系人年龄 Widget 时间线。
+新增 `ToggleContactAgeFormatIntent`。Widget 内主数值区域使用交互式 `Button(intent:)` 触发该 intent。Intent 接收联系人 ID，读取该联系人的当前格式，轮换到下一种格式，写回 App Group 偏好，然后通过 WidgetKit 刷新联系人年龄 Widget 时间线。
 
 该交互不会修改 Widget 配置参数，而是修改按联系人保存的显示偏好。因此同一联系人对应的多个年龄 Widget 会一起更新。
 
@@ -57,7 +58,7 @@ BirthTracker 已有 `UpcomingBirthdaysWidget`，它从 App Group 中的 Widget �
 3. Builder 写入 `WidgetPersonSnapshot`，再由 `WidgetSnapshotStore` 持久化到 App Group 内的 Widget store。
 4. `ContactAgeWidget` 的 timeline provider 根据所选联系人读取对应快照。
 5. Provider 再读取该联系人对应的格式偏好，生成 entry。
-6. Widget view 根据 entry 显示年/月/日或总天数。
+6. Widget view 根据 entry 使用 `DateComponentsFormatter` 本地化显示年/月/日、月/日或日。
 7. 用户点按主数值按钮时，`ToggleContactAgeFormatIntent` 切换该联系人格式偏好，并刷新 `ContactAgeWidget`。
 
 ## UI 状态
@@ -90,12 +91,11 @@ BirthTracker 已有 `UpcomingBirthdaysWidget`，它从 App Group 中的 Widget �
 在 `L10n.Widget` 和 `Localizable.xcstrings` 中新增年龄 Widget 需要的文案：
 
 - Widget 展示名和描述。
-- 年龄格式名称：年/月/日、总天数。
-- 总天数格式：英文 `"%lld days old"`，中文 `"出生 %lld 天"`。
+- 年龄格式名称：年/月/日、月/日、日。
 - 缺出生年份提示。
 - 未记录生日提示。
 
-年/月/日展示新增 `widget.contact.age.duration.format`，避免改变现有即将到来的生日 Widget 文案。
+年龄数值展示使用 Apple 的 `DateComponentsFormatter`，不在 string catalog 中手写拼接格式。
 
 ## 测试
 

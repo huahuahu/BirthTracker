@@ -15,6 +15,7 @@ struct ContactAgeSnapshotMetricsTests {
       referenceDate: referenceDate)
 
     #expect(metrics.birthDuration == PersonBirthdaySummary.BirthDuration(years: 1, months: 9, days: 26))
+    #expect(metrics.totalBirthMonthsAndDays == ContactAgeSnapshotMetrics.BirthMonthDayDuration(months: 21, days: 26))
     #expect(metrics.totalBirthDays == 665)
   }
 
@@ -30,6 +31,7 @@ struct ContactAgeSnapshotMetricsTests {
       referenceDate: referenceDate)
 
     #expect(metrics.birthDuration == PersonBirthdaySummary.BirthDuration(years: 2, months: 0, days: 0))
+    #expect(metrics.totalBirthMonthsAndDays == ContactAgeSnapshotMetrics.BirthMonthDayDuration(months: 24, days: 0))
     #expect(metrics.totalBirthDays == 730)
   }
 
@@ -45,6 +47,7 @@ struct ContactAgeSnapshotMetricsTests {
       referenceDate: referenceDate)
 
     #expect(metrics.birthDuration == PersonBirthdaySummary.BirthDuration(years: 0, months: 0, days: 0))
+    #expect(metrics.totalBirthMonthsAndDays == ContactAgeSnapshotMetrics.BirthMonthDayDuration(months: 0, days: 0))
     #expect(metrics.totalBirthDays == 0)
   }
 

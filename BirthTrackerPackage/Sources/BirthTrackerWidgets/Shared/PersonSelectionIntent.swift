@@ -1,11 +1,7 @@
 import AppIntents
 import Foundation
 import Localization
-import Models
-import OSLog
 import Persistence
-
-let logger = Logger(subsystem: "birthTracc11", category: "widget")
 
 struct SelectPersonIntent: WidgetConfigurationIntent {
   static let title: LocalizedStringResource = "Choose Person"

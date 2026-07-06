@@ -1,8 +1,24 @@
 import Foundation
 
 public struct ContactAgeSnapshotMetrics: Equatable, Sendable {
+  public struct BirthMonthDayDuration: Equatable, Sendable {
+    public var months: Int
+    public var days: Int
+
+    public init(months: Int, days: Int) {
+      self.months = months
+      self.days = days
+    }
+  }
+
   public var birthDuration: PersonBirthdaySummary.BirthDuration
   public var totalBirthDays: Int
+
+  public var totalBirthMonthsAndDays: BirthMonthDayDuration {
+    BirthMonthDayDuration(
+      months: birthDuration.years * 12 + birthDuration.months,
+      days: birthDuration.days)
+  }
 
   public init(
     birthDuration: PersonBirthdaySummary.BirthDuration,
