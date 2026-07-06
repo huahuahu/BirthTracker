@@ -1,6 +1,5 @@
 import Foundation
 import Models
-import Persistence
 import WidgetKit
 
 struct ContactAgeEntry: TimelineEntry {

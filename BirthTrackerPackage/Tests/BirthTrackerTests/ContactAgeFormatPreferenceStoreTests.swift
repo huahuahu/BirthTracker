@@ -1,4 +1,5 @@
 import Foundation
+import Models
 import Persistence
 import Testing
 
@@ -34,6 +35,39 @@ struct ContactAgeFormatPreferenceStoreTests {
     #expect(fixture.store.format(for: personID) == .day)
     #expect(fixture.store.toggleFormat(for: personID) == .yearMonthDay)
     #expect(fixture.store.format(for: personID) == .yearMonthDay)
+  }
+
+  @Test("Store cycles through month day and day for contacts younger than one year")
+  func storeCyclesThroughMonthDayAndDayForContactsYoungerThanOneYear() throws {
+    let fixture = try PreferenceStoreFixture()
+    let personID = UUID()
+
+    fixture.store.setFormat(.yearMonthDay, for: personID)
+
+    #expect(fixture.store.toggleFormat(for: personID, availableFormats: [.monthDay, .day]) == .day)
+    #expect(fixture.store.format(for: personID) == .day)
+    #expect(fixture.store.toggleFormat(for: personID, availableFormats: [.monthDay, .day]) == .monthDay)
+    #expect(fixture.store.format(for: personID) == .monthDay)
+  }
+
+  @Test("Store keeps day format when it is the only available format")
+  func storeKeepsDayFormatWhenItIsTheOnlyAvailableFormat() throws {
+    let fixture = try PreferenceStoreFixture()
+    let personID = UUID()
+
+    fixture.store.setFormat(.yearMonthDay, for: personID)
+
+    #expect(fixture.store.toggleFormat(for: personID, availableFormats: [.day]) == .day)
+    #expect(fixture.store.format(for: personID) == .day)
+    #expect(fixture.store.toggleFormat(for: personID, availableFormats: [.day]) == .day)
+    #expect(fixture.store.format(for: personID) == .day)
+  }
+
+  @Test("Display format resolves unavailable saved formats")
+  func displayFormatResolvesUnavailableSavedFormats() {
+    #expect(ContactAgeDisplayFormat.yearMonthDay.resolved(in: [.monthDay, .day]) == .monthDay)
+    #expect(ContactAgeDisplayFormat.yearMonthDay.resolved(in: [.day]) == .day)
+    #expect(ContactAgeDisplayFormat.monthDay.resolved(in: [.monthDay, .day]) == .monthDay)
   }
 
   @Test("Store maps legacy format raw values")
