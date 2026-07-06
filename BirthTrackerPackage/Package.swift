@@ -14,6 +14,7 @@ let package = Package(
     .library(name: "DesignSystem", targets: ["DesignSystem"]),
     .library(name: "Features", targets: ["Features"]),
     .library(name: "Localization", targets: ["Localization"]),
+    .library(name: "Logging", targets: ["Logging"]),
     .library(name: "Models", targets: ["Models"]),
     .library(name: "Persistence", targets: ["Persistence"]),
     .library(name: "TestingSupport", targets: ["TestingSupport"]),
@@ -46,6 +47,10 @@ let package = Package(
       resources: [.process("Resources")]
     ),
     .target(
+      name: "Logging",
+      path: "Sources/Logging"
+    ),
+    .target(
       name: "Models",
       path: "Sources/Models"
     ),
@@ -61,7 +66,7 @@ let package = Package(
     ),
     .testTarget(
       name: "BirthTrackerPackageTests",
-      dependencies: ["Features", "Models", "Persistence", "TestingSupport"],
+      dependencies: ["Features", "Logging", "Models", "Persistence", "TestingSupport"],
       path: "Tests/BirthTrackerTests"
     ),
   ]
