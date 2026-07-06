@@ -1,29 +1,39 @@
 import Localization
+import Models
 import SFSafeSymbols
 import SwiftUI
 import WidgetKit
 
-struct UpcomingBirthdaysWidgetView: View {
+public struct UpcomingBirthdaysWidgetView: View {
   @Environment(\.widgetFamily)
   private var family
 
-  let entry: UpcomingBirthdaysEntry
+  private let birthdays: [UpcomingBirthday]
+  private let selectedPersonUnavailable: Bool
 
-  var body: some View {
+  public init(
+    birthdays: [UpcomingBirthday],
+    selectedPersonUnavailable: Bool
+  ) {
+    self.birthdays = birthdays
+    self.selectedPersonUnavailable = selectedPersonUnavailable
+  }
+
+  public var body: some View {
     VStack(alignment: .leading, spacing: 8) {
       Label(L10n.Widget.title, systemImage: SFSymbol.gift.rawValue)
         .font(.headline)
 
-      if entry.selectedPersonUnavailable {
+      if selectedPersonUnavailable {
         Text(L10n.Widget.selectedPersonUnavailable)
           .font(.caption)
           .foregroundStyle(.secondary)
-      } else if entry.birthdays.isEmpty {
+      } else if birthdays.isEmpty {
         Text(L10n.Widget.noUpcomingBirthdays)
           .font(.caption)
           .foregroundStyle(.secondary)
       } else {
-        ForEach(entry.birthdays.prefix(visibleBirthdayLimit)) { birthday in
+        ForEach(birthdays.prefix(visibleBirthdayLimit)) { birthday in
           VStack(alignment: .leading, spacing: 2) {
             Text(birthday.personName)
               .font(.subheadline.weight(.semibold))

@@ -4,45 +4,47 @@ import Localization
 import Models
 import Persistence
 
-struct SelectPersonIntent: WidgetConfigurationIntent {
-  static let title: LocalizedStringResource = "Choose Person"
-  static let description = IntentDescription("Choose which person this widget shows.")
+public struct SelectPersonIntent: WidgetConfigurationIntent {
+  public static let title: LocalizedStringResource = "Choose Person"
+  public static let description = IntentDescription("Choose which person this widget shows.")
 
   @Parameter(title: "Person")
-  var person: WidgetPersonEntity?
+  public var person: WidgetPersonEntity?
 
-  init() {}
+  public init() {}
 
-  init(personID: UUID?) {
+  public init(personID: UUID?) {
     person = personID.map { WidgetPersonEntity(id: $0, name: L10n.string(L10n.Widget.selectedPersonUnavailable)) }
   }
 
-  var selectedPersonID: UUID? {
+  public var selectedPersonID: UUID? {
     person?.id
   }
 }
 
-struct WidgetPersonEntity: AppEntity {
-  static let typeDisplayRepresentation = TypeDisplayRepresentation(name: "Person")
-  static let defaultQuery = WidgetPersonQuery()
+public struct WidgetPersonEntity: AppEntity {
+  public static let typeDisplayRepresentation = TypeDisplayRepresentation(name: "Person")
+  public static let defaultQuery = WidgetPersonQuery()
 
-  let id: UUID
+  public let id: UUID
 
   @Property(title: "Person")
-  var name: String
+  public var name: String
 
-  var displayRepresentation: DisplayRepresentation {
+  public var displayRepresentation: DisplayRepresentation {
     DisplayRepresentation(title: "\(name)")
   }
 
-  init(id: UUID, name: String) {
+  public init(id: UUID, name: String) {
     self.id = id
     self.name = name
   }
 }
 
-struct WidgetPersonQuery: EntityQuery {
-  func entities(for identifiers: [UUID]) async throws -> [WidgetPersonEntity] {
+public struct WidgetPersonQuery: EntityQuery {
+  public init() {}
+
+  public func entities(for identifiers: [UUID]) async throws -> [WidgetPersonEntity] {
     let snapshots = try WidgetSnapshotStore.fetchAll()
     let entitiesByID = Dictionary(
       uniqueKeysWithValues: snapshots.map { snapshot in
@@ -60,7 +62,7 @@ struct WidgetPersonQuery: EntityQuery {
     return result
   }
 
-  func suggestedEntities() async throws -> [WidgetPersonEntity] {
+  public func suggestedEntities() async throws -> [WidgetPersonEntity] {
     let result = try WidgetSnapshotStore.fetchAll().map(WidgetPersonEntity.init(snapshot:))
     logger.info("suggestedEntities \(result.map(\.id))")
     return result

@@ -27,7 +27,7 @@ BirthTracker 已有 `UpcomingBirthdaysWidget`，它从 App Group 中的 Widget �
 
 新增 `ContactAgeWidget`，并在 `BirthTrackerWidgetBundle` 中与 `UpcomingBirthdaysWidget` 一起注册。`BirthTrackerWidgetKind` 增加新的 `contactAge` kind，值为 `"ContactAgeWidget"`。
 
-`ContactAgeWidget` 继续使用 `AppIntentConfiguration`。联系人选择复用 `SelectPersonIntent`，配置参数只持久化联系人 UUID 字符串；候选列表由 `WidgetPersonOptionsProvider` 从 Widget 快照动态生成，因此两个 Widget 共用同一套联系人候选来源且不持久化 `AppEntity`。
+`ContactAgeWidget` 继续使用 `AppIntentConfiguration`。联系人选择复用 `SelectPersonIntent` 和轻量 `WidgetPersonEntity`，让系统显示 Widget 编辑 UI；timeline provider 只通过 `selectedPersonID` 读取联系人 UUID，再从 Widget 快照加载扁平数据。
 
 ### 共享模型和快照
 

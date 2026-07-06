@@ -30,6 +30,8 @@ targets:
         product: App
       - package: BirthTrackerPackage
         product: DesignSystem
+      - package: BirthTrackerPackage
+        product: BirthTrackerWidgets
       - target: BirthTrackerWidget
         embed: true
     settings:

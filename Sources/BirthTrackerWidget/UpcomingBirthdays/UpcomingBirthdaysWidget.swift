@@ -1,19 +1,23 @@
+import BirthTrackerWidgets
 import Localization
 import Persistence
 import SwiftUI
 import WidgetKit
 
-public struct UpcomingBirthdaysWidget: Widget {
-  public init() {}
+struct UpcomingBirthdaysWidget: Widget {
+  init() {}
 
-  public var body: some WidgetConfiguration {
+  var body: some WidgetConfiguration {
     AppIntentConfiguration(
       kind: BirthTrackerWidgetKind.upcomingBirthdays,
       intent: SelectPersonIntent.self,
       provider: UpcomingBirthdaysProvider()
     ) { entry in
-      UpcomingBirthdaysWidgetView(entry: entry)
-        .containerBackground(.background, for: .widget)
+      UpcomingBirthdaysWidgetView(
+        birthdays: entry.birthdays,
+        selectedPersonUnavailable: entry.selectedPersonUnavailable
+      )
+      .containerBackground(.background, for: .widget)
     }
     .configurationDisplayName(L10n.Widget.upcomingBirthdays)
     .description(L10n.Widget.description)

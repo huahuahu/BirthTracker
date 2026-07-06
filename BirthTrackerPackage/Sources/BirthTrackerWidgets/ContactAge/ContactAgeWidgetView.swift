@@ -1,24 +1,40 @@
 import Localization
 import Models
+import Persistence
 import SFSafeSymbols
 import SwiftUI
 import WidgetKit
 
-struct ContactAgeWidgetView: View {
+public struct ContactAgeWidgetView: View {
   @Environment(\.widgetFamily)
   private var family
 
-  let entry: ContactAgeEntry
+  private let date: Date
+  private let snapshot: WidgetPersonSnapshot?
+  private let displayFormat: ContactAgeDisplayFormat
+  private let selectedPersonUnavailable: Bool
   private let durationFormatter = ContactAgeDurationFormatter()
 
-  var body: some View {
+  public init(
+    date: Date,
+    snapshot: WidgetPersonSnapshot?,
+    displayFormat: ContactAgeDisplayFormat,
+    selectedPersonUnavailable: Bool
+  ) {
+    self.date = date
+    self.snapshot = snapshot
+    self.displayFormat = displayFormat
+    self.selectedPersonUnavailable = selectedPersonUnavailable
+  }
+
+  public var body: some View {
     VStack(alignment: .leading, spacing: 8) {
       Label(L10n.Widget.contactAge, systemImage: SFSymbol.clock.rawValue)
         .font(.headline)
 
-      if entry.selectedPersonUnavailable {
+      if selectedPersonUnavailable {
         message(L10n.string(L10n.Widget.selectedPersonUnavailable))
-      } else if let snapshot = entry.snapshot {
+      } else if let snapshot {
         snapshotContent(snapshot)
       } else {
         message(L10n.string(L10n.Widget.contactAgeChoosePerson))
@@ -73,17 +89,17 @@ struct ContactAgeWidgetView: View {
 
     return durationFormatter.string(
       for: metrics,
-      displayFormat: entry.displayFormat)
+      displayFormat: displayFormat)
   }
 
   private func contactAgeMetrics(for snapshot: WidgetPersonSnapshot) -> ContactAgeSnapshotMetrics? {
     ContactAgeSnapshotMetrics.make(
       snapshot: snapshot,
-      referenceDate: entry.date)
+      referenceDate: date)
   }
 
   private var formatLabel: LocalizedStringResource {
-    switch entry.displayFormat {
+    switch displayFormat {
     case .yearMonthDay:
       L10n.Widget.ageFormatYearMonthDay
     case .monthDay:

@@ -1,3 +1,4 @@
+import BirthTrackerWidgets
 import Foundation
 import Models
 import Persistence
