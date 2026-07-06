@@ -126,6 +126,31 @@ struct LoggingTests {
     #expect(record.level == level)
     #expect(record.primaryTag == .debug)
   }
+
+  @Test("OSLogSink dispatches every supported level to the matching writer", arguments: LogLevel.allCases)
+  func osLogSinkDispatchesEverySupportedLevelToMatchingWriter(level: LogLevel) throws {
+    let writer = RecordingOSLogWriter()
+    let sink = OSLogSink(writerFactory: { category in
+      writer.recordCategory(category)
+      return writer
+    })
+    let record = LogRecord(
+      level: level,
+      primaryTag: .widget,
+      tags: [.data],
+      message: "Message for \(level.rawValue)",
+      values: [.public("visible"), .private("secret")],
+      timestamp: Date(timeIntervalSince1970: 1_799_999_300))
+
+    sink.write(record)
+
+    let call = try #require(writer.calls.first)
+    #expect(writer.categories == [LogTag.widget.rawValue])
+    #expect(writer.calls.count == 1)
+    #expect(call.level == level)
+    #expect(call.publicMessage == record.publicMessage)
+    #expect(call.privateMessage == record.privateMessage)
+  }
 }
 
 private final class RecordingLogSink: LogSink, @unchecked Sendable {
@@ -142,5 +167,65 @@ private final class RecordingLogSink: LogSink, @unchecked Sendable {
     lock.lock()
     defer { lock.unlock() }
     capturedRecords.append(record)
+  }
+}
+
+private final class RecordingOSLogWriter: OSLogWriting, @unchecked Sendable {
+  struct Call: Equatable {
+    let level: LogLevel
+    let publicMessage: String
+    let privateMessage: String
+  }
+
+  private let lock = NSLock()
+  private var capturedCategories: [String] = []
+  private var capturedCalls: [Call] = []
+
+  var categories: [String] {
+    lock.lock()
+    defer { lock.unlock() }
+    return capturedCategories
+  }
+
+  var calls: [Call] {
+    lock.lock()
+    defer { lock.unlock() }
+    return capturedCalls
+  }
+
+  func recordCategory(_ category: String) {
+    lock.lock()
+    defer { lock.unlock() }
+    capturedCategories.append(category)
+  }
+
+  func debug(publicMessage: String, privateMessage: String) {
+    record(.debug, publicMessage: publicMessage, privateMessage: privateMessage)
+  }
+
+  func info(publicMessage: String, privateMessage: String) {
+    record(.info, publicMessage: publicMessage, privateMessage: privateMessage)
+  }
+
+  func notice(publicMessage: String, privateMessage: String) {
+    record(.notice, publicMessage: publicMessage, privateMessage: privateMessage)
+  }
+
+  func warning(publicMessage: String, privateMessage: String) {
+    record(.warning, publicMessage: publicMessage, privateMessage: privateMessage)
+  }
+
+  func error(publicMessage: String, privateMessage: String) {
+    record(.error, publicMessage: publicMessage, privateMessage: privateMessage)
+  }
+
+  func fault(publicMessage: String, privateMessage: String) {
+    record(.fault, publicMessage: publicMessage, privateMessage: privateMessage)
+  }
+
+  private func record(_ level: LogLevel, publicMessage: String, privateMessage: String) {
+    lock.lock()
+    defer { lock.unlock() }
+    capturedCalls.append(Call(level: level, publicMessage: publicMessage, privateMessage: privateMessage))
   }
 }
