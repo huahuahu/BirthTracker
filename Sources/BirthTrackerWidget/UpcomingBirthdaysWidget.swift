@@ -1,6 +1,6 @@
 import Localization
+import Logging
 import Models
-import OSLog
 import Persistence
 import SFSafeSymbols
 import SwiftUI
@@ -39,7 +39,10 @@ struct UpcomingBirthdaysProvider: AppIntentTimelineProvider {
 
   private func loadEntry(for selectedPersonID: UUID?) -> UpcomingBirthdaysEntry {
     do {
-      logger.info("load Entry for \(selectedPersonID?.uuidString ?? "nil")")
+      BirthLogger.widget.info(
+        "Loading widget entry.",
+        tags: [.data],
+        values: [.private(selectedPersonID?.uuidString ?? "nil")])
       if let selectedPersonID {
         guard let snapshot = try WidgetSnapshotStore.fetchPerson(id: selectedPersonID) else {
           return UpcomingBirthdaysEntry(date: .now, birthdays: [], selectedPersonUnavailable: true)
@@ -57,6 +60,10 @@ struct UpcomingBirthdaysProvider: AppIntentTimelineProvider {
         birthdays: snapshots.prefix(8).map(\.upcomingBirthday),
         selectedPersonUnavailable: false)
     } catch {
+      BirthLogger.widget.error(
+        "Failed to load widget entry.",
+        tags: [.data, .persistence],
+        values: [.private(String(describing: error))])
       return UpcomingBirthdaysEntry(date: .now, birthdays: [], selectedPersonUnavailable: false)
     }
   }

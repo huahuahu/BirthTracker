@@ -37,7 +37,7 @@ let package = Package(
     ),
     .target(
       name: "Features",
-      dependencies: ["DesignSystem", "Localization", "Models", "Persistence", "SFSafeSymbols"],
+      dependencies: ["DesignSystem", "Localization", "Logging", "Models", "Persistence", "SFSafeSymbols"],
       path: "Sources/Features",
       swiftSettings: [.defaultIsolation(MainActor.self)]
     ),

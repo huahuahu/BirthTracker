@@ -58,6 +58,8 @@ targets:
         product: Persistence
       - package: BirthTrackerPackage
         product: Localization
+      - package: BirthTrackerPackage
+        product: Logging
       - package: SFSafeSymbols
         product: SFSafeSymbols
     settings:
@@ -81,6 +83,8 @@ targets:
       - target: BirthTracker
       - package: BirthTrackerPackage
         product: Features
+      - package: BirthTrackerPackage
+        product: Logging
       - package: BirthTrackerPackage
         product: Models
       - package: BirthTrackerPackage
