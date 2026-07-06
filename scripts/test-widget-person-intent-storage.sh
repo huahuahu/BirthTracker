@@ -17,15 +17,18 @@ fail() {
   exit 1
 }
 
-grep -q 'var personID: String?' "$INTENT_FILE" \
-  || fail "SelectPersonIntent should persist a String personID parameter"
+grep -q 'var person: WidgetPersonEntity?' "$INTENT_FILE" \
+  || fail "SelectPersonIntent should expose WidgetPersonEntity so WidgetKit shows the edit UI"
 
-if grep -q 'var person: WidgetPersonEntity?' "$INTENT_FILE"; then
-  fail "SelectPersonIntent should not persist WidgetPersonEntity directly"
-fi
+grep -q 'struct WidgetPersonEntity: AppEntity' "$INTENT_FILE" \
+  || fail "WidgetPersonEntity should be a registered AppEntity for Widget configuration"
 
 grep -q 'selectedPersonID' "$INTENT_FILE" \
-  || fail "SelectPersonIntent should expose a UUID parser for the persisted personID"
+  || fail "SelectPersonIntent should expose a UUID accessor for provider code"
+
+if grep -R 'configuration\.person' "$CONTACT_AGE_DIR" "$UPCOMING_BIRTHDAYS_DIR"; then
+  fail "Widget providers should read selectedPersonID instead of storing person entities"
+fi
 
 expected_files=(
   "$SHARED_DIR/BirthTrackerWidgetsAppIntentsPackage.swift"
