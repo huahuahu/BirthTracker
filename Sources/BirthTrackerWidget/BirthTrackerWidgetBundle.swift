@@ -1,3 +1,4 @@
+import BirthTrackerWidgets
 import SwiftUI
 import WidgetKit
 

@@ -63,8 +63,10 @@ struct UpcomingBirthdaysProvider: AppIntentTimelineProvider {
   }
 }
 
-struct UpcomingBirthdaysWidget: Widget {
-  var body: some WidgetConfiguration {
+public struct UpcomingBirthdaysWidget: Widget {
+  public init() {}
+
+  public var body: some WidgetConfiguration {
     AppIntentConfiguration(
       kind: BirthTrackerWidgetKind.upcomingBirthdays,
       intent: SelectPersonIntent.self,

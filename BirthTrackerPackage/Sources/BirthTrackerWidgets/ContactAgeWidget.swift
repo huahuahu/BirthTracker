@@ -94,8 +94,10 @@ struct ContactAgeProvider: AppIntentTimelineProvider {
   }
 }
 
-struct ContactAgeWidget: Widget {
-  var body: some WidgetConfiguration {
+public struct ContactAgeWidget: Widget {
+  public init() {}
+
+  public var body: some WidgetConfiguration {
     AppIntentConfiguration(
       kind: BirthTrackerWidgetKind.contactAge,
       intent: SelectPersonIntent.self,

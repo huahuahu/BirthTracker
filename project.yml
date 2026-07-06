@@ -53,13 +53,7 @@ targets:
       - path: Sources/BirthTrackerWidget
     dependencies:
       - package: BirthTrackerPackage
-        product: Models
-      - package: BirthTrackerPackage
-        product: Persistence
-      - package: BirthTrackerPackage
-        product: Localization
-      - package: SFSafeSymbols
-        product: SFSafeSymbols
+        product: BirthTrackerWidgets
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: $(WIDGET_BUNDLE_ID)
