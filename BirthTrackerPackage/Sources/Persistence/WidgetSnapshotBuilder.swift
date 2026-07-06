@@ -9,26 +9,32 @@ public enum WidgetSnapshotBuilder {
     let summaries =
       people
       .map { PersonBirthdaySummary.make(for: $0, referenceDate: referenceDate) }
-      .filter { $0.nextBirthdayDate != nil }
       .sorted { lhs, rhs in
-        guard let lhsDate = lhs.nextBirthdayDate, let rhsDate = rhs.nextBirthdayDate else {
+        switch (lhs.nextBirthdayDate, rhs.nextBirthdayDate) {
+        case (let lhsDate?, let rhsDate?):
+          if lhsDate == rhsDate {
+            return lhs.personName.localizedStandardCompare(rhs.personName) == .orderedAscending
+          }
+          return lhsDate < rhsDate
+        case (.some, nil):
+          return true
+        case (nil, .some):
+          return false
+        case (nil, nil):
           return lhs.personName.localizedStandardCompare(rhs.personName) == .orderedAscending
         }
-        if lhsDate == rhsDate {
-          return lhs.personName.localizedStandardCompare(rhs.personName) == .orderedAscending
-        }
-        return lhsDate < rhsDate
       }
 
-    return summaries.enumerated().compactMap { index, summary in
-      guard let nextBirthdayDate = summary.nextBirthdayDate else { return nil }
-      return WidgetPersonSnapshot(
+    return summaries.enumerated().map { index, summary in
+      WidgetPersonSnapshot(
         personID: summary.personID,
         displayName: summary.personName,
-        nextBirthdayDate: nextBirthdayDate,
+        nextBirthdayDate: summary.nextBirthdayDate,
         age: summary.nextAge,
+        birthDate: summary.birthDate,
         birthDuration: summary.birthDuration,
         daysUntilNextBirthday: summary.daysUntilNextBirthday,
+        totalBirthDays: summary.totalBirthDays,
         calendarKind: summary.calendarKind,
         generatedAt: referenceDate,
         sortIndex: index)

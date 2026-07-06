@@ -1,3 +1,4 @@
+import BirthTrackerWidgets
 import SwiftUI
 import WidgetKit
 
@@ -5,5 +6,6 @@ import WidgetKit
 struct BirthTrackerWidgetBundle: WidgetBundle {
   var body: some Widget {
     UpcomingBirthdaysWidget()
+    ContactAgeWidget()
   }
 }
