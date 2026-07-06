@@ -7,21 +7,23 @@ public struct LogRecord: Equatable, Sendable {
   public let message: String
   public let values: [LogValue]
   public let timestamp: Date
+  private let interpolatedPrivateValues: [String]
 
   public init(
     level: LogLevel,
     primaryTag: LogTag,
     tags: [LogTag] = [],
-    message: String,
+    message: LogMessage,
     values: [LogValue] = [],
     timestamp: Date = Date()
   ) {
     self.level = level
     self.primaryTag = primaryTag
     self.tags = Self.normalizedTags(primaryTag: primaryTag, tags: tags)
-    self.message = message
+    self.message = message.publicDescription
     self.values = values
     self.timestamp = timestamp
+    self.interpolatedPrivateValues = message.privateValues
   }
 
   public var publicMessage: String {
@@ -39,7 +41,8 @@ public struct LogRecord: Equatable, Sendable {
 
   public var privateMessage: String {
     let privateValues =
-      values
+      interpolatedPrivateValues
+      + values
       .filter { $0.privacy == .private }
       .map(\.description)
 

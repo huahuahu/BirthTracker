@@ -73,6 +73,20 @@ struct LoggingTests {
     #expect(record.privateMessage == "private=person-id-123")
   }
 
+  @Test("Log records support values inserted inside messages")
+  func logRecordsSupportValuesInsertedInsideMessages() {
+    let record = LogRecord(
+      level: .info,
+      primaryTag: .widget,
+      tags: [.data],
+      message: "Loaded \(3, privacy: .public) entries for \("person-id-123")",
+      timestamp: Date(timeIntervalSince1970: 1_799_999_000))
+
+    #expect(record.message == "Loaded 3 entries for <private>")
+    #expect(record.publicMessage == "[widget,data] Loaded 3 entries for <private>")
+    #expect(record.privateMessage == "private=person-id-123")
+  }
+
   @Test("BirthLogger writes records through an injected sink")
   func birthLoggerWritesRecordsThroughInjectedSink() throws {
     let sink = RecordingLogSink()

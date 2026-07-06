@@ -18,7 +18,7 @@ public struct BirthLogger: Sendable {
   public static let debug = BirthLogger(primaryTag: .debug)
 
   public func debug(
-    _ message: String,
+    _ message: LogMessage,
     tags: [LogTag] = [],
     values: [LogValue] = [],
     timestamp: Date = Date()
@@ -27,7 +27,7 @@ public struct BirthLogger: Sendable {
   }
 
   public func info(
-    _ message: String,
+    _ message: LogMessage,
     tags: [LogTag] = [],
     values: [LogValue] = [],
     timestamp: Date = Date()
@@ -36,7 +36,7 @@ public struct BirthLogger: Sendable {
   }
 
   public func notice(
-    _ message: String,
+    _ message: LogMessage,
     tags: [LogTag] = [],
     values: [LogValue] = [],
     timestamp: Date = Date()
@@ -45,7 +45,7 @@ public struct BirthLogger: Sendable {
   }
 
   public func warning(
-    _ message: String,
+    _ message: LogMessage,
     tags: [LogTag] = [],
     values: [LogValue] = [],
     timestamp: Date = Date()
@@ -54,7 +54,7 @@ public struct BirthLogger: Sendable {
   }
 
   public func error(
-    _ message: String,
+    _ message: LogMessage,
     tags: [LogTag] = [],
     values: [LogValue] = [],
     timestamp: Date = Date()
@@ -63,7 +63,7 @@ public struct BirthLogger: Sendable {
   }
 
   public func fault(
-    _ message: String,
+    _ message: LogMessage,
     tags: [LogTag] = [],
     values: [LogValue] = [],
     timestamp: Date = Date()
@@ -73,7 +73,7 @@ public struct BirthLogger: Sendable {
 
   public func log(
     _ level: LogLevel,
-    _ message: String,
+    _ message: LogMessage,
     tags: [LogTag] = [],
     values: [LogValue] = [],
     timestamp: Date = Date()
@@ -90,7 +90,7 @@ public struct BirthLogger: Sendable {
 
   public static func log(
     _ level: LogLevel,
-    _ message: String,
+    _ message: LogMessage,
     primaryTag: LogTag,
     tags: [LogTag] = [],
     values: [LogValue] = [],
