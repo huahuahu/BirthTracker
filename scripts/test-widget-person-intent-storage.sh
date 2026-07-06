@@ -19,11 +19,15 @@ fail() {
   exit 1
 }
 
-grep -q 'var person: WidgetPersonEntity?' "$INTENT_FILE" \
-  || fail "SelectPersonIntent should expose WidgetPersonEntity so WidgetKit shows the edit UI"
+grep -q 'var personID: String?' "$INTENT_FILE" \
+  || fail "SelectPersonIntent should persist a primitive String personID parameter"
 
-grep -q 'struct WidgetPersonEntity: AppEntity' "$INTENT_FILE" \
-  || fail "WidgetPersonEntity should be a registered AppEntity for Widget configuration"
+grep -q 'optionsProvider: WidgetPersonOptionsProvider()' "$INTENT_FILE" \
+  || fail "SelectPersonIntent should provide dynamic person options for the String personID parameter"
+
+if grep -q 'WidgetPersonEntity' "$INTENT_FILE"; then
+  fail "SelectPersonIntent should not use WidgetPersonEntity because WidgetKit fails to persist its EntityIdentifier"
+fi
 
 grep -q 'selectedPersonID' "$INTENT_FILE" \
   || fail "SelectPersonIntent should expose a UUID accessor for provider code"

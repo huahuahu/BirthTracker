@@ -1,76 +1,36 @@
 import AppIntents
 import Foundation
 import Localization
-import Models
 import Persistence
 
 public struct SelectPersonIntent: WidgetConfigurationIntent {
   public static let title: LocalizedStringResource = "Choose Person"
   public static let description = IntentDescription("Choose which person this widget shows.")
 
-  @Parameter(title: "Person")
-  public var person: WidgetPersonEntity?
+  @Parameter(title: "Person", optionsProvider: WidgetPersonOptionsProvider())
+  public var personID: String?
 
   public init() {}
 
   public init(personID: UUID?) {
-    person = personID.map { WidgetPersonEntity(id: $0, name: L10n.string(L10n.Widget.selectedPersonUnavailable)) }
+    self.personID = personID?.uuidString
   }
 
   public var selectedPersonID: UUID? {
-    person?.id
+    guard let personID else { return nil }
+    return UUID(uuidString: personID)
   }
 }
 
-public struct WidgetPersonEntity: AppEntity {
-  public static let typeDisplayRepresentation = TypeDisplayRepresentation(name: "Person")
-  public static let defaultQuery = WidgetPersonQuery()
-
-  public let id: UUID
-
-  @Property(title: "Person")
-  public var name: String
-
-  public var displayRepresentation: DisplayRepresentation {
-    DisplayRepresentation(title: "\(name)")
-  }
-
-  public init(id: UUID, name: String) {
-    self.id = id
-    self.name = name
-  }
-}
-
-public struct WidgetPersonQuery: EntityQuery {
+public struct WidgetPersonOptionsProvider: DynamicOptionsProvider {
   public init() {}
 
-  public func entities(for identifiers: [UUID]) async throws -> [WidgetPersonEntity] {
+  public func results() async throws -> IntentItemCollection<String> {
     let snapshots = try WidgetSnapshotStore.fetchAll()
-    let entitiesByID = Dictionary(
-      uniqueKeysWithValues: snapshots.map { snapshot in
-        (snapshot.personID, WidgetPersonEntity(snapshot: snapshot))
-      })
-
-    let result =
-      identifiers.map { identifier in
-        entitiesByID[identifier]
-          ?? WidgetPersonEntity(
-            id: identifier,
-            name: L10n.string(L10n.Widget.selectedPersonUnavailable))
-      }
-    logger.info("entities for \(identifiers), result is \(result.map(\.id))")
-    return result
-  }
-
-  public func suggestedEntities() async throws -> [WidgetPersonEntity] {
-    let result = try WidgetSnapshotStore.fetchAll().map(WidgetPersonEntity.init(snapshot:))
-    logger.info("suggestedEntities \(result.map(\.id))")
-    return result
-  }
-}
-
-extension WidgetPersonEntity {
-  fileprivate init(snapshot: WidgetPersonSnapshot) {
-    self.init(id: snapshot.personID, name: snapshot.displayName)
+    let items = snapshots.map { snapshot in
+      IntentItem(snapshot.personID.uuidString, title: "\(snapshot.displayName)")
+    }
+    logger.info("suggested person IDs \(snapshots.map(\.personID.uuidString))")
+    return IntentItemCollection(sections: [IntentItemSection(items: items)])
   }
 }
