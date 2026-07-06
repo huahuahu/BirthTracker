@@ -72,4 +72,75 @@ struct LoggingTests {
     #expect(record.publicMessage == "[widget,data] Failed to load widget entry public=snapshot-count=0")
     #expect(record.privateMessage == "private=person-id-123")
   }
+
+  @Test("BirthLogger writes records through an injected sink")
+  func birthLoggerWritesRecordsThroughInjectedSink() throws {
+    let sink = RecordingLogSink()
+    let timestamp = Date(timeIntervalSince1970: 1_799_999_100)
+    let logger = BirthLogger(primaryTag: .widget, sink: sink)
+
+    logger.info(
+      "Loaded widget entry",
+      tags: [.data],
+      values: [.private("person-id-123"), .public("snapshot-count=1")],
+      timestamp: timestamp)
+
+    let record = try #require(sink.records.first)
+    #expect(record.level == .info)
+    #expect(record.primaryTag == .widget)
+    #expect(record.tags.map(\.rawValue) == ["widget", "data"])
+    #expect(record.message == "Loaded widget entry")
+    #expect(record.values == [.private("person-id-123"), .public("snapshot-count=1")])
+    #expect(record.timestamp == timestamp)
+  }
+
+  @Test("Static BirthLogger entry point writes records through a provided sink")
+  func staticBirthLoggerEntryPointWritesRecordsThroughProvidedSink() throws {
+    let sink = RecordingLogSink()
+    let timestamp = Date(timeIntervalSince1970: 1_799_999_200)
+
+    BirthLogger.log(
+      .error,
+      "Failed to rebuild widget snapshots",
+      primaryTag: .widget,
+      tags: [.persistence],
+      values: [.private("App Group unavailable")],
+      timestamp: timestamp,
+      sink: sink)
+
+    let record = try #require(sink.records.first)
+    #expect(record.level == .error)
+    #expect(record.primaryTag == .widget)
+    #expect(record.tags.map(\.rawValue) == ["widget", "persistence"])
+    #expect(record.privateMessage == "private=App Group unavailable")
+  }
+
+  @Test("BirthLogger preserves every supported level", arguments: LogLevel.allCases)
+  func birthLoggerPreservesEverySupportedLevel(level: LogLevel) throws {
+    let sink = RecordingLogSink()
+    let logger = BirthLogger(primaryTag: .debug, sink: sink)
+
+    logger.log(level, "Message for \(level.rawValue)", timestamp: Date(timeIntervalSince1970: 1))
+
+    let record = try #require(sink.records.first)
+    #expect(record.level == level)
+    #expect(record.primaryTag == .debug)
+  }
+}
+
+private final class RecordingLogSink: LogSink, @unchecked Sendable {
+  private let lock = NSLock()
+  private var capturedRecords: [LogRecord] = []
+
+  var records: [LogRecord] {
+    lock.lock()
+    defer { lock.unlock() }
+    return capturedRecords
+  }
+
+  func write(_ record: LogRecord) {
+    lock.lock()
+    defer { lock.unlock() }
+    capturedRecords.append(record)
+  }
 }
