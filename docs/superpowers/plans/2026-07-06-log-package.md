@@ -13,7 +13,7 @@
 - 修改代码前遵守 `AGENTS.md`：代码变更后运行 `make check`。
 - 不提交 `Config/Project.xcconfig`；只提交模板文件。
 - `BirthTracker.xcodeproj` 是生成产物；修改 `project.yml` 后运行 `xcodegen generate`，不要提交生成的 `.xcodeproj`。
-- Swift/Xcode build/test 使用 xcodebuildmcp；首次 build/test 前调用 `xcodebuildmcp-session_show_defaults`，必要时从 `.xcodebuildmcp/config.yaml` 设置 defaults。
+- SwiftPM package 单元测试使用计划中给出的 `swift test --package-path BirthTrackerPackage --filter LoggingTests`；Xcode target build/test 使用 xcodebuildmcp，首次 xcodebuildmcp build/test 前调用 `xcodebuildmcp-session_show_defaults`，必要时从 `.xcodebuildmcp/config.yaml` 设置 defaults。
 - SwiftPM 或 Xcode 命令如果触发网络依赖解析，使用本机 1082 代理；如果遇到 SwiftPM bare repository 安全限制，用一次性 `GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0=safe.bareRepository GIT_CONFIG_VALUE_0=all` 前缀。
 - 新增单元测试使用 Swift Testing，不使用 XCTest。
 - 业务代码迁移后不直接创建 `OSLog.Logger`；只有 `Logging` target 内部可以 `import OSLog`。
