@@ -35,12 +35,12 @@ struct ContactAgeProvider: AppIntentTimelineProvider {
   }
 
   func snapshot(for configuration: SelectPersonIntent, in context: Context) async -> ContactAgeEntry {
-    loadEntry(for: configuration.person?.id)
+    loadEntry(for: configuration.selectedPersonID)
   }
 
   func timeline(for configuration: SelectPersonIntent, in context: Context) async -> Timeline<ContactAgeEntry> {
     let entryDate = Date.now
-    let entry = loadEntry(for: configuration.person?.id, date: entryDate)
+    let entry = loadEntry(for: configuration.selectedPersonID, date: entryDate)
     let refreshDate = nextRefreshDate(after: entryDate)
     return Timeline(entries: [entry], policy: .after(refreshDate))
   }

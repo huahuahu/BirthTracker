@@ -28,11 +28,11 @@ struct UpcomingBirthdaysProvider: AppIntentTimelineProvider {
   }
 
   func snapshot(for configuration: SelectPersonIntent, in context: Context) async -> UpcomingBirthdaysEntry {
-    loadEntry(for: configuration.person?.id)
+    loadEntry(for: configuration.selectedPersonID)
   }
 
   func timeline(for configuration: SelectPersonIntent, in context: Context) async -> Timeline<UpcomingBirthdaysEntry> {
-    let entry = loadEntry(for: configuration.person?.id)
+    let entry = loadEntry(for: configuration.selectedPersonID)
     let refreshDate = Calendar.current.date(byAdding: .hour, value: 6, to: .now) ?? .now.addingTimeInterval(21_600)
     return Timeline(entries: [entry], policy: .after(refreshDate))
   }
