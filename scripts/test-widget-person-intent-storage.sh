@@ -19,6 +19,14 @@ fail() {
   exit 1
 }
 
+relative_to_root() {
+  local path="$1"
+  case "$path" in
+    "$ROOT"/*) printf '%s\n' "${path#"$ROOT"/}" ;;
+    *) printf '%s\n' "$path" ;;
+  esac
+}
+
 grep -q 'var personID: String?' "$INTENT_FILE" \
   || fail "SelectPersonIntent should persist a primitive String personID parameter"
 
@@ -39,7 +47,6 @@ fi
 expected_package_files=(
   "$SHARED_DIR/BirthTrackerWidgetsAppIntentsPackage.swift"
   "$SHARED_DIR/PersonSelectionIntent.swift"
-  "$SHARED_DIR/WidgetLogger.swift"
   "$CONTACT_AGE_DIR/ContactAgeDurationFormatter.swift"
   "$CONTACT_AGE_DIR/ContactAgeWidgetView.swift"
   "$CONTACT_AGE_DIR/ToggleContactAgeFormatIntent.swift"
@@ -60,8 +67,11 @@ expected_extension_files=(
 
 for file in "${expected_package_files[@]}" "${expected_extension_files[@]}"; do
   [[ -f "$file" ]] \
-    || fail "$(realpath --relative-to "$ROOT" "$file") should exist"
+    || fail "$(relative_to_root "$file") should exist"
 done
+
+[[ ! -f "$SHARED_DIR/WidgetLogger.swift" ]] \
+  || fail "Widget logging should use the shared Logging package instead of WidgetLogger.swift"
 
 for file in ContactAgeWidget.swift ContactAgeProvider.swift ContactAgeEntry.swift ContactAgeWidgetPreviews.swift; do
   [[ ! -f "$WIDGET_PACKAGE_DIR/$file" ]] \
