@@ -18,176 +18,6 @@
         }
       }
     },
-    "Choose a person to show their age." : {
-      "comment" : "Contact age Widget empty state before a person is selected.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Choose a person to show their age."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "选择联系人以显示年龄。"
-          }
-        }
-      }
-    },
-    "Contact Age" : {
-      "comment" : "Widget display name and header for showing one person's current age.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Contact Age"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "联系人年龄"
-          }
-        }
-      }
-    },
-    "Tap to switch format" : {
-      "comment" : "Hint shown in the contact age Widget under the tappable age value.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tap to switch format"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "点按切换格式"
-          }
-        }
-      }
-    },
-    "Toggle Age Format" : {
-      "comment" : "AppIntent title for cycling a contact age Widget between year/month/day, month/day, and day formats.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Toggle Age Format"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "切换年龄格式"
-          }
-        }
-      }
-    },
-    "Track one person's current age. Tap to switch formats." : {
-      "comment" : "Widget gallery description for the contact age Widget.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Track one person's current age. Tap to switch formats."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "记录一位联系人的当前年龄，点按即可切换格式。"
-          }
-        }
-      }
-    },
-    "widget.contact.age.duration.format" : {
-      "comment" : "Contact age Widget duration format. Arguments are years, months, days.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lldy %lldm %lldd"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld 年 %lld 月 %lld 天"
-          }
-        }
-      }
-    },
-    "widget.contact.age.format.duration" : {
-      "comment" : "Short label for the year/month/day contact age format.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Y/M/D"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "年/月/日"
-          }
-        }
-      }
-    },
-    "widget.contact.age.format.month.day" : {
-      "comment" : "Short label for the total-months-and-days contact age format.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "M/D"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "月/日"
-          }
-        }
-      }
-    },
-    "widget.contact.age.format.total.days" : {
-      "comment" : "Short label for the total-days contact age format.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "D"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "日"
-          }
-        }
-      }
-    },
-    "widget.contact.age.total.days.format" : {
-      "comment" : "Contact age Widget total-days format. Argument is total day count since birth.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld days old"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "出生 %lld 天"
-          }
-        }
-      }
-    },
     "Add a person to start the timeline." : {
       "comment" : "Empty-state description shown on the main timeline when no people have been added yet.",
       "localizations" : {
@@ -511,6 +341,23 @@
         }
       }
     },
+    "Choose a person to show their age." : {
+      "comment" : "Contact age Widget empty state before a person is selected.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose a person to show their age."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "选择联系人以显示年龄。"
+          }
+        }
+      }
+    },
     "Choose Person" : {
       "comment" : "Widget configuration title for selecting which person to show.",
       "localizations" : {
@@ -545,6 +392,23 @@
         }
       }
     },
+    "Contact Age" : {
+      "comment" : "Widget display name and header for showing one person's current age.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Contact Age"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "联系人年龄"
+          }
+        }
+      }
+    },
     "Contact Details" : {
       "comment" : "Navigation title for a single tracked person's detail page.",
       "localizations" : {
@@ -558,42 +422,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "联系人详情"
-          }
-        }
-      }
-    },
-    "Creating Test Data…" : {
-      "comment" : "HUD/overlay title displayed while generating sample test data.",
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Creating test data…"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "正在创建测试数据…"
-          }
-        }
-      }
-    },
-    "Creation failed: %@" : {
-      "comment" : "Alert message format shown when generating sample test data fails. %@ is a user-readable reason.",
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Creation failed: %@"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "创建失败：%@"
           }
         }
       }
@@ -730,24 +558,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "编辑联系人"
-          }
-        }
-      }
-    },
-    "Generate Test Data" : {
-      "comment" : "Debug-only button that inserts sample birthday records into local storage.",
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Generate Test Data"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "生成测试数据"
           }
         }
       }
@@ -1262,38 +1072,19 @@
         }
       }
     },
-    "Test Data Created" : {
-      "comment" : "Success message shown after generating sample test data.",
-      "extractionState" : "stale",
+    "Tap to switch format" : {
+      "comment" : "Hint shown in the contact age Widget under the tappable age value.",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Test Data Created"
+            "value" : "Tap to switch format"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Test Data 创建完成"
-          }
-        }
-      }
-    },
-    "Test Data Creation Failed" : {
-      "comment" : "Alert title shown when generating sample test data fails.",
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Test Data Creation Failed"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "创建失败"
+            "value" : "点按切换格式"
           }
         }
       }
@@ -1328,6 +1119,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "重置失败"
+          }
+        }
+      }
+    },
+    "Toggle Age Format" : {
+      "comment" : "AppIntent title for cycling a contact age Widget between year/month/day, month/day, and day formats.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Toggle Age Format"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "切换年龄格式"
+          }
+        }
+      }
+    },
+    "Track one person's current age. Tap to switch formats." : {
+      "comment" : "Widget gallery description for the contact age Widget.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Track one person's current age. Tap to switch formats."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "记录一位联系人的当前年龄，点按即可切换格式。"
           }
         }
       }
@@ -1413,6 +1238,57 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "出生 %lld 年 %lld 月 %lld 天"
+          }
+        }
+      }
+    },
+    "widget.contact.age.format.duration" : {
+      "comment" : "Short label for the year/month/day contact age format.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Y/M/D"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "年/月/日"
+          }
+        }
+      }
+    },
+    "widget.contact.age.format.month.day" : {
+      "comment" : "Short label for the total-months-and-days contact age format.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "M/D"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "月/日"
+          }
+        }
+      }
+    },
+    "widget.contact.age.format.total.days" : {
+      "comment" : "Short label for the total-days contact age format.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "D"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "日"
           }
         }
       }
