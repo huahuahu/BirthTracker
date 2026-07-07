@@ -6,9 +6,22 @@ import Persistence
 
 public struct SelectPersonIntent: WidgetConfigurationIntent {
   public static let title: LocalizedStringResource = "Choose Person"
-  public static let description = IntentDescription("Choose which person this widget shows.")
+  public static let description = IntentDescription(
+    LocalizedStringResource(
+      "Choose which person this widget shows.",
+      defaultValue: "Select a participant to show their moments",
+      table: "Intents",
+      bundle: .main
+    )
+  )
 
-  @Parameter(title: "Person", optionsProvider: WidgetPersonOptionsProvider())
+  @Parameter(
+    title: LocalizedStringResource(
+      "Contact",
+      defaultValue: "Participant",
+      table: "Intents",
+      bundle: .main
+    ), optionsProvider: WidgetPersonOptionsProvider())
   public var personID: String?
 
   public init() {}
