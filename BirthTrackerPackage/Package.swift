@@ -18,6 +18,7 @@ let package = Package(
     .library(name: "Models", targets: ["Models"]),
     .library(name: "Persistence", targets: ["Persistence"]),
     .library(name: "TestingSupport", targets: ["TestingSupport"]),
+    .library(name: "BirthTrackerWidgets", targets: ["BirthTrackerWidgets"]),
   ],
   dependencies: [
     .package(url: "https://github.com/SFSafeSymbols/SFSafeSymbols.git", .upToNextMajor(from: "7.0.0")),
@@ -63,6 +64,11 @@ let package = Package(
       name: "TestingSupport",
       dependencies: ["Models", "Persistence"],
       path: "Sources/TestingSupport"
+    ),
+    .target(
+      name: "BirthTrackerWidgets",
+      dependencies: ["Localization", "Logging", "Models", "Persistence", "SFSafeSymbols"],
+      path: "Sources/BirthTrackerWidgets"
     ),
     .testTarget(
       name: "BirthTrackerPackageTests",

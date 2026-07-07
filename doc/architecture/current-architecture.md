@@ -34,12 +34,13 @@
 
 ## Widgets
 
-- Widget 代码位于 `Sources/BirthTrackerWidget`。
-- 面向 Widget 共享的模型和持久化常量放在 package 模块里，而不是 App-only 代码里。
+- Widget extension 入口、具体 Widget 类型、`AppIntentConfiguration`、timeline provider、entry 和 Widget preview 位于 `Sources/BirthTrackerWidget`，并按 `ContactAge`、`UpcomingBirthdays` 分目录组织。
+- 面向 Widget 共享的 UI、AppIntent 配置类型、模型和持久化常量放在 package 模块里，而不是 App-only 代码里。
 - App 和 Widget 配置使用 `Config/Project.xcconfig` 里的占位符，以及已提交的 entitlement 模板。
-- App 将主 SwiftData 数据库中的人物转换成扁平快照，并写入 App Group 中独立的 Widget SwiftData store。
-- App 和 Widget 通过 `PersonBirthdaySummary` 共享“已经出生多久”“距离下次生日”等生日摘要语义；Widget 仍只读取扁平快照字段，不复用 App 的 SwiftUI 详情页。
+- App 将主 SwiftData 数据库中的人物转换成扁平快照，并写入 App Group 中独立的 Widget SwiftData store；该快照包含有生日和无生日联系人，生日列表 Widget 会过滤没有下一次生日的快照。
+- App 和 Widget 通过 `PersonBirthdaySummary` 共享“已经出生多久”“已经出生总天数”“距离下次生日”等生日摘要语义；Widget 仍只读取扁平快照字段，不复用 App 的 SwiftUI 详情页。
 - Widget extension 使用 `AppIntentConfiguration` 支持每个小组件实例选择一个联系人。
+- 联系人年龄 Widget 使用交互式 AppIntent 在年/月/日、月/日、日三种显示格式间轮换，格式偏好按联系人 ID 保存在 App Group `UserDefaults` 中；同一联系人对应的多个年龄 Widget 会共享该格式。
 - Widget store 是派生缓存，不启用 CloudKit，不替代主数据库。
 
 ## 检查命令

@@ -140,7 +140,9 @@ public struct PeopleTimelineView: View {
 
     do {
       try WidgetSnapshotStore.rebuild(with: snapshots)
-      WidgetCenter.shared.reloadTimelines(ofKind: BirthTrackerWidgetKind.upcomingBirthdays)
+      for kind in BirthTrackerWidgetKind.snapshotBackedKinds {
+        WidgetCenter.shared.reloadTimelines(ofKind: kind)
+      }
     } catch {
       if (error as? WidgetSnapshotStoreError) == .appGroupUnavailable {
         BirthLogger.widget.error(

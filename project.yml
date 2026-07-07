@@ -30,6 +30,8 @@ targets:
         product: App
       - package: BirthTrackerPackage
         product: DesignSystem
+      - package: BirthTrackerPackage
+        product: BirthTrackerWidgets
       - target: BirthTrackerWidget
         embed: true
     settings:
@@ -53,15 +55,9 @@ targets:
       - path: Sources/BirthTrackerWidget
     dependencies:
       - package: BirthTrackerPackage
-        product: Models
-      - package: BirthTrackerPackage
-        product: Persistence
-      - package: BirthTrackerPackage
-        product: Localization
+        product: BirthTrackerWidgets
       - package: BirthTrackerPackage
         product: Logging
-      - package: SFSafeSymbols
-        product: SFSafeSymbols
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: $(WIDGET_BUNDLE_ID)

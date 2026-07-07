@@ -71,14 +71,13 @@ public enum WidgetSnapshotStore {
     if let container {
       activeContainer = container
     } else {
-      activeContainer = try makeContainer(allowsSave: false)
+      activeContainer = try makeContainer(allowsSave: true)
     }
 
     let context = ModelContext(activeContainer)
     let descriptor = FetchDescriptor<WidgetPersonSnapshotRecord>(
       sortBy: [
         SortDescriptor(\.sortIndex),
-        SortDescriptor(\.nextBirthdayDate),
         SortDescriptor(\.displayName),
       ])
     return try context.fetch(descriptor).map(WidgetPersonSnapshot.init(record:))
@@ -92,7 +91,7 @@ public enum WidgetSnapshotStore {
     if let container {
       activeContainer = container
     } else {
-      activeContainer = try makeContainer(allowsSave: false)
+      activeContainer = try makeContainer(allowsSave: true)
     }
 
     let context = ModelContext(activeContainer)
