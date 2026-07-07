@@ -1,5 +1,6 @@
 import BirthTrackerWidgets
 import Foundation
+import Logging
 import Models
 import Persistence
 import WidgetKit
@@ -31,7 +32,9 @@ struct UpcomingBirthdaysProvider: AppIntentTimelineProvider {
 
   private func loadEntry(for selectedPersonID: UUID?) -> UpcomingBirthdaysEntry {
     do {
-      logger.info("load Entry for \(selectedPersonID?.uuidString ?? "nil")")
+      BirthLogger.widget.info(
+        "Loading widget entry for \(selectedPersonID?.uuidString ?? "nil").",
+        tags: [.data])
       if let selectedPersonID {
         guard let snapshot = try WidgetSnapshotStore.fetchPerson(id: selectedPersonID) else {
           return UpcomingBirthdaysEntry(date: .now, birthdays: [], selectedPersonUnavailable: true)
@@ -49,7 +52,9 @@ struct UpcomingBirthdaysProvider: AppIntentTimelineProvider {
         birthdays: Array(snapshots.compactMap(\.upcomingBirthday).prefix(8)),
         selectedPersonUnavailable: false)
     } catch {
-      logger.error("Unable to load upcoming birthdays entry: \(error.localizedDescription)")
+      BirthLogger.widget.error(
+        "Failed to load upcoming birthdays entry: \(error.localizedDescription).",
+        tags: [.data, .persistence])
       return UpcomingBirthdaysEntry(date: .now, birthdays: [], selectedPersonUnavailable: false)
     }
   }

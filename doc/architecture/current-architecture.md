@@ -21,6 +21,8 @@
 - `Models` 负责领域模型，包括生日、被记录的人、关系事实、纯 Swift 关系称谓 resolver、联系人生日摘要 display model、Widget 快照记录和生日计算。
 - `Persistence` 负责 SwiftData 容器、App Group 访问、Widget 专用 SwiftData store 和 Widget 持久化常量。
 - `DesignSystem` 负责共享的 UI 相邻设置，例如外观模式和已选日历类型。
+- `Localization` 负责本地化资源和类型安全访问入口。
+- `Logging` 负责统一日志 facade、日志类型、动态值隐私、OSLog 写入和测试替换接口。
 - `TestingSupport` 负责测试 fixture、内存持久化辅助逻辑和 debug 数据。
 
 ## 持久化

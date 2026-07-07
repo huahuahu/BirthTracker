@@ -25,6 +25,8 @@ make fix
 - `BirthTrackerPackage/Sources/Models` 放 SwiftData 模型和共享领域类型。
 - `BirthTrackerPackage/Sources/Persistence` 放 SwiftData 容器、App Group 访问和 Widget 持久化常量。
 - `BirthTrackerPackage/Sources/DesignSystem` 放可复用的 UI 相邻设置和选择辅助逻辑。
+- `BirthTrackerPackage/Sources/Localization` 放本地化资源和类型安全访问入口。
+- `BirthTrackerPackage/Sources/Logging` 放统一日志 facade、日志类型、动态值隐私、OSLog sink 和测试替换接口。
 - `BirthTrackerPackage/Sources/TestingSupport` 放测试 fixture 和内存持久化辅助逻辑。
 - `Sources/BirthTrackerApp` 和 `Sources/BirthTrackerWidget` 放 target 专属入口、资源和 plist 文件。
 

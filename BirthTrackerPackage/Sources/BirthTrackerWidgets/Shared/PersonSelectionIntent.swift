@@ -1,6 +1,7 @@
 import AppIntents
 import Foundation
 import Localization
+import Logging
 import Persistence
 
 public struct SelectPersonIntent: WidgetConfigurationIntent {
@@ -30,7 +31,13 @@ public struct WidgetPersonOptionsProvider: DynamicOptionsProvider {
     let items = snapshots.map { snapshot in
       IntentItem(snapshot.personID.uuidString, title: "\(snapshot.displayName)")
     }
-    logger.info("suggested person IDs \(snapshots.map(\.personID.uuidString))")
+    BirthLogger.widget.info(
+      "Loaded suggested widget person IDs.",
+      tags: [.data],
+      values: [
+        .private(snapshots.map(\.personID.uuidString).joined(separator: ",")),
+        .public("result-count=\(items.count)"),
+      ])
     return IntentItemCollection(sections: [IntentItemSection(items: items)])
   }
 }

@@ -14,6 +14,7 @@ let package = Package(
     .library(name: "DesignSystem", targets: ["DesignSystem"]),
     .library(name: "Features", targets: ["Features"]),
     .library(name: "Localization", targets: ["Localization"]),
+    .library(name: "Logging", targets: ["Logging"]),
     .library(name: "Models", targets: ["Models"]),
     .library(name: "Persistence", targets: ["Persistence"]),
     .library(name: "TestingSupport", targets: ["TestingSupport"]),
@@ -37,7 +38,7 @@ let package = Package(
     ),
     .target(
       name: "Features",
-      dependencies: ["DesignSystem", "Localization", "Models", "Persistence", "SFSafeSymbols"],
+      dependencies: ["DesignSystem", "Localization", "Logging", "Models", "Persistence", "SFSafeSymbols"],
       path: "Sources/Features",
       swiftSettings: [.defaultIsolation(MainActor.self)]
     ),
@@ -45,6 +46,10 @@ let package = Package(
       name: "Localization",
       path: "Sources/Localization",
       resources: [.process("Resources")]
+    ),
+    .target(
+      name: "Logging",
+      path: "Sources/Logging"
     ),
     .target(
       name: "Models",
@@ -62,12 +67,12 @@ let package = Package(
     ),
     .target(
       name: "BirthTrackerWidgets",
-      dependencies: ["Localization", "Models", "Persistence", "SFSafeSymbols"],
+      dependencies: ["Localization", "Logging", "Models", "Persistence", "SFSafeSymbols"],
       path: "Sources/BirthTrackerWidgets"
     ),
     .testTarget(
       name: "BirthTrackerPackageTests",
-      dependencies: ["Features", "Models", "Persistence", "TestingSupport"],
+      dependencies: ["Features", "Logging", "Models", "Persistence", "TestingSupport"],
       path: "Tests/BirthTrackerTests"
     ),
   ]

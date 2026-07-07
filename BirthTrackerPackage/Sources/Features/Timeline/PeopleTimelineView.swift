@@ -1,14 +1,12 @@
 import DesignSystem
 import Localization
+import Logging
 import Models
-import OSLog
 import Persistence
 import SFSafeSymbols
 import SwiftData
 import SwiftUI
 import WidgetKit
-
-private let widgetSnapshotLogger = Logger(subsystem: "BirthTracker", category: "WidgetSnapshot")
 
 public struct PeopleTimelineView: View {
   @Environment(\.modelContext)
@@ -147,8 +145,14 @@ public struct PeopleTimelineView: View {
       }
     } catch {
       if (error as? WidgetSnapshotStoreError) == .appGroupUnavailable {
-        widgetSnapshotLogger.error("Skipping widget snapshot persistence because App Group is unavailable.")
+        BirthLogger.widget.error(
+          "Skipping widget snapshot persistence because App Group is unavailable.",
+          tags: [.persistence])
       } else {
+        BirthLogger.widget.error(
+          "Unable to persist widget snapshots.",
+          tags: [.persistence],
+          values: [.private(String(describing: error))])
         assertionFailure("Unable to persist widget snapshots: \(error)")
       }
     }

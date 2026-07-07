@@ -1,5 +1,6 @@
 import BirthTrackerWidgets
 import Foundation
+import Logging
 import Models
 import Persistence
 import WidgetKit
@@ -63,7 +64,9 @@ struct ContactAgeProvider: AppIntentTimelineProvider {
         displayFormat: formatStore.format(for: selectedPersonID),
         selectedPersonUnavailable: false)
     } catch {
-      logger.error("Unable to load contact age entry: \(error.localizedDescription)")
+      BirthLogger.widget.error(
+        "Failed to load contact age entry: \(error.localizedDescription).",
+        tags: [.data, .persistence])
       return ContactAgeEntry(
         date: date,
         snapshot: nil,
