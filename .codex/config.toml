@@ -1,0 +1,6 @@
+[marketplaces.birthtracker-local]
+source_type = "local"
+source = ".."
+
+[plugins."build-ios-apps@birthtracker-local"]
+enabled = true
