@@ -1,0 +1,86 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720" role="img" aria-labelledby="title desc">
+  <title id="title">UpcomingBirthdaysWidget 生日倒计时小缺口圆环视觉参考</title>
+  <desc id="desc">UpcomingBirthdaysWidget 的小号和中号尺寸都以距离生日还有二十七天为主信息，接近完整的圆环用薄荷圆点表示今天，用粉色短弧表示剩余路程，用礼物图标表示生日终点。</desc>
+  <defs>
+    <filter id="shadow" x="-30%" y="-30%" width="160%" height="180%">
+      <feDropShadow dx="0" dy="14" stdDeviation="18" flood-color="#2D232D" flood-opacity="0.14"/>
+    </filter>
+    <linearGradient id="avatar" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#D63A61"/>
+      <stop offset="1" stop-color="#C92F58"/>
+    </linearGradient>
+    <style>
+      .ui { font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "PingFang SC", sans-serif; }
+      .label { fill: #747480; font-size: 15px; font-weight: 600; letter-spacing: 1.8px; }
+      .name { fill: #17171C; font-size: 20px; font-weight: 650; }
+      .number { fill: #17171C; font-size: 76px; font-weight: 760; letter-spacing: -4px; }
+      .unit { fill: #747480; font-size: 15px; font-weight: 650; }
+      .date { fill: #17171C; font-size: 24px; font-weight: 680; }
+      .meta { fill: #747480; font-size: 16px; font-weight: 540; }
+      .legend { fill: #4B4B55; font-size: 17px; font-weight: 560; }
+    </style>
+  </defs>
+
+  <rect width="1200" height="720" rx="32" fill="#F3F3F7"/>
+  <g class="ui">
+    <text x="60" y="70" fill="#17171C" font-size="30" font-weight="720">2B · 接近终点 · 小缺口圆环</text>
+    <text x="60" y="108" fill="#747480" font-size="17">倒计时是唯一主角；圆环只表达正在靠近，不展示百分比。</text>
+
+    <text class="label" x="168" y="163">SYSTEM SMALL</text>
+    <g filter="url(#shadow)">
+      <rect x="90" y="185" width="280" height="280" rx="50" fill="#FFFFFF"/>
+    </g>
+    <rect x="118" y="213" width="34" height="34" rx="11" fill="url(#avatar)"/>
+    <text x="135" y="237" text-anchor="middle" fill="#FFFFFF" font-size="15" font-weight="750">安</text>
+    <text class="name" x="163" y="238">安安</text>
+
+    <circle cx="230" cy="328" r="82" fill="none" stroke="#9D8790" stroke-width="9" stroke-linecap="round" stroke-dasharray="482 33"/>
+    <path d="M 304.32 293.35 A 82 82 0 0 1 312 328" fill="none" stroke="#F04B72" stroke-width="18" stroke-linecap="butt"/>
+    <circle cx="304.32" cy="293.35" r="10" fill="#2B836A" stroke="#FFFFFF" stroke-width="5"/>
+    <g transform="translate(312 328)">
+      <circle r="20" fill="#FFFFFF" stroke="#F04B72" stroke-width="4"/>
+      <path d="M-10-2H10V9H-10ZM-12-7H12V-1H-12ZM0-7V-13M0-13C-4-13-6-15-6-18-2-18 0-16 0-13ZM0-13C4-13 6-15 6-18 2-18 0-16 0-13Z" fill="none" stroke="#F04B72" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
+    <text class="number" x="230" y="327" text-anchor="middle">27</text>
+    <text class="unit" x="230" y="354" text-anchor="middle">天后生日</text>
+    <text class="meta" x="282" y="435">8 月 8 日</text>
+
+    <text class="label" x="675" y="163">SYSTEM MEDIUM</text>
+    <g filter="url(#shadow)">
+      <rect x="430" y="205" width="700" height="260" rx="50" fill="#FFFFFF"/>
+    </g>
+    <circle cx="582" cy="335" r="96" fill="none" stroke="#9D8790" stroke-width="10" stroke-linecap="round" stroke-dasharray="565 38"/>
+    <path d="M 669.01 294.43 A 96 96 0 0 1 678 335" fill="none" stroke="#F04B72" stroke-width="20" stroke-linecap="butt"/>
+    <circle cx="669.01" cy="294.43" r="11" fill="#2B836A" stroke="#FFFFFF" stroke-width="5"/>
+    <g transform="translate(678 335)">
+      <circle r="21" fill="#FFFFFF" stroke="#F04B72" stroke-width="4"/>
+      <path d="M-10-2H10V9H-10ZM-12-7H12V-1H-12ZM0-7V-13M0-13C-4-13-6-15-6-18-2-18 0-16 0-13ZM0-13C4-13 6-15 6-18 2-18 0-16 0-13Z" fill="none" stroke="#F04B72" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
+    <text class="number" x="582" y="335" text-anchor="middle">27</text>
+    <text class="unit" x="582" y="364" text-anchor="middle">天后生日</text>
+
+    <rect x="750" y="253" width="36" height="36" rx="12" fill="url(#avatar)"/>
+    <text x="768" y="278" text-anchor="middle" fill="#FFFFFF" font-size="16" font-weight="750">安</text>
+    <text class="name" x="798" y="278">安安</text>
+    <text x="750" y="331" fill="#17171C" font-size="30" font-weight="720">生日正在靠近</text>
+    <text class="date" x="750" y="376">8 月 8 日</text>
+    <text class="meta" x="750" y="410">星期六 · 将满 6 岁</text>
+
+    <g transform="translate(125 565)">
+      <circle cx="0" cy="0" r="9" fill="#2B836A" stroke="#FFFFFF" stroke-width="4"/>
+      <text class="legend" x="24" y="6">今天的位置</text>
+    </g>
+    <g transform="translate(425 565)">
+      <line x1="0" y1="0" x2="52" y2="0" stroke="#F04B72" stroke-width="12" stroke-linecap="butt"/>
+      <text class="legend" x="72" y="6">剩余路程</text>
+    </g>
+    <g transform="translate(745 565)">
+      <circle cx="0" cy="0" r="17" fill="#FFFFFF" stroke="#F04B72" stroke-width="4"/>
+      <path d="M-8-1H8V8H-8ZM-10-6H10V0H-10ZM0-6V-11" fill="none" stroke="#F04B72" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      <text class="legend" x="30" y="6">下一次生日终点</text>
+    </g>
+
+    <line x1="60" y1="625" x2="1140" y2="625" stroke="#DFDFE7" stroke-width="2"/>
+    <text x="60" y="665" fill="#747480" font-size="15">视觉结论：数字是答案；圆环是方向；小号保持单一焦点，中号补充人物与日期。</text>
+  </g>
+</svg>
