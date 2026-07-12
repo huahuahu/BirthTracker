@@ -1,27 +1,16 @@
 import AppIntents
 import Foundation
-import Localization
 import Logging
 import Persistence
 
 public struct SelectPersonIntent: WidgetConfigurationIntent {
-  public static let title: LocalizedStringResource = "Choose Person"
+  public static let title = LocalizedStringResource("Choose Person", table: "Intents", bundle: .main)
   public static let description = IntentDescription(
-    LocalizedStringResource(
-      "Choose which person this widget shows.",
-      defaultValue: "Select a participant to show their moments",
-      table: "Intents",
-      bundle: .main
-    )
-  )
+    LocalizedStringResource("Choose which person this widget shows.", table: "Intents", bundle: .main))
 
   @Parameter(
-    title: LocalizedStringResource(
-      "Contact",
-      defaultValue: "Participant",
-      table: "Intents",
-      bundle: .main
-    ), optionsProvider: WidgetPersonOptionsProvider())
+    title: LocalizedStringResource("Contact", table: "Intents", bundle: .main),
+    optionsProvider: WidgetPersonOptionsProvider())
   public var personID: String?
 
   public init() {}

@@ -1,4 +1,3 @@
-import Localization
 import Models
 import Persistence
 import SFSafeSymbols
@@ -29,15 +28,15 @@ public struct ContactAgeWidgetView: View {
 
   public var body: some View {
     VStack(alignment: .leading, spacing: 8) {
-      Label(L10n.Widget.contactAge, systemImage: SFSymbol.clock.rawValue)
+      Label(WidgetL10n.contactAge, systemImage: SFSymbol.clock.rawValue)
         .font(.headline)
 
       if selectedPersonUnavailable {
-        message(L10n.string(L10n.Widget.selectedPersonUnavailable))
+        message(WidgetL10n.string(WidgetL10n.selectedPersonUnavailable))
       } else if let snapshot {
         snapshotContent(snapshot)
       } else {
-        message(L10n.string(L10n.Widget.contactAgeChoosePerson))
+        message(WidgetL10n.string(WidgetL10n.contactAgeChoosePerson))
       }
     }
     .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
@@ -51,7 +50,7 @@ public struct ContactAgeWidgetView: View {
         .lineLimit(1)
 
       if snapshot.nextBirthdayDate == nil {
-        message(L10n.string(L10n.Widget.noBirthdayRecorded))
+        message(WidgetL10n.string(WidgetL10n.noBirthdayRecorded))
       } else if let ageText = ageText(for: snapshot) {
         Button(intent: ToggleContactAgeFormatIntent(personID: snapshot.personID)) {
           VStack(alignment: .leading, spacing: 4) {
@@ -70,16 +69,16 @@ public struct ContactAgeWidgetView: View {
 
         if family == .systemMedium {
           if let days = snapshot.daysUntilNextBirthday {
-            Text(L10n.PersonDetail.daysUntilBirthday(days))
+            Text(WidgetL10n.daysUntilBirthday(days))
               .font(.caption)
               .foregroundStyle(.secondary)
           }
-          Text(L10n.Widget.contactAgeTapToSwitch)
+          Text(WidgetL10n.contactAgeTapToSwitch)
             .font(.caption2)
             .foregroundStyle(.secondary)
         }
       } else {
-        message(L10n.string(L10n.Widget.contactAgeNeedsBirthYear))
+        message(WidgetL10n.string(WidgetL10n.contactAgeNeedsBirthYear))
       }
     }
   }
@@ -101,11 +100,11 @@ public struct ContactAgeWidgetView: View {
   private var formatLabel: LocalizedStringResource {
     switch displayFormat {
     case .yearMonthDay:
-      L10n.Widget.ageFormatYearMonthDay
+      WidgetL10n.ageFormatYearMonthDay
     case .monthDay:
-      L10n.Widget.ageFormatMonthDay
+      WidgetL10n.ageFormatMonthDay
     case .day:
-      L10n.Widget.ageFormatDay
+      WidgetL10n.ageFormatDay
     }
   }
 

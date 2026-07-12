@@ -1,23 +1,6 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
-    "Add a birth year to show age." : {
-      "comment" : "Widget empty state when a selected person has a birthday month/day but no birth year, so current age cannot be calculated.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Add a birth year to show age."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "添加出生年份以显示年龄。"
-          }
-        }
-      }
-    },
     "Add a person to start the timeline." : {
       "comment" : "Empty-state description shown on the main timeline when no people have been added yet.",
       "localizations" : {
@@ -341,74 +324,6 @@
         }
       }
     },
-    "Choose a person to show their age." : {
-      "comment" : "Contact age Widget empty state before a person is selected.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Choose a person to show their age."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "选择联系人以显示年龄。"
-          }
-        }
-      }
-    },
-    "Choose Person" : {
-      "comment" : "Widget configuration title for selecting which person to show.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Choose Person"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "选择联系人"
-          }
-        }
-      }
-    },
-    "Choose which person's birthday this widget shows." : {
-      "comment" : "Widget configuration description for selecting a person.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Choose which person's birthday this widget shows."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "选择这个小组件显示哪位联系人的生日。"
-          }
-        }
-      }
-    },
-    "Contact Age" : {
-      "comment" : "Widget display name and header for showing one person's current age.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Contact Age"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "联系人年龄"
-          }
-        }
-      }
-    },
     "Contact Details" : {
       "comment" : "Navigation title for a single tracked person's detail page.",
       "localizations" : {
@@ -694,23 +609,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "暂无备注"
-          }
-        }
-      }
-    },
-    "No upcoming birthdays" : {
-      "comment" : "Widget empty-state text when there are no upcoming birthday entries to show.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "No upcoming birthdays"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "暂无即将到来的生日"
           }
         }
       }
@@ -1004,40 +902,6 @@
         }
       }
     },
-    "See the next birthdays at a glance." : {
-      "comment" : "Widget description shown in the widget gallery. Keep it short and benefit-oriented.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "See the next birthdays at a glance."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "一眼查看接下来的生日。"
-          }
-        }
-      }
-    },
-    "Selected person is no longer available." : {
-      "comment" : "Widget empty state shown when a configured person was deleted.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Selected person is no longer available."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "所选联系人已不在列表中。"
-          }
-        }
-      }
-    },
     "Settings" : {
       "comment" : "Navigation title and button label for the settings screen.",
       "localizations" : {
@@ -1068,23 +932,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "存储位置已更新，重启 App 后生效。"
-          }
-        }
-      }
-    },
-    "Tap to switch format" : {
-      "comment" : "Hint shown in the contact age Widget under the tappable age value.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tap to switch format"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "点按切换格式"
           }
         }
       }
@@ -1123,40 +970,6 @@
         }
       }
     },
-    "Toggle Age Format" : {
-      "comment" : "AppIntent title for cycling a contact age Widget between year/month/day, month/day, and day formats.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Toggle Age Format"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "切换年龄格式"
-          }
-        }
-      }
-    },
-    "Track one person's current age. Tap to switch formats." : {
-      "comment" : "Widget gallery description for the contact age Widget.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Track one person's current age. Tap to switch formats."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "记录一位联系人的当前年龄，点按即可切换格式。"
-          }
-        }
-      }
-    },
     "Unable to Save" : {
       "comment" : "Alert title shown when saving a person form fails.",
       "localizations" : {
@@ -1191,23 +1004,6 @@
         }
       }
     },
-    "Upcoming Birthdays" : {
-      "comment" : "Widget display name shown in the widget gallery.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Upcoming Birthdays"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "即将到来的生日"
-          }
-        }
-      }
-    },
     "Widget preview" : {
       "comment" : "Label above a small preview card on the person detail page.",
       "localizations" : {
@@ -1221,74 +1017,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Widget 预览"
-          }
-        }
-      }
-    },
-    "widget.birth.duration.format" : {
-      "comment" : "Compact Widget birth duration format. Arguments are years, months, days.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Born %lldy %lldm %lldd"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "出生 %lld 年 %lld 月 %lld 天"
-          }
-        }
-      }
-    },
-    "widget.contact.age.format.duration" : {
-      "comment" : "Short label for the year/month/day contact age format.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Y/M/D"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "年/月/日"
-          }
-        }
-      }
-    },
-    "widget.contact.age.format.month.day" : {
-      "comment" : "Short label for the total-months-and-days contact age format.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "M/D"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "月/日"
-          }
-        }
-      }
-    },
-    "widget.contact.age.format.total.days" : {
-      "comment" : "Short label for the total-days contact age format.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "D"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "日"
           }
         }
       }

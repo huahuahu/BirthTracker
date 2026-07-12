@@ -56,8 +56,6 @@ targets:
     dependencies:
       - package: BirthTrackerPackage
         product: BirthTrackerWidgets
-      - package: BirthTrackerPackage
-        product: Logging
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: $(WIDGET_BUNDLE_ID)
