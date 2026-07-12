@@ -131,8 +131,12 @@ grep -q 'product: BirthTrackerWidgets' "$PROJECT_FILE" \
   || fail "project.yml should make the Widget extension depend on BirthTrackerWidgets"
 awk '/^  BirthTracker:$/,/^  BirthTrackerWidget:$/' "$PROJECT_FILE" | grep -q 'product: BirthTrackerWidgets' \
   || fail "project.yml should make the host app depend on BirthTrackerWidgets so AppIntents can instantiate Widget configuration intents"
-awk '/^  BirthTrackerWidget:$/,/^  BirthTrackerTests:$/' "$PROJECT_FILE" | grep -q 'product: BirthTrackerWidgets' \
-  || fail "project.yml should make the Widget extension depend on BirthTrackerWidgets"
+widget_target_block="$(awk '/^  BirthTrackerWidget:$/,/^  BirthTrackerTests:$/' "$PROJECT_FILE")"
+grep -q 'product: BirthTrackerWidgets' <<<"$widget_target_block" \
+  || fail "Widget extension should depend on BirthTrackerWidgets"
+if grep -q 'product: Logging' <<<"$widget_target_block"; then
+  fail "Widget extension should not directly depend on Logging"
+fi
 grep -q 'import BirthTrackerWidgets' "$BUNDLE_FILE" \
   || fail "BirthTrackerWidgetBundle should import BirthTrackerWidgets"
 grep -q 'BirthTrackerWidgetsBundle().body' "$BUNDLE_FILE" \
