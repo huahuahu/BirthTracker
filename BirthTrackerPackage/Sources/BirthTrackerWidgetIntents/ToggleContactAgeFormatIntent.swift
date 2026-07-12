@@ -14,19 +14,19 @@ enum ToggleContactAgeFormatIntentError: LocalizedError {
   }
 }
 
-struct ToggleContactAgeFormatIntent: AppIntent {
-  static let title = LocalizedStringResource("Toggle Age Format", table: "Intents", bundle: .main)
+public struct ToggleContactAgeFormatIntent: AppIntent {
+  public static let title = LocalizedStringResource("Toggle Age Format", table: "Intents", bundle: .main)
 
   @Parameter(title: LocalizedStringResource("Person ID", table: "Intents", bundle: .main))
-  var personID: String
+  public var personID: String
 
-  init() {}
+  public init() {}
 
-  init(personID: UUID) {
+  public init(personID: UUID) {
     self.personID = personID.uuidString
   }
 
-  func perform() async throws -> some IntentResult {
+  public func perform() async throws -> some IntentResult {
     guard let personID = UUID(uuidString: personID) else {
       throw ToggleContactAgeFormatIntentError.invalidPersonID(personID)
     }

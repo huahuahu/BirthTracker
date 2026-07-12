@@ -24,6 +24,8 @@
 - `Localization` 负责本地化资源和类型安全访问入口。
 - `Logging` 负责统一日志 facade、日志类型、动态值隐私、OSLog 写入和测试替换接口。
 - `TestingSupport` 负责测试 fixture、内存持久化辅助逻辑和 debug 数据。
+- `BirthTrackerWidgetIntents` 负责 App 与 Widget extension 共同使用的 Widget 配置 Intent、交互式 Intent 和 `AppIntentsPackage`。
+- `BirthTrackerWidgets` 负责 Widget bundle、UI、timeline provider、entry、preview 和 package 内的 Widget UI 本地化。
 
 ## 持久化
 
@@ -35,7 +37,9 @@
 ## Widgets
 
 - Widget extension 入口位于 `Sources/BirthTrackerWidget`，该目录只保留 `@main` bundle 壳、Info.plist 和 target 本地化资源；具体 Widget 类型、`AppIntentConfiguration`、timeline provider、entry 和 Widget preview 位于 `BirthTrackerPackage/Sources/BirthTrackerWidgets`。
-- 面向 Widget 的 bundle 组合、UI、AppIntent 配置类型、模型和持久化常量放在 package 模块里，而不是 App-only 或 extension-only 代码里。
+- 跨 App 与 Widget extension 使用的 `WidgetConfigurationIntent`、交互式 `AppIntent` 和 `AppIntentsPackage` 位于 `BirthTrackerPackage/Sources/BirthTrackerWidgetIntents`。
+- `BirthTrackerWidgets` 依赖 `BirthTrackerWidgetIntents`；App target 只直接依赖 Intent module，Widget extension 同时直接依赖 Intent 与 Widget UI module。App 与 Widget extension 各自通过宿主 `AppIntentsPackage.includedPackages` 注册 framework 中的 `BirthTrackerWidgetIntentsAppIntentsPackage`。
+- 面向 Widget 的 bundle 组合、UI、模型和持久化常量放在 package 模块里，而不是 App-only 或 extension-only 代码里。
 - App 和 Widget 配置使用 `Config/Project.xcconfig` 里的占位符，以及已提交的 entitlement 模板。
 - App 将主 SwiftData 数据库中的人物转换成扁平快照，并写入 App Group 中独立的 Widget SwiftData store；该快照包含有生日和无生日联系人，生日列表 Widget 会过滤没有下一次生日的快照。
 - App 和 Widget 通过 `PersonBirthdaySummary` 共享“已经出生多久”“已经出生总天数”“距离下次生日”等生日摘要语义；Widget 仍只读取扁平快照字段，不复用 App 的 SwiftUI 详情页。
