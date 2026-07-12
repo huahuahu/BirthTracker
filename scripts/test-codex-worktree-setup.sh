@@ -111,7 +111,8 @@ parse)
     exit 1
   }
   printf 'xcode-build-server|%s|%s\n' "$(pwd -P)" "$*" >> "${CODEX_TEST_CALLS:?}"
-  mkdir -p "$(dirname "$5")"
+  compile_parent=${5%/*}
+  mkdir -p "$compile_parent"
   printf '%s\n' '{"module_name":"Features"}' > "$5"
   ;;
 *)
@@ -211,6 +212,32 @@ test_rejects_invalid_codex_paths() {
   [[ "$STATUS" -eq 2 ]] || fail "invalid source tree path should exit 2: $OUTPUT"
   [[ "$OUTPUT" == "error: CODEX_SOURCE_TREE_PATH does not exist: $TMP/missing source tree" ]] \
     || fail "unexpected invalid source tree path output: $OUTPUT"
+  cleanup_fixture
+}
+
+test_wrapper_does_not_require_dirname() {
+  local checkout bin log tool tool_path
+  TMP="$(mktemp -d)"
+  checkout="$TMP/main checkout"
+  bin="$TMP/bin"
+  log="$checkout/AIOutput/codex-worktree-setup.log"
+  mkdir -p "$checkout" "$bin"
+
+  for tool in date mkdir; do
+    tool_path="$(command -v "$tool")" || fail "test requires $tool"
+    ln -s "$tool_path" "$bin/$tool"
+  done
+
+  run_and_capture env \
+    PATH="$bin" \
+    CODEX_SOURCE_TREE_PATH="$checkout" \
+    CODEX_WORKTREE_PATH="$checkout" \
+    /bin/sh "$SCRIPT"
+
+  [[ "$STATUS" -eq 0 ]] || fail "Codex wrapper should not require dirname, got $STATUS: $OUTPUT"
+  [[ -z "$OUTPUT" ]] || fail "Codex main-checkout output should be redirected to its log: $OUTPUT"
+  grep -q "codex-worktree-setup: main checkout detected" "$log" \
+    || fail "Codex wrapper should reach the shared setup without dirname"
   cleanup_fixture
 }
 
@@ -377,6 +404,7 @@ run_named_test() {
   case "$1" in
   requires-paths) test_requires_codex_paths ;;
   rejects-invalid-paths) test_rejects_invalid_codex_paths ;;
+  wrapper-without-dirname) test_wrapper_does_not_require_dirname ;;
   stub-argument-guards) test_stubs_reject_split_arguments ;;
   full-initialization) test_runs_full_initialization ;;
   missing-tool) test_reports_missing_tool ;;
@@ -396,6 +424,7 @@ fi
 
 test_requires_codex_paths
 test_rejects_invalid_codex_paths
+test_wrapper_does_not_require_dirname
 test_stubs_reject_split_arguments
 test_runs_full_initialization
 test_reports_missing_tool

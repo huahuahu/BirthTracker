@@ -118,19 +118,28 @@ run_xcodebuild() {
     exit 127
   fi
 
-  if ! BUILD_WORKSPACE="$(read_build_server_value workspace)"; then
+  if BUILD_WORKSPACE="$(read_build_server_value workspace)"; then
+    :
+  else
+    BUILD_WORKSPACE_STATUS=$?
     echo "error: buildServer.json is missing a workspace value." >&2
-    exit 1
+    exit "$BUILD_WORKSPACE_STATUS"
   fi
 
-  if ! BUILD_SCHEME="$(read_build_server_value scheme)"; then
+  if BUILD_SCHEME="$(read_build_server_value scheme)"; then
+    :
+  else
+    BUILD_SCHEME_STATUS=$?
     echo "error: buildServer.json is missing a scheme value." >&2
-    exit 1
+    exit "$BUILD_SCHEME_STATUS"
   fi
 
-  if ! BUILD_ROOT="$(read_build_server_value build_root)"; then
+  if BUILD_ROOT="$(read_build_server_value build_root)"; then
+    :
+  else
+    BUILD_ROOT_STATUS=$?
     echo "error: buildServer.json is missing a build_root value." >&2
-    exit 1
+    exit "$BUILD_ROOT_STATUS"
   fi
 
   if [ -z "$BUILD_WORKSPACE" ] || [ -z "$BUILD_SCHEME" ] || [ -z "$BUILD_ROOT" ]; then
@@ -166,7 +175,8 @@ run_xcodebuild() {
     COMPILE_FILE_STATUS=$?
     return "$COMPILE_FILE_STATUS"
   fi
-  mkdir -p "$(dirname "$COMPILE_FILE")"
+  COMPILE_FILE_PARENT=${COMPILE_FILE%/*}
+  mkdir -p "$COMPILE_FILE_PARENT"
   rm -f "$COMPILE_FILE" "$COMPILE_FILE.lock"
 
   echo "$LOG_PREFIX: building BirthTracker for iOS Simulator."

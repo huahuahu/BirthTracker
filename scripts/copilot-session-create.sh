@@ -24,11 +24,25 @@ if ! WORKSPACE_PATH="$(cd "$COPILOT_WORKSPACE_PATH" 2>/dev/null && pwd -P)"; the
 fi
 
 if ! ROOT_PATH="$(cd "$COPILOT_ROOT_PATH" 2>/dev/null && pwd -P)"; then
+  mkdir -p "$WORKSPACE_PATH/AIOutput"
+  exec >> "$WORKSPACE_PATH/AIOutput/copilot-session-create.log" 2>&1
+  date
   echo "error: COPILOT_ROOT_PATH does not exist: $COPILOT_ROOT_PATH" >&2
   exit 2
 fi
 
-SCRIPT_DIR="$(CDPATH= cd "$(dirname "$0")" && pwd -P)"
+case "$0" in
+*/*)
+  SCRIPT_DIR=${0%/*}
+  if [ -z "$SCRIPT_DIR" ]; then
+    SCRIPT_DIR=/
+  fi
+  ;;
+*)
+  SCRIPT_DIR=.
+  ;;
+esac
+SCRIPT_DIR="$(CDPATH= cd "$SCRIPT_DIR" && pwd -P)"
 
 exec "$SCRIPT_DIR/worktree-setup.sh" \
   "$ROOT_PATH" \

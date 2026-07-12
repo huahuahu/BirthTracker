@@ -21,7 +21,18 @@ if ! ROOT_PATH="$(cd "$CODEX_SOURCE_TREE_PATH" 2>/dev/null && pwd -P)"; then
   exit 2
 fi
 
-SCRIPT_DIR="$(CDPATH= cd "$(dirname "$0")" && pwd -P)"
+case "$0" in
+*/*)
+  SCRIPT_DIR=${0%/*}
+  if [ -z "$SCRIPT_DIR" ]; then
+    SCRIPT_DIR=/
+  fi
+  ;;
+*)
+  SCRIPT_DIR=.
+  ;;
+esac
+SCRIPT_DIR="$(CDPATH= cd "$SCRIPT_DIR" && pwd -P)"
 
 exec "$SCRIPT_DIR/worktree-setup.sh" \
   "$ROOT_PATH" \
