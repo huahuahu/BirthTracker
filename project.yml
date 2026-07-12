@@ -31,7 +31,7 @@ targets:
       - package: BirthTrackerPackage
         product: DesignSystem
       - package: BirthTrackerPackage
-        product: BirthTrackerWidgets
+        product: BirthTrackerWidgetIntents
       - target: BirthTrackerWidget
         embed: true
     settings:
@@ -56,6 +56,8 @@ targets:
     dependencies:
       - package: BirthTrackerPackage
         product: BirthTrackerWidgets
+      - package: BirthTrackerPackage
+        product: BirthTrackerWidgetIntents
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: $(WIDGET_BUNDLE_ID)

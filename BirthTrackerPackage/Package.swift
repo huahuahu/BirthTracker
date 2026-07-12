@@ -18,6 +18,7 @@ let package = Package(
     .library(name: "Models", targets: ["Models"]),
     .library(name: "Persistence", targets: ["Persistence"]),
     .library(name: "TestingSupport", targets: ["TestingSupport"]),
+    .library(name: "BirthTrackerWidgetIntents", targets: ["BirthTrackerWidgetIntents"]),
     .library(name: "BirthTrackerWidgets", targets: ["BirthTrackerWidgets"]),
   ],
   dependencies: [
@@ -66,8 +67,13 @@ let package = Package(
       path: "Sources/TestingSupport"
     ),
     .target(
+      name: "BirthTrackerWidgetIntents",
+      dependencies: ["Logging", "Persistence"],
+      path: "Sources/BirthTrackerWidgetIntents"
+    ),
+    .target(
       name: "BirthTrackerWidgets",
-      dependencies: ["Logging", "Models", "Persistence", "SFSafeSymbols"],
+      dependencies: ["BirthTrackerWidgetIntents", "Logging", "Models", "Persistence", "SFSafeSymbols"],
       path: "Sources/BirthTrackerWidgets",
       resources: [.process("Resources")]
     ),

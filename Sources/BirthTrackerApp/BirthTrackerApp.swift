@@ -1,4 +1,5 @@
 import App
+import BirthTrackerWidgetIntents
 import DesignSystem
 import SwiftUI
 
@@ -6,6 +7,10 @@ import SwiftUI
 struct BirthTrackerApp: App {
   @AppStorage(AppSettingsKey.appearanceMode)
   private var appearanceMode = AppearanceMode.system.rawValue
+
+  init() {
+    _ = BirthTrackerWidgetIntentsAppIntentsPackage.self
+  }
 
   var body: some Scene {
     WindowGroup {

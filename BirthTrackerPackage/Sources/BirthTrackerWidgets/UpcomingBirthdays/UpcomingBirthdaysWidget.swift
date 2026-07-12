@@ -1,3 +1,4 @@
+import BirthTrackerWidgetIntents
 import Persistence
 import SwiftUI
 import WidgetKit
