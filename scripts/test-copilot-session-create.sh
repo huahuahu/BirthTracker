@@ -3,6 +3,7 @@ set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 SCRIPT="$ROOT/scripts/copilot-session-create.sh"
+CORE_SCRIPT="$ROOT/scripts/worktree-setup.sh"
 
 fail() {
   echo "FAIL: $*" >&2
@@ -14,6 +15,59 @@ run_and_capture() {
   OUTPUT="$("$@" 2>&1)"
   STATUS=$?
   set -e
+}
+
+setup_error_propagation_fixture() {
+  local main="$1"
+  local workspace="$2"
+  local bin="$3"
+
+  mkdir -p "$main/Config" "$workspace/.xcodebuildmcp" "$bin"
+  printf '%s\n' 'APP_BUNDLE_ID = example.local' > "$main/Config/Project.xcconfig.example"
+  cat > "$workspace/.xcodebuildmcp/config.yaml" <<'YAML'
+sessionDefaults:
+  simulatorId: F4B82181-8A72-4AC3-9C95-454DE83A0C62
+YAML
+
+  cat > "$bin/xcodegen" <<'STUB'
+#!/bin/sh
+set -eu
+mkdir -p BirthTracker.xcodeproj
+STUB
+  chmod +x "$bin/xcodegen"
+
+  cat > "$bin/xcode-build-server" <<'STUB'
+#!/bin/sh
+set -eu
+expected_workspace="${COPILOT_TEST_EXPECTED_WORKSPACE:?}"
+
+case "$1" in
+config)
+  cat > buildServer.json <<JSON
+{
+  "workspace": "BirthTracker.xcodeproj/project.xcworkspace",
+  "build_root": "$expected_workspace/AIOutput/DerivedData",
+  "scheme": "BirthTrackerFromBuildServer"
+}
+JSON
+  ;;
+parse)
+  compile_parent=${5%/*}
+  mkdir -p "$compile_parent"
+  printf '%s\n' '{"module_name":"Features"}' > "$5"
+  ;;
+*)
+  exit 1
+  ;;
+esac
+STUB
+  chmod +x "$bin/xcode-build-server"
+
+  cat > "$bin/xcodebuild" <<'STUB'
+#!/bin/sh
+exit 0
+STUB
+  chmod +x "$bin/xcodebuild"
 }
 
 test_logs_session_create_output_to_aioutput() {
@@ -85,7 +139,8 @@ if [[ "$1" == "parse" ]]; then
     echo "unexpected xcode-build-server parse scheme arguments: $*" >&2
     exit 1
   }
-  mkdir -p "$(dirname "$5")"
+  compile_parent=${5%/*}
+  mkdir -p "$compile_parent"
   printf '{"module_name":"Features"}\n' > "$5"
   echo "stub xcode-build-server parse ran"
   exit 0
@@ -239,7 +294,288 @@ STUB
   [[ ! -f "$workspace/buildServer.json" ]] || fail "unset trigger should not generate buildServer.json"
 }
 
+test_wrapper_does_not_require_dirname() {
+  local tmp checkout bin log tool tool_path
+  tmp="$(mktemp -d)"
+  trap 'rm -rf "$tmp"' RETURN
+
+  checkout="$tmp/main checkout"
+  bin="$tmp/bin"
+  log="$checkout/AIOutput/copilot-session-create.log"
+  mkdir -p "$checkout" "$bin"
+
+  for tool in date mkdir; do
+    tool_path="$(command -v "$tool")" || fail "test requires $tool"
+    ln -s "$tool_path" "$bin/$tool"
+  done
+
+  run_and_capture env \
+    PATH="$bin" \
+    COPILOT_SCRIPT_TRIGGER=session.create \
+    COPILOT_WORKSPACE_PATH="$checkout" \
+    COPILOT_ROOT_PATH="$checkout" \
+    /bin/sh "$SCRIPT"
+
+  [[ "$STATUS" -eq 0 ]] || fail "Copilot wrapper should not require dirname, got $STATUS: $OUTPUT"
+  [[ -z "$OUTPUT" ]] || fail "Copilot main-checkout output should be redirected to its log: $OUTPUT"
+  grep -q "copilot-session-create: main checkout detected" "$log" \
+    || fail "Copilot wrapper should reach the shared setup without dirname"
+}
+
+test_logs_invalid_root_path_failure() {
+  local tmp workspace missing_root log
+  tmp="$(mktemp -d)"
+  trap 'rm -rf "$tmp"' RETURN
+
+  workspace="$tmp/workspace"
+  missing_root="$tmp/missing root"
+  log="$workspace/AIOutput/copilot-session-create.log"
+  mkdir -p "$workspace"
+
+  run_and_capture env \
+    COPILOT_SCRIPT_TRIGGER=session.create \
+    COPILOT_WORKSPACE_PATH="$workspace" \
+    COPILOT_ROOT_PATH="$missing_root" \
+    /bin/sh "$SCRIPT"
+
+  [[ "$STATUS" -eq 2 ]] || fail "invalid Copilot root should exit 2, got $STATUS: $OUTPUT"
+  [[ -z "$OUTPUT" ]] || fail "invalid Copilot root output should be redirected to its log: $OUTPUT"
+  [[ -f "$log" ]] || fail "invalid Copilot root should create a session log"
+  grep -q "$(date +%Y)" "$log" || fail "invalid Copilot root log should include a date line"
+  grep -q "error: COPILOT_ROOT_PATH does not exist: $missing_root" "$log" \
+    || fail "invalid Copilot root log should include the validation error"
+}
+
+test_propagates_simulator_id_read_failure() {
+  local tmp main workspace bin
+  tmp="$(mktemp -d)"
+  trap 'rm -rf "$tmp"' RETURN
+
+  main="$tmp/main"
+  workspace="$tmp/workspace"
+  bin="$tmp/bin"
+  setup_error_propagation_fixture "$main" "$workspace" "$bin"
+
+  cat > "$bin/awk" <<'STUB'
+#!/bin/sh
+exit 73
+STUB
+  chmod +x "$bin/awk"
+
+  run_and_capture env \
+    PATH="$bin:$PATH" \
+    HOME="$workspace/home" \
+    COPILOT_TEST_EXPECTED_WORKSPACE="$(cd "$workspace" && pwd -P)" \
+    COPILOT_SCRIPT_TRIGGER=session.create \
+    COPILOT_WORKSPACE_PATH="$workspace" \
+    COPILOT_ROOT_PATH="$main" \
+    bash "$SCRIPT"
+
+  [[ "$STATUS" -eq 73 ]] \
+    || fail "simulator ID read failure should preserve status 73, got $STATUS"
+}
+
+test_propagates_plutil_failure() {
+  local tmp main workspace bin
+  tmp="$(mktemp -d)"
+  trap 'rm -rf "$tmp"' RETURN
+
+  main="$tmp/main"
+  workspace="$tmp/workspace"
+  bin="$tmp/bin"
+  setup_error_propagation_fixture "$main" "$workspace" "$bin"
+
+  cat > "$bin/plutil" <<'STUB'
+#!/bin/sh
+exit 76
+STUB
+  chmod +x "$bin/plutil"
+
+  run_and_capture env \
+    PATH="$bin:$PATH" \
+    HOME="$workspace/home" \
+    COPILOT_TEST_EXPECTED_WORKSPACE="$(cd "$workspace" && pwd -P)" \
+    COPILOT_SCRIPT_TRIGGER=session.create \
+    COPILOT_WORKSPACE_PATH="$workspace" \
+    COPILOT_ROOT_PATH="$main" \
+    /bin/sh "$SCRIPT"
+
+  [[ "$STATUS" -eq 76 ]] || fail "plutil failure should preserve status 76, got $STATUS"
+}
+
+test_returns_127_when_awk_is_missing() {
+  local tmp main workspace bin tool tool_path log
+  tmp="$(mktemp -d)"
+  trap 'rm -rf "$tmp"' RETURN
+
+  main="$tmp/main"
+  workspace="$tmp/workspace"
+  bin="$tmp/bin"
+  log="$workspace/AIOutput/copilot-session-create.log"
+  setup_error_propagation_fixture "$main" "$workspace" "$bin"
+
+  for tool in cat cp date dirname md5 mkdir plutil rm sed; do
+    tool_path="$(command -v "$tool")" || fail "test requires $tool"
+    ln -s "$tool_path" "$bin/$tool"
+  done
+
+  run_and_capture env \
+    PATH="$bin" \
+    HOME="$workspace/home" \
+    COPILOT_TEST_EXPECTED_WORKSPACE="$(cd "$workspace" && pwd -P)" \
+    COPILOT_SCRIPT_TRIGGER=session.create \
+    COPILOT_WORKSPACE_PATH="$workspace" \
+    COPILOT_ROOT_PATH="$main" \
+    /bin/bash "$SCRIPT"
+
+  [[ "$STATUS" -eq 127 ]] || fail "missing awk should exit 127, got $STATUS"
+  grep -q "error: awk is required to read .xcodebuildmcp/config.yaml." "$log" \
+    || fail "missing awk should write a clear error to the session log"
+}
+
+test_propagates_md5sum_failure() {
+  local tmp main workspace bin
+  tmp="$(mktemp -d)"
+  trap 'rm -rf "$tmp"' RETURN
+
+  main="$tmp/main"
+  workspace="$tmp/workspace"
+  bin="$tmp/bin"
+  setup_error_propagation_fixture "$main" "$workspace" "$bin"
+
+  cat > "$bin/md5sum" <<'STUB'
+#!/bin/sh
+exit 74
+STUB
+  chmod +x "$bin/md5sum"
+
+  run_and_capture env \
+    PATH="$bin:/usr/bin:/bin" \
+    HOME="$workspace/home" \
+    COPILOT_TEST_EXPECTED_WORKSPACE="$(cd "$workspace" && pwd -P)" \
+    COPILOT_SCRIPT_TRIGGER=session.create \
+    COPILOT_WORKSPACE_PATH="$workspace" \
+    COPILOT_ROOT_PATH="$main" \
+    bash "$SCRIPT"
+
+  [[ "$STATUS" -eq 74 ]] || fail "md5sum failure should preserve status 74, got $STATUS"
+}
+
+test_propagates_sed_failure() {
+  local tmp main workspace bin
+  tmp="$(mktemp -d)"
+  trap 'rm -rf "$tmp"' RETURN
+
+  main="$tmp/main"
+  workspace="$tmp/workspace"
+  bin="$tmp/bin"
+  setup_error_propagation_fixture "$main" "$workspace" "$bin"
+
+  cat > "$bin/sed" <<'STUB'
+#!/bin/sh
+exit 75
+STUB
+  chmod +x "$bin/sed"
+
+  run_and_capture env \
+    PATH="$bin:$PATH" \
+    HOME="$workspace/home" \
+    COPILOT_TEST_EXPECTED_WORKSPACE="$(cd "$workspace" && pwd -P)" \
+    /bin/bash "$CORE_SCRIPT" \
+    "$(cd "$main" && pwd -P)" \
+    "$(cd "$workspace" && pwd -P)" \
+    "copilot-session-create.log" \
+    "copilot-session-create"
+
+  [[ "$STATUS" -eq 75 ]] || fail "sed failure should preserve status 75, got $STATUS"
+}
+
+test_core_does_not_require_dirname() {
+  local tmp main workspace bin
+  tmp="$(mktemp -d)"
+  trap 'rm -rf "$tmp"' RETURN
+
+  main="$tmp/main"
+  workspace="$tmp/workspace"
+  bin="$tmp/bin"
+  setup_error_propagation_fixture "$main" "$workspace" "$bin"
+
+  cat > "$bin/dirname" <<'STUB'
+#!/bin/sh
+exit 77
+STUB
+  chmod +x "$bin/dirname"
+
+  run_and_capture env \
+    PATH="$bin:$PATH" \
+    HOME="$workspace/home" \
+    COPILOT_TEST_EXPECTED_WORKSPACE="$(cd "$workspace" && pwd -P)" \
+    /bin/sh "$CORE_SCRIPT" \
+    "$(cd "$main" && pwd -P)" \
+    "$(cd "$workspace" && pwd -P)" \
+    "copilot-session-create.log" \
+    "copilot-session-create"
+
+  [[ "$STATUS" -eq 0 ]] || fail "shared setup should not require dirname, got $STATUS"
+}
+
+test_returns_127_when_sed_is_missing() {
+  local tmp main workspace bin tool tool_path log
+  tmp="$(mktemp -d)"
+  trap 'rm -rf "$tmp"' RETURN
+
+  main="$tmp/main"
+  workspace="$tmp/workspace"
+  bin="$tmp/bin"
+  log="$workspace/AIOutput/copilot-session-create.log"
+  setup_error_propagation_fixture "$main" "$workspace" "$bin"
+
+  for tool in awk cat cp date dirname md5 mkdir plutil rm; do
+    tool_path="$(command -v "$tool")" || fail "test requires $tool"
+    ln -s "$tool_path" "$bin/$tool"
+  done
+
+  run_and_capture env \
+    PATH="$bin" \
+    HOME="$workspace/home" \
+    COPILOT_TEST_EXPECTED_WORKSPACE="$(cd "$workspace" && pwd -P)" \
+    /bin/bash "$CORE_SCRIPT" \
+    "$(cd "$main" && pwd -P)" \
+    "$(cd "$workspace" && pwd -P)" \
+    "copilot-session-create.log" \
+    "copilot-session-create"
+
+  [[ "$STATUS" -eq 127 ]] || fail "missing sed should exit 127, got $STATUS"
+  grep -q "error: sed is required to compute xcode-build-server cache paths." "$log" \
+    || fail "missing sed should write a clear error to the session log"
+}
+
+[[ -x "$CORE_SCRIPT" ]] || fail "scripts/worktree-setup.sh should exist and be executable"
+
+if [[ "$#" -eq 1 ]]; then
+  case "$1" in
+  wrapper-without-dirname) test_wrapper_does_not_require_dirname ;;
+  core-without-dirname) test_core_does_not_require_dirname ;;
+  invalid-root-log) test_logs_invalid_root_path_failure ;;
+  plutil-failure) test_propagates_plutil_failure ;;
+  *) fail "unknown test name: $1" ;;
+  esac
+  echo "copilot-session-create test passed: $1"
+  exit 0
+fi
+
+[[ "$#" -eq 0 ]] || fail "usage: test-copilot-session-create.sh [test-name]"
+
 test_skips_when_trigger_is_unset
+test_wrapper_does_not_require_dirname
+test_logs_invalid_root_path_failure
 test_logs_session_create_output_to_aioutput
+test_core_does_not_require_dirname
+test_returns_127_when_sed_is_missing
+test_propagates_sed_failure
+test_returns_127_when_awk_is_missing
+test_propagates_md5sum_failure
+test_propagates_simulator_id_read_failure
+test_propagates_plutil_failure
 
 echo "copilot-session-create tests passed"
