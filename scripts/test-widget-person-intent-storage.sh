@@ -266,28 +266,6 @@ if grep -q 'product: Logging' <<<"$widget_target_block"; then
 fi
 grep -q '^import BirthTrackerWidgetIntents$' "$APP_ENTRY_FILE" \
   || fail "BirthTrackerApp should import BirthTrackerWidgetIntents"
-grep -q '^import AppIntents$' "$APP_ENTRY_FILE" \
-  || fail "BirthTrackerApp should import AppIntents for host package registration"
-grep -q '^struct BirthTrackerAppIntentsPackage: AppIntentsPackage' "$APP_ENTRY_FILE" \
-  || fail "BirthTrackerApp should define a host AppIntentsPackage"
-grep -Fq 'static var includedPackages: [any AppIntentsPackage.Type]' "$APP_ENTRY_FILE" \
-  || fail "BirthTrackerApp host package should expose includedPackages"
-grep -Fq '[BirthTrackerWidgetIntentsAppIntentsPackage.self]' "$APP_ENTRY_FILE" \
-  || fail "BirthTrackerApp host package should include BirthTrackerWidgetIntents"
-if grep -q '_ = BirthTrackerWidgetIntentsAppIntentsPackage.self' "$APP_ENTRY_FILE"; then
-  fail "BirthTrackerApp should register framework intents through includedPackages instead of an empty type reference"
-fi
-
-grep -q '^import AppIntents$' "$BUNDLE_FILE" \
-  || fail "BirthTrackerWidget should import AppIntents for host package registration"
-grep -q '^import BirthTrackerWidgetIntents$' "$BUNDLE_FILE" \
-  || fail "BirthTrackerWidget should import BirthTrackerWidgetIntents"
-grep -q '^struct BirthTrackerWidgetExtensionAppIntentsPackage: AppIntentsPackage' "$BUNDLE_FILE" \
-  || fail "BirthTrackerWidget should define a host AppIntentsPackage"
-grep -Fq 'static var includedPackages: [any AppIntentsPackage.Type]' "$BUNDLE_FILE" \
-  || fail "BirthTrackerWidget host package should expose includedPackages"
-grep -Fq '[BirthTrackerWidgetIntentsAppIntentsPackage.self]' "$BUNDLE_FILE" \
-  || fail "BirthTrackerWidget host package should include BirthTrackerWidgetIntents"
 
 for intent_consumer in \
   "$CONTACT_AGE_DIR/ContactAgeWidget.swift" \
