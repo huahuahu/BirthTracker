@@ -62,6 +62,11 @@ read_xcodebuildmcp_session_default() {
     return 0
   fi
 
+  if ! command -v awk >/dev/null 2>&1; then
+    echo "error: awk is required to read .xcodebuildmcp/config.yaml." >&2
+    return 127
+  fi
+
   awk -v key="$1:" '$1 == key { print $2; exit }' "$WORKSPACE_PATH/.xcodebuildmcp/config.yaml"
 }
 
@@ -69,7 +74,12 @@ hash_text() {
   if command -v md5 >/dev/null 2>&1; then
     printf '%s' "$1" | md5 -q
   elif command -v md5sum >/dev/null 2>&1; then
-    printf '%s' "$1" | md5sum | awk '{ print $1 }'
+    if MD5SUM_OUTPUT="$(printf '%s' "$1" | md5sum)"; then
+      printf '%s\n' "${MD5SUM_OUTPUT%% *}"
+    else
+      MD5SUM_STATUS=$?
+      return "$MD5SUM_STATUS"
+    fi
   else
     echo "error: md5 or md5sum is required to compute xcode-build-server cache paths." >&2
     exit 127
@@ -78,7 +88,12 @@ hash_text() {
 
 build_server_compile_file_path() {
   CACHE_ROOT_KEY="$(printf '%s' "$WORKSPACE_PATH" | sed 's#/#-#g')"
-  BUILD_ROOT_HASH="$(hash_text "$BUILD_ROOT")"
+  if BUILD_ROOT_HASH="$(hash_text "$BUILD_ROOT")"; then
+    :
+  else
+    BUILD_ROOT_HASH_STATUS=$?
+    return "$BUILD_ROOT_HASH_STATUS"
+  fi
   echo "$HOME/Library/Caches/xcode-build-server/$CACHE_ROOT_KEY/compile_file-$BUILD_SCHEME-$BUILD_ROOT_HASH"
 }
 
@@ -122,14 +137,25 @@ run_xcodebuild() {
   rm -rf "$BUILD_ROOT"
 
   BUILD_DESTINATION="generic/platform=iOS Simulator"
-  if SIMULATOR_ID="$(read_xcodebuildmcp_session_default simulatorId)" && [ -n "$SIMULATOR_ID" ]; then
+  if SIMULATOR_ID="$(read_xcodebuildmcp_session_default simulatorId)"; then
+    :
+  else
+    SIMULATOR_ID_STATUS=$?
+    return "$SIMULATOR_ID_STATUS"
+  fi
+  if [ -n "$SIMULATOR_ID" ]; then
     BUILD_DESTINATION="platform=iOS Simulator,id=$SIMULATOR_ID"
   fi
 
   RESULT_BUNDLE_PATH="$WORKSPACE_PATH/AIOutput/BuildServer.xcresult"
   rm -rf "$RESULT_BUNDLE_PATH"
 
-  COMPILE_FILE="$(build_server_compile_file_path)"
+  if COMPILE_FILE="$(build_server_compile_file_path)"; then
+    :
+  else
+    COMPILE_FILE_STATUS=$?
+    return "$COMPILE_FILE_STATUS"
+  fi
   mkdir -p "$(dirname "$COMPILE_FILE")"
   rm -f "$COMPILE_FILE" "$COMPILE_FILE.lock"
 
