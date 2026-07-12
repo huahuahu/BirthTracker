@@ -37,15 +37,29 @@
 - Consumes: `scripts/worktree-setup.sh <source-tree> <worktree> <log-filename> <log-prefix>` 四个位置参数；前两个是入口脚本通过 `pwd -P` 规范化的绝对路径。
 - Produces: 平台无关的完整初始化入口；Copilot wrapper 继续暴露现有 `COPILOT_SCRIPT_TRIGGER`、`COPILOT_ROOT_PATH` 和 `COPILOT_WORKSPACE_PATH` 接口。
 
-- [ ] **Step 1：运行现有 Copilot characterization test 建立重构基线**
+- [ ] **Step 1：为共享核心接口增加失败测试**
+
+在 `scripts/test-copilot-session-create.sh` 的 `SCRIPT` 定义后增加：
+
+```bash
+CORE_SCRIPT="$ROOT/scripts/worktree-setup.sh"
+```
+
+在执行测试函数之前增加：
+
+```bash
+[[ -x "$CORE_SCRIPT" ]] || fail "scripts/worktree-setup.sh should exist and be executable"
+```
+
+- [ ] **Step 2：运行测试并确认共享核心尚不存在**
 
 ```bash
 ./scripts/test-copilot-session-create.sh
 ```
 
-Expected: PASS，并输出 `copilot-session-create tests passed`。
+Expected: FAIL，并输出 `FAIL: scripts/worktree-setup.sh should exist and be executable`。控制器已经在修改前运行过同一测试并确认原始 Copilot 行为通过，因此该失败只来自新的共享核心接口尚未实现。
 
-- [ ] **Step 2：创建共享核心脚本**
+- [ ] **Step 3：创建共享核心脚本**
 
 Create `scripts/worktree-setup.sh` with this complete content:
 
@@ -238,7 +252,7 @@ run_xcode_build_server
 run_xcodebuild
 ```
 
-- [ ] **Step 3：把 Copilot 脚本收敛为平台入口**
+- [ ] **Step 4：把 Copilot 脚本收敛为平台入口**
 
 Replace `scripts/copilot-session-create.sh` with:
 
@@ -286,7 +300,7 @@ exec "$SCRIPT_DIR/worktree-setup.sh" \
 chmod +x scripts/worktree-setup.sh scripts/copilot-session-create.sh
 ```
 
-- [ ] **Step 4：运行 Copilot 回归测试**
+- [ ] **Step 5：运行 Copilot 回归测试**
 
 ```bash
 ./scripts/test-copilot-session-create.sh
@@ -294,10 +308,10 @@ chmod +x scripts/worktree-setup.sh scripts/copilot-session-create.sh
 
 Expected: PASS，并输出 `copilot-session-create tests passed`。任何失败都先修复共享核心，不放宽旧测试契约。
 
-- [ ] **Step 5：提交共享核心重构**
+- [ ] **Step 6：提交共享核心重构**
 
 ```bash
-git add scripts/worktree-setup.sh scripts/copilot-session-create.sh
+git add scripts/worktree-setup.sh scripts/copilot-session-create.sh scripts/test-copilot-session-create.sh
 git commit -m "refactor: share worktree setup logic"
 ```
 
@@ -565,7 +579,25 @@ test_preserves_existing_target_config() {
   cleanup_fixture
 }
 
-[[ -x "$SCRIPT" ]] || fail "scripts/codex-worktree-setup.sh should exist and be executable"
+run_named_test() {
+  case "$1" in
+  requires-paths) test_requires_codex_paths ;;
+  rejects-invalid-paths) test_rejects_invalid_codex_paths ;;
+  full-initialization) test_runs_full_initialization ;;
+  missing-tool) test_reports_missing_tool ;;
+  main-checkout) test_skips_main_checkout ;;
+  preserves-config) test_preserves_existing_target_config ;;
+  *) fail "unknown test name: $1" ;;
+  esac
+}
+
+if [[ "$#" -eq 1 ]]; then
+  run_named_test "$1"
+  echo "codex-worktree-setup test passed: $1"
+  exit 0
+fi
+
+[[ "$#" -eq 0 ]] || fail "usage: test-codex-worktree-setup.sh [test-name]"
 
 test_requires_codex_paths
 test_rejects_invalid_codex_paths
@@ -598,13 +630,25 @@ test-scripts:
 	./scripts/test-widget-person-intent-storage.sh
 ```
 
-- [ ] **Step 2：运行新测试并确认它因入口尚不存在而失败**
+- [ ] **Step 2：逐项运行行为测试并确认它们因 Codex 入口尚不存在而失败**
 
 ```bash
-./scripts/test-codex-worktree-setup.sh
+for test_name in \
+  requires-paths \
+  rejects-invalid-paths \
+  full-initialization \
+  missing-tool \
+  main-checkout \
+  preserves-config
+do
+  if ./scripts/test-codex-worktree-setup.sh "$test_name"; then
+    echo "expected RED but test passed: $test_name" >&2
+    exit 1
+  fi
+done
 ```
 
-Expected: FAIL，包含 `FAIL: scripts/codex-worktree-setup.sh should exist and be executable`。
+Expected: 六项命令都失败；失败来自 `scripts/codex-worktree-setup.sh` 尚不存在，因此实际状态与各测试要求的路径校验、退出码、日志或初始化结果不符，而不是测试语法错误。
 
 - [ ] **Step 3：实现最小 Codex 入口**
 
