@@ -2,33 +2,88 @@
   "sourceLanguage" : "en",
   "strings" : {
     "Choose Person" : {
+      "extractionState" : "stale",
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Choose Person" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "选择联系人" } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose Person"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "选择联系人"
+          }
+        }
       }
     },
     "Choose which person this widget shows." : {
+      "extractionState" : "stale",
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Choose which person this widget shows." } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "选择要展示的联系人" } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose which person this widget shows."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "选择要展示的联系人"
+          }
+        }
       }
     },
     "Contact" : {
+      "extractionState" : "stale",
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Contact" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "联系人" } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Contact"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "联系人"
+          }
+        }
       }
     },
     "Person ID" : {
+      "extractionState" : "stale",
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Person ID" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "Person ID" } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Person ID"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Person ID"
+          }
+        }
       }
     },
     "Toggle Age Format" : {
+      "extractionState" : "stale",
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Toggle Age Format" } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "切换年龄格式" } }
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Toggle Age Format"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "切换年龄格式"
+          }
+        }
       }
     }
   },
