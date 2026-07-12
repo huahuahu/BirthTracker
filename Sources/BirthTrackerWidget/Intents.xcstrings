@@ -3,34 +3,14 @@
   "strings" : {
     "Choose Person" : {
       "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Choose Person"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "选择联系人"
-          }
-        }
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Choose Person" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "选择联系人" } }
       }
     },
     "Choose which person's birthday this widget shows." : {
       "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Choose which person's birthday this widget shows."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "选择这个小组件显示哪位联系人的生日。"
-          }
-        }
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Choose which person's birthday this widget shows." } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "选择这个小组件显示哪位联系人的生日。" } }
       }
     },
     "Person" : {

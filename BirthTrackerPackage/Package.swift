@@ -67,8 +67,9 @@ let package = Package(
     ),
     .target(
       name: "BirthTrackerWidgets",
-      dependencies: ["Localization", "Logging", "Models", "Persistence", "SFSafeSymbols"],
-      path: "Sources/BirthTrackerWidgets"
+      dependencies: ["Logging", "Models", "Persistence", "SFSafeSymbols"],
+      path: "Sources/BirthTrackerWidgets",
+      resources: [.process("Resources")]
     ),
     .testTarget(
       name: "BirthTrackerPackageTests",

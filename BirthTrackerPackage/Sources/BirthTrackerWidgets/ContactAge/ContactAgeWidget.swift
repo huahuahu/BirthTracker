@@ -1,4 +1,3 @@
-import Localization
 import Persistence
 import SwiftUI
 import WidgetKit
@@ -20,8 +19,8 @@ struct ContactAgeWidget: Widget {
       )
       .containerBackground(.background, for: .widget)
     }
-    .configurationDisplayName(L10n.Widget.contactAge)
-    .description(L10n.Widget.contactAgeDescription)
+    .configurationDisplayName(WidgetL10n.contactAge)
+    .description(WidgetL10n.contactAgeDescription)
     .supportedFamilies([.systemSmall, .systemMedium])
   }
 }

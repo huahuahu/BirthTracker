@@ -1,4 +1,3 @@
-import Localization
 import Persistence
 import SwiftUI
 import WidgetKit
@@ -18,8 +17,8 @@ struct UpcomingBirthdaysWidget: Widget {
       )
       .containerBackground(.background, for: .widget)
     }
-    .configurationDisplayName(L10n.Widget.upcomingBirthdays)
-    .description(L10n.Widget.description)
+    .configurationDisplayName(WidgetL10n.upcomingBirthdays)
+    .description(WidgetL10n.description)
     .supportedFamilies([.systemSmall, .systemMedium])
   }
 }

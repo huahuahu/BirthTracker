@@ -9,6 +9,9 @@ WIDGET_EXTENSION_DIR="$ROOT/Sources/BirthTrackerWidget"
 SHARED_DIR="$WIDGET_PACKAGE_DIR/Shared"
 CONTACT_AGE_DIR="$WIDGET_PACKAGE_DIR/ContactAge"
 UPCOMING_BIRTHDAYS_DIR="$WIDGET_PACKAGE_DIR/UpcomingBirthdays"
+WIDGET_RESOURCE_FILE="$WIDGET_PACKAGE_DIR/Resources/Localizable.xcstrings"
+APP_INTENTS_FILE="$ROOT/Sources/BirthTrackerApp/Intents.xcstrings"
+WIDGET_INTENTS_FILE="$WIDGET_EXTENSION_DIR/Intents.xcstrings"
 CONTACT_AGE_EXTENSION_DIR="$WIDGET_EXTENSION_DIR/ContactAge"
 UPCOMING_BIRTHDAYS_EXTENSION_DIR="$WIDGET_EXTENSION_DIR/UpcomingBirthdays"
 INTENT_FILE="$SHARED_DIR/PersonSelectionIntent.swift"
@@ -47,8 +50,10 @@ fi
 
 expected_package_files=(
   "$PACKAGE_BUNDLE_FILE"
+  "$WIDGET_RESOURCE_FILE"
   "$SHARED_DIR/BirthTrackerWidgetsAppIntentsPackage.swift"
   "$SHARED_DIR/PersonSelectionIntent.swift"
+  "$SHARED_DIR/WidgetL10n.swift"
   "$CONTACT_AGE_DIR/ContactAgeDurationFormatter.swift"
   "$CONTACT_AGE_DIR/ContactAgeEntry.swift"
   "$CONTACT_AGE_DIR/ContactAgeProvider.swift"
@@ -65,6 +70,7 @@ expected_package_files=(
 
 expected_extension_files=(
   "$BUNDLE_FILE"
+  "$WIDGET_INTENTS_FILE"
 )
 
 for file in "${expected_package_files[@]}" "${expected_extension_files[@]}"; do
@@ -100,6 +106,27 @@ grep -q 'library(name: "BirthTrackerWidgets"' "$PACKAGE_FILE" \
   || fail "Package.swift should expose a BirthTrackerWidgets product"
 grep -q 'name: "BirthTrackerWidgets"' "$PACKAGE_FILE" \
   || fail "Package.swift should define a BirthTrackerWidgets target"
+grep -q 'resources: \[.process("Resources")\]' "$PACKAGE_FILE" \
+  || fail "BirthTrackerWidgets should process its own localization resources"
+grep -q 'LocalizedStringResource("Choose Person", table: "Intents", bundle: .main)' "$INTENT_FILE" \
+  || fail "SelectPersonIntent title should use the main-bundle Intents table"
+grep -q 'LocalizedStringResource("Person", table: "Intents", bundle: .main)' "$INTENT_FILE" \
+  || fail "SelectPersonIntent parameter should use the main-bundle Intents table"
+grep -q 'LocalizedStringResource("Toggle Age Format", table: "Intents", bundle: .main)' "$CONTACT_AGE_DIR/ToggleContactAgeFormatIntent.swift" \
+  || fail "ToggleContactAgeFormatIntent should use the main-bundle Intents table"
+
+if grep -R '^import Localization$' "$WIDGET_PACKAGE_DIR"; then
+  fail "Widget UI strings should be owned by BirthTrackerWidgets resources"
+fi
+
+for intents_file in "$APP_INTENTS_FILE" "$WIDGET_INTENTS_FILE"; do
+  for key in 'Choose Person' "Choose which person's birthday this widget shows." 'Person' 'Toggle Age Format'; do
+    grep -Fq "\"$key\"" "$intents_file" \
+      || fail "$(relative_to_root "$intents_file") should contain $key"
+  done
+  grep -q '"zh-Hans"' "$intents_file" \
+    || fail "$(relative_to_root "$intents_file") should include Simplified Chinese"
+done
 grep -q 'product: BirthTrackerWidgets' "$PROJECT_FILE" \
   || fail "project.yml should make the Widget extension depend on BirthTrackerWidgets"
 awk '/^  BirthTracker:$/,/^  BirthTrackerWidget:$/' "$PROJECT_FILE" | grep -q 'product: BirthTrackerWidgets' \

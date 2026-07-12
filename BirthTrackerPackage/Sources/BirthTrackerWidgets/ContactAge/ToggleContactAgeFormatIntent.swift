@@ -1,6 +1,5 @@
 import AppIntents
 import Foundation
-import Localization
 import Persistence
 import WidgetKit
 
@@ -16,9 +15,9 @@ enum ToggleContactAgeFormatIntentError: LocalizedError {
 }
 
 struct ToggleContactAgeFormatIntent: AppIntent {
-  static let title: LocalizedStringResource = "Toggle Age Format"
+  static let title = LocalizedStringResource("Toggle Age Format", table: "Intents", bundle: .main)
 
-  @Parameter(title: "Person ID")
+  @Parameter(title: LocalizedStringResource("Person", table: "Intents", bundle: .main))
   var personID: String
 
   init() {}

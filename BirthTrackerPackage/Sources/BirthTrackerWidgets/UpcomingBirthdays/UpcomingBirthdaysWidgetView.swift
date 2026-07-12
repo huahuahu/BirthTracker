@@ -1,4 +1,3 @@
-import Localization
 import Models
 import SFSafeSymbols
 import SwiftUI
@@ -21,15 +20,15 @@ public struct UpcomingBirthdaysWidgetView: View {
 
   public var body: some View {
     VStack(alignment: .leading, spacing: 8) {
-      Label(L10n.Widget.title, systemImage: SFSymbol.gift.rawValue)
+      Label(WidgetL10n.title, systemImage: SFSymbol.gift.rawValue)
         .font(.headline)
 
       if selectedPersonUnavailable {
-        Text(L10n.Widget.selectedPersonUnavailable)
+        Text(WidgetL10n.selectedPersonUnavailable)
           .font(.caption)
           .foregroundStyle(.secondary)
       } else if birthdays.isEmpty {
-        Text(L10n.Widget.noUpcomingBirthdays)
+        Text(WidgetL10n.noUpcomingBirthdays)
           .font(.caption)
           .foregroundStyle(.secondary)
       } else {
@@ -42,7 +41,7 @@ public struct UpcomingBirthdaysWidgetView: View {
               .font(.caption)
               .foregroundStyle(.secondary)
             if let duration = birthday.birthDuration {
-              Text(L10n.Widget.birthDuration(duration.years, duration.months, duration.days))
+              Text(WidgetL10n.birthDuration(duration.years, duration.months, duration.days))
                 .font(.caption2)
                 .foregroundStyle(.secondary)
                 .lineLimit(1)
