@@ -3,6 +3,7 @@ set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 SCRIPT="$ROOT/scripts/copilot-session-create.sh"
+CORE_SCRIPT="$ROOT/scripts/worktree-setup.sh"
 
 fail() {
   echo "FAIL: $*" >&2
@@ -238,6 +239,8 @@ STUB
   [[ ! -f "$log" ]] || fail "unset trigger should not create a session create log"
   [[ ! -f "$workspace/buildServer.json" ]] || fail "unset trigger should not generate buildServer.json"
 }
+
+[[ -x "$CORE_SCRIPT" ]] || fail "scripts/worktree-setup.sh should exist and be executable"
 
 test_skips_when_trigger_is_unset
 test_logs_session_create_output_to_aioutput
