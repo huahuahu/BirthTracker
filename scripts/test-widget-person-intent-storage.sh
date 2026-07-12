@@ -13,6 +13,7 @@ CONTACT_AGE_EXTENSION_DIR="$WIDGET_EXTENSION_DIR/ContactAge"
 UPCOMING_BIRTHDAYS_EXTENSION_DIR="$WIDGET_EXTENSION_DIR/UpcomingBirthdays"
 INTENT_FILE="$SHARED_DIR/PersonSelectionIntent.swift"
 BUNDLE_FILE="$WIDGET_EXTENSION_DIR/BirthTrackerWidgetBundle.swift"
+PACKAGE_BUNDLE_FILE="$WIDGET_PACKAGE_DIR/BirthTrackerWidgetsBundle.swift"
 
 fail() {
   echo "FAIL: $*" >&2
@@ -40,29 +41,30 @@ fi
 grep -q 'selectedPersonID' "$INTENT_FILE" \
   || fail "SelectPersonIntent should expose a UUID accessor for provider code"
 
-if grep -R 'configuration\.person' "$CONTACT_AGE_EXTENSION_DIR" "$UPCOMING_BIRTHDAYS_EXTENSION_DIR"; then
+if grep -R 'configuration\.person' "$CONTACT_AGE_DIR" "$UPCOMING_BIRTHDAYS_DIR"; then
   fail "Widget providers should read selectedPersonID instead of storing person entities"
 fi
 
 expected_package_files=(
+  "$PACKAGE_BUNDLE_FILE"
   "$SHARED_DIR/BirthTrackerWidgetsAppIntentsPackage.swift"
   "$SHARED_DIR/PersonSelectionIntent.swift"
   "$CONTACT_AGE_DIR/ContactAgeDurationFormatter.swift"
+  "$CONTACT_AGE_DIR/ContactAgeEntry.swift"
+  "$CONTACT_AGE_DIR/ContactAgeProvider.swift"
+  "$CONTACT_AGE_DIR/ContactAgeWidget.swift"
+  "$CONTACT_AGE_DIR/ContactAgeWidgetPreviews.swift"
   "$CONTACT_AGE_DIR/ContactAgeWidgetView.swift"
   "$CONTACT_AGE_DIR/ToggleContactAgeFormatIntent.swift"
+  "$UPCOMING_BIRTHDAYS_DIR/UpcomingBirthdaysEntry.swift"
+  "$UPCOMING_BIRTHDAYS_DIR/UpcomingBirthdaysProvider.swift"
+  "$UPCOMING_BIRTHDAYS_DIR/UpcomingBirthdaysWidget.swift"
+  "$UPCOMING_BIRTHDAYS_DIR/UpcomingBirthdaysWidgetPreviews.swift"
   "$UPCOMING_BIRTHDAYS_DIR/UpcomingBirthdaysWidgetView.swift"
 )
 
 expected_extension_files=(
   "$BUNDLE_FILE"
-  "$CONTACT_AGE_EXTENSION_DIR/ContactAgeEntry.swift"
-  "$CONTACT_AGE_EXTENSION_DIR/ContactAgeProvider.swift"
-  "$CONTACT_AGE_EXTENSION_DIR/ContactAgeWidget.swift"
-  "$CONTACT_AGE_EXTENSION_DIR/ContactAgeWidgetPreviews.swift"
-  "$UPCOMING_BIRTHDAYS_EXTENSION_DIR/UpcomingBirthdaysEntry.swift"
-  "$UPCOMING_BIRTHDAYS_EXTENSION_DIR/UpcomingBirthdaysProvider.swift"
-  "$UPCOMING_BIRTHDAYS_EXTENSION_DIR/UpcomingBirthdaysWidget.swift"
-  "$UPCOMING_BIRTHDAYS_EXTENSION_DIR/UpcomingBirthdaysWidgetPreviews.swift"
 )
 
 for file in "${expected_package_files[@]}" "${expected_extension_files[@]}"; do
@@ -76,15 +78,15 @@ done
 for file in ContactAgeWidget.swift ContactAgeProvider.swift ContactAgeEntry.swift ContactAgeWidgetPreviews.swift; do
   [[ ! -f "$WIDGET_PACKAGE_DIR/$file" ]] \
     || fail "$file should be organized under a feature or shared subdirectory"
-  [[ ! -f "$CONTACT_AGE_DIR/$file" ]] \
-    || fail "$file should live in the Widget extension target"
+  [[ ! -f "$CONTACT_AGE_EXTENSION_DIR/$file" ]] \
+    || fail "$file should not remain in the Widget extension target"
 done
 
 for file in UpcomingBirthdaysWidget.swift UpcomingBirthdaysProvider.swift UpcomingBirthdaysEntry.swift UpcomingBirthdaysWidgetPreviews.swift; do
   [[ ! -f "$WIDGET_PACKAGE_DIR/$file" ]] \
     || fail "$file should be organized under a feature or shared subdirectory"
-  [[ ! -f "$UPCOMING_BIRTHDAYS_DIR/$file" ]] \
-    || fail "$file should live in the Widget extension target"
+  [[ ! -f "$UPCOMING_BIRTHDAYS_EXTENSION_DIR/$file" ]] \
+    || fail "$file should not remain in the Widget extension target"
 done
 
 for file in PersonSelectionIntent.swift ToggleContactAgeFormatIntent.swift; do
@@ -106,5 +108,18 @@ awk '/^  BirthTrackerWidget:$/,/^  BirthTrackerTests:$/' "$PROJECT_FILE" | grep 
   || fail "project.yml should make the Widget extension depend on BirthTrackerWidgets"
 grep -q 'import BirthTrackerWidgets' "$BUNDLE_FILE" \
   || fail "BirthTrackerWidgetBundle should import BirthTrackerWidgets"
+grep -q 'BirthTrackerWidgetsBundle().body' "$BUNDLE_FILE" \
+  || fail "BirthTrackerWidgetBundle should delegate to the package-owned BirthTrackerWidgetsBundle"
+grep -q 'public struct BirthTrackerWidgetsBundle: WidgetBundle' "$PACKAGE_BUNDLE_FILE" \
+  || fail "BirthTrackerWidgets should expose a public WidgetBundle"
+grep -q 'UpcomingBirthdaysWidget()' "$PACKAGE_BUNDLE_FILE" \
+  || fail "BirthTrackerWidgetsBundle should include the upcoming birthdays widget"
+grep -q 'ContactAgeWidget()' "$PACKAGE_BUNDLE_FILE" \
+  || fail "BirthTrackerWidgetsBundle should include the contact age widget"
+
+while IFS= read -r swift_file; do
+  [[ "$swift_file" == "$BUNDLE_FILE" ]] \
+    || fail "$(relative_to_root "$swift_file") should not contain Widget implementation code; keep only the extension shell"
+done < <(find "$WIDGET_EXTENSION_DIR" -type f -name '*.swift')
 
 echo "widget person intent storage and package structure tests passed"

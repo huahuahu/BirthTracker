@@ -1,4 +1,3 @@
-import BirthTrackerWidgets
 import Foundation
 import Logging
 import Models
