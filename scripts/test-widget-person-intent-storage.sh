@@ -5,6 +5,7 @@ ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 PACKAGE_FILE="$ROOT/BirthTrackerPackage/Package.swift"
 PROJECT_FILE="$ROOT/project.yml"
 WIDGET_PACKAGE_DIR="$ROOT/BirthTrackerPackage/Sources/BirthTrackerWidgets"
+WIDGET_INTENTS_PACKAGE_DIR="$ROOT/BirthTrackerPackage/Sources/BirthTrackerWidgetIntents"
 WIDGET_EXTENSION_DIR="$ROOT/Sources/BirthTrackerWidget"
 SHARED_DIR="$WIDGET_PACKAGE_DIR/Shared"
 CONTACT_AGE_DIR="$WIDGET_PACKAGE_DIR/ContactAge"
@@ -16,7 +17,10 @@ BASE_REVISION="03ad6a5"
 BASE_WIDGET_RESOURCE_PATH="BirthTrackerPackage/Sources/Localization/Resources/Localizable.xcstrings"
 CONTACT_AGE_EXTENSION_DIR="$WIDGET_EXTENSION_DIR/ContactAge"
 UPCOMING_BIRTHDAYS_EXTENSION_DIR="$WIDGET_EXTENSION_DIR/UpcomingBirthdays"
-INTENT_FILE="$SHARED_DIR/PersonSelectionIntent.swift"
+INTENT_FILE="$WIDGET_INTENTS_PACKAGE_DIR/PersonSelectionIntent.swift"
+TOGGLE_INTENT_FILE="$WIDGET_INTENTS_PACKAGE_DIR/ToggleContactAgeFormatIntent.swift"
+INTENTS_PACKAGE_FILE="$WIDGET_INTENTS_PACKAGE_DIR/BirthTrackerWidgetIntentsAppIntentsPackage.swift"
+APP_ENTRY_FILE="$ROOT/Sources/BirthTrackerApp/BirthTrackerApp.swift"
 BUNDLE_FILE="$WIDGET_EXTENSION_DIR/BirthTrackerWidgetBundle.swift"
 PACKAGE_BUNDLE_FILE="$WIDGET_PACKAGE_DIR/BirthTrackerWidgetsBundle.swift"
 
@@ -53,8 +57,6 @@ fi
 expected_package_files=(
   "$PACKAGE_BUNDLE_FILE"
   "$WIDGET_RESOURCE_FILE"
-  "$SHARED_DIR/BirthTrackerWidgetsAppIntentsPackage.swift"
-  "$SHARED_DIR/PersonSelectionIntent.swift"
   "$SHARED_DIR/WidgetL10n.swift"
   "$CONTACT_AGE_DIR/ContactAgeDurationFormatter.swift"
   "$CONTACT_AGE_DIR/ContactAgeEntry.swift"
@@ -62,7 +64,6 @@ expected_package_files=(
   "$CONTACT_AGE_DIR/ContactAgeWidget.swift"
   "$CONTACT_AGE_DIR/ContactAgeWidgetPreviews.swift"
   "$CONTACT_AGE_DIR/ContactAgeWidgetView.swift"
-  "$CONTACT_AGE_DIR/ToggleContactAgeFormatIntent.swift"
   "$UPCOMING_BIRTHDAYS_DIR/UpcomingBirthdaysEntry.swift"
   "$UPCOMING_BIRTHDAYS_DIR/UpcomingBirthdaysProvider.swift"
   "$UPCOMING_BIRTHDAYS_DIR/UpcomingBirthdaysWidget.swift"
@@ -70,14 +71,31 @@ expected_package_files=(
   "$UPCOMING_BIRTHDAYS_DIR/UpcomingBirthdaysWidgetView.swift"
 )
 
+expected_intent_package_files=(
+  "$INTENTS_PACKAGE_FILE"
+  "$INTENT_FILE"
+  "$TOGGLE_INTENT_FILE"
+)
+
 expected_extension_files=(
   "$BUNDLE_FILE"
   "$WIDGET_INTENTS_FILE"
 )
 
-for file in "${expected_package_files[@]}" "${expected_extension_files[@]}"; do
+for file in \
+  "${expected_package_files[@]}" \
+  "${expected_intent_package_files[@]}" \
+  "${expected_extension_files[@]}"; do
   [[ -f "$file" ]] \
     || fail "$(relative_to_root "$file") should exist"
+done
+
+for old_intent_file in \
+  "$SHARED_DIR/BirthTrackerWidgetsAppIntentsPackage.swift" \
+  "$SHARED_DIR/PersonSelectionIntent.swift" \
+  "$CONTACT_AGE_DIR/ToggleContactAgeFormatIntent.swift"; do
+  [[ ! -e "$old_intent_file" ]] \
+    || fail "$(relative_to_root "$old_intent_file") should move to BirthTrackerWidgetIntents"
 done
 
 [[ ! -f "$SHARED_DIR/WidgetLogger.swift" ]] \
@@ -106,8 +124,14 @@ done
 
 grep -q 'library(name: "BirthTrackerWidgets"' "$PACKAGE_FILE" \
   || fail "Package.swift should expose a BirthTrackerWidgets product"
+grep -q 'library(name: "BirthTrackerWidgetIntents"' "$PACKAGE_FILE" \
+  || fail "Package.swift should expose a BirthTrackerWidgetIntents product"
 grep -q 'name: "BirthTrackerWidgets"' "$PACKAGE_FILE" \
   || fail "Package.swift should define a BirthTrackerWidgets target"
+grep -q 'name: "BirthTrackerWidgetIntents"' "$PACKAGE_FILE" \
+  || fail "Package.swift should define a BirthTrackerWidgetIntents target"
+grep -q 'dependencies: \["BirthTrackerWidgetIntents", "Logging", "Models", "Persistence", "SFSafeSymbols"\]' "$PACKAGE_FILE" \
+  || fail "BirthTrackerWidgets should depend on BirthTrackerWidgetIntents"
 grep -q 'resources: \[.process("Resources")\]' "$PACKAGE_FILE" \
   || fail "BirthTrackerWidgets should process its own localization resources"
 
@@ -218,20 +242,43 @@ grep -Fq 'LocalizedStringResource("Choose which person this widget shows.", tabl
   || fail "SelectPersonIntent description should preserve its original source key"
 grep -Fq 'LocalizedStringResource("Contact", table: "Intents", bundle: .main)' "$INTENT_FILE" \
   || fail "SelectPersonIntent parameter should preserve the Contact source key"
-grep -Fq 'LocalizedStringResource("Toggle Age Format", table: "Intents", bundle: .main)' "$CONTACT_AGE_DIR/ToggleContactAgeFormatIntent.swift" \
+grep -Fq 'LocalizedStringResource("Toggle Age Format", table: "Intents", bundle: .main)' "$TOGGLE_INTENT_FILE" \
   || fail "ToggleContactAgeFormatIntent title should use the main-bundle Intents table"
-grep -Fq 'LocalizedStringResource("Person ID", table: "Intents", bundle: .main)' "$CONTACT_AGE_DIR/ToggleContactAgeFormatIntent.swift" \
+grep -Fq 'LocalizedStringResource("Person ID", table: "Intents", bundle: .main)' "$TOGGLE_INTENT_FILE" \
   || fail "ToggleContactAgeFormatIntent parameter should preserve the Person ID source key"
-grep -q 'product: BirthTrackerWidgets' "$PROJECT_FILE" \
-  || fail "project.yml should make the Widget extension depend on BirthTrackerWidgets"
-awk '/^  BirthTracker:$/,/^  BirthTrackerWidget:$/' "$PROJECT_FILE" | grep -q 'product: BirthTrackerWidgets' \
-  || fail "project.yml should make the host app depend on BirthTrackerWidgets so AppIntents can instantiate Widget configuration intents"
+grep -q '^public struct ToggleContactAgeFormatIntent: AppIntent' "$TOGGLE_INTENT_FILE" \
+  || fail "ToggleContactAgeFormatIntent should be public across the module boundary"
+
+app_target_block="$(awk '/^  BirthTracker:$/,/^  BirthTrackerWidget:$/' "$PROJECT_FILE")"
+grep -q 'product: BirthTrackerWidgetIntents' <<<"$app_target_block" \
+  || fail "BirthTracker app should depend on BirthTrackerWidgetIntents"
+if grep -q 'product: BirthTrackerWidgets' <<<"$app_target_block"; then
+  fail "BirthTracker app should not depend on BirthTrackerWidgets"
+fi
+
 widget_target_block="$(awk '/^  BirthTrackerWidget:$/,/^  BirthTrackerTests:$/' "$PROJECT_FILE")"
 grep -q 'product: BirthTrackerWidgets' <<<"$widget_target_block" \
   || fail "Widget extension should depend on BirthTrackerWidgets"
+grep -q 'product: BirthTrackerWidgetIntents' <<<"$widget_target_block" \
+  || fail "Widget extension should depend on BirthTrackerWidgetIntents"
 if grep -q 'product: Logging' <<<"$widget_target_block"; then
   fail "Widget extension should not directly depend on Logging"
 fi
+grep -q '^import BirthTrackerWidgetIntents$' "$APP_ENTRY_FILE" \
+  || fail "BirthTrackerApp should import BirthTrackerWidgetIntents"
+grep -q 'BirthTrackerWidgetIntentsAppIntentsPackage.self' "$APP_ENTRY_FILE" \
+  || fail "BirthTrackerApp should retain the AppIntents package"
+
+for intent_consumer in \
+  "$CONTACT_AGE_DIR/ContactAgeWidget.swift" \
+  "$CONTACT_AGE_DIR/ContactAgeProvider.swift" \
+  "$CONTACT_AGE_DIR/ContactAgeWidgetView.swift" \
+  "$UPCOMING_BIRTHDAYS_DIR/UpcomingBirthdaysWidget.swift" \
+  "$UPCOMING_BIRTHDAYS_DIR/UpcomingBirthdaysProvider.swift"; do
+  grep -q '^import BirthTrackerWidgetIntents$' "$intent_consumer" \
+    || fail "$(relative_to_root "$intent_consumer") should import BirthTrackerWidgetIntents"
+done
+
 grep -q 'import BirthTrackerWidgets' "$BUNDLE_FILE" \
   || fail "BirthTrackerWidgetBundle should import BirthTrackerWidgets"
 grep -q 'BirthTrackerWidgetsBundle().body' "$BUNDLE_FILE" \
