@@ -48,6 +48,10 @@ YAML
   cat > "$BIN/xcodegen" <<'STUB'
 #!/usr/bin/env bash
 set -euo pipefail
+[[ "$#" -eq 1 && "$1" == "generate" ]] || {
+  echo "unexpected xcodegen arguments: $*" >&2
+  exit 1
+}
 printf 'xcodegen|%s|%s\n' "$(pwd -P)" "$*" >> "${CODEX_TEST_CALLS:?}"
 mkdir -p BirthTracker.xcodeproj
 STUB
@@ -56,9 +60,25 @@ STUB
   cat > "$BIN/xcode-build-server" <<'STUB'
 #!/usr/bin/env bash
 set -euo pipefail
-printf 'xcode-build-server|%s|%s\n' "$(pwd -P)" "$*" >> "${CODEX_TEST_CALLS:?}"
-case "$1" in
+case "${1:-}" in
 config)
+  [[ "$#" -eq 7 ]] || {
+    echo "unexpected config argument count: $#" >&2
+    exit 1
+  }
+  [[ "$2" == "-workspace" && "$3" == "BirthTracker.xcodeproj/project.xcworkspace" ]] || {
+    echo "unexpected config workspace arguments: $*" >&2
+    exit 1
+  }
+  [[ "$4" == "-scheme" && "$5" == "BirthTracker" ]] || {
+    echo "unexpected config scheme arguments: $*" >&2
+    exit 1
+  }
+  [[ "$6" == "--build_root" && "$7" == "${CODEX_TEST_WORKTREE:?}/AIOutput/DerivedData" ]] || {
+    echo "unexpected config build root arguments: $*" >&2
+    exit 1
+  }
+  printf 'xcode-build-server|%s|%s\n' "$(pwd -P)" "$*" >> "${CODEX_TEST_CALLS:?}"
   cat > buildServer.json <<JSON
 {
   "name": "stub build server",
@@ -70,10 +90,27 @@ config)
 JSON
   ;;
 parse)
-  [[ "$4" == "-o" ]] || {
-    echo "unexpected parse arguments: $*" >&2
+  [[ "$#" -eq 7 ]] || {
+    echo "unexpected parse argument count: $#" >&2
     exit 1
   }
+  build_root="${CODEX_TEST_WORKTREE:?}/AIOutput/DerivedData"
+  cache_root_key="${CODEX_TEST_WORKTREE//\//-}"
+  build_root_hash="$(printf '%s' "$build_root" | md5 -q)"
+  expected_compile_file="$HOME/Library/Caches/xcode-build-server/$cache_root_key/compile_file-BirthTrackerFromBuildServer-$build_root_hash"
+  [[ "$2" == "-s" && "$3" == "$build_root" ]] || {
+    echo "unexpected parse sync arguments: $*" >&2
+    exit 1
+  }
+  [[ "$4" == "-o" && "$5" == "$expected_compile_file" ]] || {
+    echo "unexpected parse output arguments: $*" >&2
+    exit 1
+  }
+  [[ "$6" == "--scheme" && "$7" == "BirthTrackerFromBuildServer" ]] || {
+    echo "unexpected parse scheme arguments: $*" >&2
+    exit 1
+  }
+  printf 'xcode-build-server|%s|%s\n' "$(pwd -P)" "$*" >> "${CODEX_TEST_CALLS:?}"
   mkdir -p "$(dirname "$5")"
   printf '%s\n' '{"module_name":"Features"}' > "$5"
   ;;
@@ -88,6 +125,31 @@ STUB
   cat > "$BIN/xcodebuild" <<'STUB'
 #!/usr/bin/env bash
 set -euo pipefail
+expected_args=(
+  GCC_GENERATE_DEBUGGING_SYMBOLS=YES
+  ONLY_ACTIVE_ARCH=YES
+  COMPILER_INDEX_STORE_ENABLE=YES
+  -workspace BirthTracker.xcodeproj/project.xcworkspace
+  -scheme BirthTrackerFromBuildServer
+  -configuration Debug
+  -destination "platform=iOS Simulator,id=F4B82181-8A72-4AC3-9C95-454DE83A0C62"
+  -resultBundlePath "${CODEX_TEST_WORKTREE:?}/AIOutput/BuildServer.xcresult"
+  -allowProvisioningUpdates
+  -derivedDataPath "$CODEX_TEST_WORKTREE/AIOutput/DerivedData"
+  CODE_SIGNING_ALLOWED=NO
+  build-for-testing
+)
+args=("$@")
+[[ "${#args[@]}" -eq "${#expected_args[@]}" ]] || {
+  echo "unexpected xcodebuild argument count: $#" >&2
+  exit 1
+}
+for index in "${!expected_args[@]}"; do
+  [[ "${args[$index]}" == "${expected_args[$index]}" ]] || {
+    echo "unexpected xcodebuild argument at $index: $*" >&2
+    exit 1
+  }
+done
 [[ ! -e "${CODEX_TEST_WORKTREE:?}/AIOutput/DerivedData/stale.txt" ]] || {
   echo "xcodebuild should run after stale DerivedData is removed" >&2
   exit 1
@@ -149,6 +211,71 @@ test_rejects_invalid_codex_paths() {
   [[ "$STATUS" -eq 2 ]] || fail "invalid source tree path should exit 2: $OUTPUT"
   [[ "$OUTPUT" == "error: CODEX_SOURCE_TREE_PATH does not exist: $TMP/missing source tree" ]] \
     || fail "unexpected invalid source tree path output: $OUTPUT"
+  cleanup_fixture
+}
+
+test_stubs_reject_split_arguments() {
+  local build_root_hash cache_root_key compile_file
+  new_fixture
+
+  run_and_capture env \
+    CODEX_TEST_CALLS="$CALLS" \
+    CODEX_TEST_WORKTREE="$WORKTREE" \
+    /bin/bash -c '
+      cd "$1"
+      "$2" config \
+        -workspace BirthTracker.xcodeproj/project.xcworkspace \
+        -scheme BirthTracker \
+        --build_root $1/AIOutput/DerivedData
+    ' _ "$WORKTREE" "$BIN/xcode-build-server"
+  [[ "$STATUS" -ne 0 ]] \
+    || fail "xcode-build-server config stub accepted a split build root path"
+
+  cache_root_key="$(printf '%s' "$WORKTREE" | sed 's#/#-#g')"
+  build_root_hash="$(printf '%s' "$WORKTREE/AIOutput/DerivedData" | md5 -q)"
+  compile_file="$HOME_DIR/Library/Caches/xcode-build-server/$cache_root_key/compile_file-BirthTrackerFromBuildServer-$build_root_hash"
+  run_and_capture env \
+    HOME="$HOME_DIR" \
+    CODEX_TEST_CALLS="$CALLS" \
+    CODEX_TEST_WORKTREE="$WORKTREE" \
+    /bin/bash -c '
+      cd "$1"
+      "$2" parse \
+        -s "$1/AIOutput/DerivedData" \
+        -o $3 \
+        --scheme BirthTrackerFromBuildServer
+    ' _ "$WORKTREE" "$BIN/xcode-build-server" "$compile_file"
+  [[ "$STATUS" -ne 0 ]] \
+    || fail "xcode-build-server parse stub accepted a split compile file path"
+
+  rm "$WORKTREE/AIOutput/DerivedData/stale.txt"
+  run_and_capture env \
+    CODEX_TEST_CALLS="$CALLS" \
+    CODEX_TEST_WORKTREE="$WORKTREE" \
+    /bin/bash -c '
+      cd "$1"
+      "$2" \
+        GCC_GENERATE_DEBUGGING_SYMBOLS=YES \
+        ONLY_ACTIVE_ARCH=YES \
+        COMPILER_INDEX_STORE_ENABLE=YES \
+        -workspace BirthTracker.xcodeproj/project.xcworkspace \
+        -scheme BirthTrackerFromBuildServer \
+        -configuration Debug \
+        -destination "platform=iOS Simulator,id=F4B82181-8A72-4AC3-9C95-454DE83A0C62" \
+        -resultBundlePath $1/AIOutput/BuildServer.xcresult \
+        -allowProvisioningUpdates \
+        -derivedDataPath "$1/AIOutput/DerivedData" \
+        CODE_SIGNING_ALLOWED=NO \
+        build-for-testing
+    ' _ "$WORKTREE" "$BIN/xcodebuild"
+  [[ "$STATUS" -ne 0 ]] || fail "xcodebuild stub accepted a split result bundle path"
+
+  run_and_capture env \
+    CODEX_TEST_CALLS="$CALLS" \
+    CODEX_TEST_WORKTREE="$WORKTREE" \
+    /bin/bash -c 'cd "$1" && "$2" generate unexpected' \
+    _ "$WORKTREE" "$BIN/xcodegen"
+  [[ "$STATUS" -ne 0 ]] || fail "xcodegen stub accepted unexpected arguments"
   cleanup_fixture
 }
 
@@ -250,6 +377,7 @@ run_named_test() {
   case "$1" in
   requires-paths) test_requires_codex_paths ;;
   rejects-invalid-paths) test_rejects_invalid_codex_paths ;;
+  stub-argument-guards) test_stubs_reject_split_arguments ;;
   full-initialization) test_runs_full_initialization ;;
   missing-tool) test_reports_missing_tool ;;
   main-checkout) test_skips_main_checkout ;;
@@ -268,6 +396,7 @@ fi
 
 test_requires_codex_paths
 test_rejects_invalid_codex_paths
+test_stubs_reject_split_arguments
 test_runs_full_initialization
 test_reports_missing_tool
 test_skips_main_checkout
