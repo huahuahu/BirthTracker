@@ -6,13 +6,10 @@ import Persistence
 public struct SelectPersonIntent: WidgetConfigurationIntent {
   public static let title = LocalizedStringResource("Choose Person", table: "Intents", bundle: .main)
   public static let description = IntentDescription(
-    LocalizedStringResource(
-      "Choose which person's birthday this widget shows.",
-      table: "Intents",
-      bundle: .main))
+    LocalizedStringResource("Choose which person this widget shows.", table: "Intents", bundle: .main))
 
   @Parameter(
-    title: LocalizedStringResource("Person", table: "Intents", bundle: .main),
+    title: LocalizedStringResource("Contact", table: "Intents", bundle: .main),
     optionsProvider: WidgetPersonOptionsProvider())
   public var personID: String?
 

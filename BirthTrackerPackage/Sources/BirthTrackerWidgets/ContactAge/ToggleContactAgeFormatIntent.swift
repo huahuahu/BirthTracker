@@ -17,7 +17,7 @@ enum ToggleContactAgeFormatIntentError: LocalizedError {
 struct ToggleContactAgeFormatIntent: AppIntent {
   static let title = LocalizedStringResource("Toggle Age Format", table: "Intents", bundle: .main)
 
-  @Parameter(title: LocalizedStringResource("Person", table: "Intents", bundle: .main))
+  @Parameter(title: LocalizedStringResource("Person ID", table: "Intents", bundle: .main))
   var personID: String
 
   init() {}

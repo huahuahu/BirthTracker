@@ -240,7 +240,7 @@ grep -q 'resources: \[.process("Resources")\]' "$PACKAGE_FILE" \
   || fail "BirthTrackerWidgets should process its own localization resources"
 grep -q 'LocalizedStringResource("Choose Person", table: "Intents", bundle: .main)' "$INTENT_FILE" \
   || fail "SelectPersonIntent title should use the main-bundle Intents table"
-grep -q 'LocalizedStringResource("Person", table: "Intents", bundle: .main)' "$INTENT_FILE" \
+grep -q 'LocalizedStringResource("Contact", table: "Intents", bundle: .main)' "$INTENT_FILE" \
   || fail "SelectPersonIntent parameter should use the main-bundle Intents table"
 grep -q 'LocalizedStringResource("Toggle Age Format", table: "Intents", bundle: .main)' "$CONTACT_AGE_DIR/ToggleContactAgeFormatIntent.swift" \
   || fail "ToggleContactAgeFormatIntent should use the main-bundle Intents table"
@@ -250,7 +250,7 @@ if grep -R '^import Localization$' "$WIDGET_PACKAGE_DIR"; then
 fi
 
 for intents_file in "$APP_INTENTS_FILE" "$WIDGET_INTENTS_FILE"; do
-  for key in 'Choose Person' "Choose which person's birthday this widget shows." 'Person' 'Toggle Age Format'; do
+  for key in 'Choose Person' 'Choose which person this widget shows.' 'Contact' 'Person ID' 'Toggle Age Format'; do
     grep -Fq "\"$key\"" "$intents_file" \
       || fail "$(relative_to_root "$intents_file") should contain $key"
   done
@@ -370,12 +370,12 @@ L10n.Widget.birthDuration(y, m, d)         → WidgetL10n.birthDuration(y, m, d)
 
 | Key | English | 简体中文 |
 | --- | --- | --- |
-| `Add a birth year to show age.` | Add a birth year to show age. | 添加出生年份后可显示年龄。 |
+| `Add a birth year to show age.` | Add a birth year to show age. | 添加出生年份以显示年龄。 |
 | `Birthdays` | Birthdays | 生日 |
-| `Choose a person to show their age.` | Choose a person to show their age. | 选择一位联系人以显示年龄。 |
+| `Choose a person to show their age.` | Choose a person to show their age. | 选择联系人以显示年龄。 |
 | `Contact Age` | Contact Age | 联系人年龄 |
 | `No birthday recorded` | No birthday recorded | 未记录生日 |
-| `No upcoming birthdays` | No upcoming birthdays | 没有即将到来的生日 |
+| `No upcoming birthdays` | No upcoming birthdays | 暂无即将到来的生日 |
 | `See the next birthdays at a glance.` | See the next birthdays at a glance. | 一眼查看接下来的生日。 |
 | `Selected person is no longer available.` | Selected person is no longer available. | 所选联系人已不在列表中。 |
 | `Tap to switch format` | Tap to switch format | 点按切换格式 |
@@ -385,7 +385,7 @@ L10n.Widget.birthDuration(y, m, d)         → WidgetL10n.birthDuration(y, m, d)
 | `widget.birth.duration.format` | `Born %lldy %lldm %lldd` | `出生 %lld 年 %lld 月 %lld 天` |
 | `widget.contact.age.format.duration` | `Y/M/D` | `年/月/日` |
 | `widget.contact.age.format.month.day` | `M/D` | `月/日` |
-| `widget.contact.age.format.total.days` | `Days` | `天数` |
+| `widget.contact.age.format.total.days` | `D` | `日` |
 
 使用 `apply_patch` 创建以下完整 catalog；格式化空格可以不同，但 key、语言和 value 必须一致：
 
@@ -393,12 +393,12 @@ L10n.Widget.birthDuration(y, m, d)         → WidgetL10n.birthDuration(y, m, d)
 {
   "sourceLanguage" : "en",
   "strings" : {
-    "Add a birth year to show age." : { "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "Add a birth year to show age." } }, "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "添加出生年份后可显示年龄。" } } } },
+    "Add a birth year to show age." : { "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "Add a birth year to show age." } }, "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "添加出生年份以显示年龄。" } } } },
     "Birthdays" : { "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "Birthdays" } }, "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "生日" } } } },
-    "Choose a person to show their age." : { "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "Choose a person to show their age." } }, "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "选择一位联系人以显示年龄。" } } } },
+    "Choose a person to show their age." : { "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "Choose a person to show their age." } }, "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "选择联系人以显示年龄。" } } } },
     "Contact Age" : { "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "Contact Age" } }, "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "联系人年龄" } } } },
     "No birthday recorded" : { "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "No birthday recorded" } }, "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "未记录生日" } } } },
-    "No upcoming birthdays" : { "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "No upcoming birthdays" } }, "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "没有即将到来的生日" } } } },
+    "No upcoming birthdays" : { "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "No upcoming birthdays" } }, "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "暂无即将到来的生日" } } } },
     "See the next birthdays at a glance." : { "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "See the next birthdays at a glance." } }, "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "一眼查看接下来的生日。" } } } },
     "Selected person is no longer available." : { "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "Selected person is no longer available." } }, "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "所选联系人已不在列表中。" } } } },
     "Tap to switch format" : { "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "Tap to switch format" } }, "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "点按切换格式" } } } },
@@ -408,7 +408,7 @@ L10n.Widget.birthDuration(y, m, d)         → WidgetL10n.birthDuration(y, m, d)
     "widget.birth.duration.format" : { "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "Born %lldy %lldm %lldd" } }, "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "出生 %lld 年 %lld 月 %lld 天" } } } },
     "widget.contact.age.format.duration" : { "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "Y/M/D" } }, "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "年/月/日" } } } },
     "widget.contact.age.format.month.day" : { "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "M/D" } }, "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "月/日" } } } },
-    "widget.contact.age.format.total.days" : { "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "Days" } }, "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "天数" } } } }
+    "widget.contact.age.format.total.days" : { "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "D" } }, "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "日" } } } }
   },
   "version" : "1.0"
 }
@@ -421,13 +421,10 @@ L10n.Widget.birthDuration(y, m, d)         → WidgetL10n.birthDuration(y, m, d)
 ```swift
 public static let title = LocalizedStringResource("Choose Person", table: "Intents", bundle: .main)
 public static let description = IntentDescription(
-  LocalizedStringResource(
-    "Choose which person's birthday this widget shows.",
-    table: "Intents",
-    bundle: .main))
+  LocalizedStringResource("Choose which person this widget shows.", table: "Intents", bundle: .main))
 
 @Parameter(
-  title: LocalizedStringResource("Person", table: "Intents", bundle: .main),
+  title: LocalizedStringResource("Contact", table: "Intents", bundle: .main),
   optionsProvider: WidgetPersonOptionsProvider())
 public var personID: String?
 ```
@@ -437,7 +434,7 @@ public var personID: String?
 ```swift
 static let title = LocalizedStringResource("Toggle Age Format", table: "Intents", bundle: .main)
 
-@Parameter(title: LocalizedStringResource("Person", table: "Intents", bundle: .main))
+@Parameter(title: LocalizedStringResource("Person ID", table: "Intents", bundle: .main))
 var personID: String
 ```
 
@@ -448,8 +445,9 @@ var personID: String
 | Key | English | 简体中文 |
 | --- | --- | --- |
 | `Choose Person` | Choose Person | 选择联系人 |
-| `Choose which person's birthday this widget shows.` | Choose which person's birthday this widget shows. | 选择这个小组件显示哪位联系人的生日。 |
-| `Person` | Person | 联系人 |
+| `Choose which person this widget shows.` | Choose which person this widget shows. | 选择要展示的联系人 |
+| `Contact` | Contact | 联系人 |
+| `Person ID` | Person ID | Person ID |
 | `Toggle Age Format` | Toggle Age Format | 切换年龄格式 |
 
 两个文件都使用以下完整内容；comments 可以保留现有更详细的说明，但不可改变 key/value：
@@ -464,16 +462,22 @@ var personID: String
         "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "选择联系人" } }
       }
     },
-    "Choose which person's birthday this widget shows." : {
+    "Choose which person this widget shows." : {
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Choose which person's birthday this widget shows." } },
-        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "选择这个小组件显示哪位联系人的生日。" } }
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Choose which person this widget shows." } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "选择要展示的联系人" } }
       }
     },
-    "Person" : {
+    "Contact" : {
       "localizations" : {
-        "en" : { "stringUnit" : { "state" : "translated", "value" : "Person" } },
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Contact" } },
         "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "联系人" } }
+      }
+    },
+    "Person ID" : {
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Person ID" } },
+        "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "Person ID" } }
       }
     },
     "Toggle Age Format" : {

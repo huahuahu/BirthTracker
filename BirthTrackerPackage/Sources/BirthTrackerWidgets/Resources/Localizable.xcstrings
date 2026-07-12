@@ -1,12 +1,12 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
-    "Add a birth year to show age." : { "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "Add a birth year to show age." } }, "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "添加出生年份后可显示年龄。" } } } },
+    "Add a birth year to show age." : { "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "Add a birth year to show age." } }, "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "添加出生年份以显示年龄。" } } } },
     "Birthdays" : { "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "Birthdays" } }, "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "生日" } } } },
-    "Choose a person to show their age." : { "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "Choose a person to show their age." } }, "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "选择一位联系人以显示年龄。" } } } },
+    "Choose a person to show their age." : { "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "Choose a person to show their age." } }, "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "选择联系人以显示年龄。" } } } },
     "Contact Age" : { "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "Contact Age" } }, "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "联系人年龄" } } } },
     "No birthday recorded" : { "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "No birthday recorded" } }, "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "未记录生日" } } } },
-    "No upcoming birthdays" : { "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "No upcoming birthdays" } }, "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "没有即将到来的生日" } } } },
+    "No upcoming birthdays" : { "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "No upcoming birthdays" } }, "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "暂无即将到来的生日" } } } },
     "See the next birthdays at a glance." : { "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "See the next birthdays at a glance." } }, "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "一眼查看接下来的生日。" } } } },
     "Selected person is no longer available." : { "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "Selected person is no longer available." } }, "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "所选联系人已不在列表中。" } } } },
     "Tap to switch format" : { "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "Tap to switch format" } }, "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "点按切换格式" } } } },
@@ -16,7 +16,7 @@
     "widget.birth.duration.format" : { "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "Born %lldy %lldm %lldd" } }, "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "出生 %lld 年 %lld 月 %lld 天" } } } },
     "widget.contact.age.format.duration" : { "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "Y/M/D" } }, "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "年/月/日" } } } },
     "widget.contact.age.format.month.day" : { "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "M/D" } }, "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "月/日" } } } },
-    "widget.contact.age.format.total.days" : { "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "Days" } }, "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "天数" } } } }
+    "widget.contact.age.format.total.days" : { "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "D" } }, "zh-Hans" : { "stringUnit" : { "state" : "translated", "value" : "日" } } } }
   },
   "version" : "1.0"
 }

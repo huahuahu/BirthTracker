@@ -103,7 +103,7 @@ package 中的 `BirthTrackerWidgetsBundle` 提供公开初始化方法和公开 
 4. provider 生成 entry，具体 Widget 将 entry 交给 package 内的 View 渲染。
 5. extension 壳只向 WidgetKit 暴露 package 的 `WidgetBundle`。
 
-`BirthTrackerWidgets` target 继续依赖 `Localization`、`Logging`、`Models`、`Persistence` 和 `SFSafeSymbols`。App target 继续依赖 `BirthTrackerWidgets`，以便系统从宿主 App 导出并实例化 Widget configuration intent。Widget extension 在 `project.yml` 中只直接依赖 `BirthTrackerWidgets`，移除对 `Logging` 的直接依赖。
+`BirthTrackerWidgets` target 依赖 `Logging`、`Models`、`Persistence` 和 `SFSafeSymbols`，不再依赖 `Localization`。App target 继续依赖 `BirthTrackerWidgets`，以便系统从宿主 App 导出并实例化 Widget configuration intent。Widget extension 在 `project.yml` 中只直接依赖 `BirthTrackerWidgets`，移除对 `Logging` 的直接依赖。
 
 provider 现有的错误捕获、日志记录、空数据 fallback 和刷新策略原样迁移，不增加新的运行时错误分支。
 
