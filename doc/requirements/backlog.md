@@ -6,6 +6,7 @@
 
 - 改进生日统计和时间线摘要。
 - 扩展 Widget 配置和展示选项。
+- 将 `UpcomingBirthdaysWidget` 改为以单人生日倒计时为主角，同时保留 `ContactAgeWidget` 展示已经出生多久的现有职责；已确认的“小缺口圆环”方向见 [单人生日倒计时 Widget 设计](../../docs/superpowers/specs/2026-07-12-birthday-countdown-widget-design.md)。
 - 等核心模型稳定后加入数据导出。
 - 发布前审查 App Store 元数据和本地化需求。
 
