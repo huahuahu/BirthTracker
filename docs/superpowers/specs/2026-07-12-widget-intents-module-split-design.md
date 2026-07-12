@@ -66,7 +66,7 @@ BirthTrackerPackage/Sources/BirthTrackerWidgets/
 
 ## AppIntents 注册与可见性
 
-`BirthTrackerWidgetIntentsAppIntentsPackage` 是新 module 对外暴露的 `AppIntentsPackage`。App target 显式导入 `BirthTrackerWidgetIntents` 并引用该 package type，避免 Swift 静态链接器把仅用于 metadata 的 module 视为未使用依赖。
+`BirthTrackerWidgetIntentsAppIntentsPackage` 是新 module 对外暴露的 framework `AppIntentsPackage`。App 与 Widget extension 各自在宿主 bundle 中声明一个 `AppIntentsPackage`，并通过 `includedPackages` 包含该 framework package；这符合 Apple 对跨 framework 复用 App Intents 的注册方式，也让 metadata extractor 能明确追踪依赖。
 
 跨 module 使用的类型提供最小公开 API：
 
@@ -74,7 +74,7 @@ BirthTrackerPackage/Sources/BirthTrackerWidgets/
 - `ToggleContactAgeFormatIntent` 改为公开，只暴露 AppIntent conformance、无参初始化和按联系人 UUID 初始化所需成员。
 - Intent 内部错误类型继续保持 module 内部可见。
 
-Widget extension 壳继续只组合 package 提供的 `BirthTrackerWidgetsBundle`。extension 对 Intent product 的显式依赖用于 metadata 提取；Widget UI module 对 Intent target 的依赖用于编译期类型访问。
+Widget extension 壳继续只组合 package 提供的 `BirthTrackerWidgetsBundle`，并额外承载 extension 宿主的 `AppIntentsPackage` 注册。extension 对 Intent product 的显式依赖用于链接和 metadata 提取；Widget UI module 对 Intent target 的依赖用于编译期类型访问。
 
 ## XcodeGen 依赖
 
@@ -126,7 +126,7 @@ LocalizedStringResource("Source Key", table: "Intents", bundle: .main)
 - `BirthTrackerWidgets` target 依赖新 Intent target。
 - App 依赖 Intent product，且不依赖 Widget UI product。
 - extension 显式依赖两个 product。
-- App 入口显式引用 `BirthTrackerWidgetIntentsAppIntentsPackage`。
+- App 与 Widget extension 各自声明宿主 `AppIntentsPackage`，其 `includedPackages` 包含 `BirthTrackerWidgetIntentsAppIntentsPackage`。
 - Widget 源文件从新 module 导入 Intent 类型。
 - AppIntent 字符串仍使用 `Intents` table 和 `.main`。
 - App 与 extension 的 `Intents.xcstrings` 逐字节一致。

@@ -68,8 +68,14 @@ grep -q 'product: BirthTrackerWidgetIntents' <<<"$widget_target_block" \
 
 grep -q '^import BirthTrackerWidgetIntents$' "$APP_ENTRY_FILE" \
   || fail "BirthTrackerApp should import BirthTrackerWidgetIntents"
-grep -q 'BirthTrackerWidgetIntentsAppIntentsPackage.self' "$APP_ENTRY_FILE" \
-  || fail "BirthTrackerApp should retain the AppIntents package"
+grep -q '^struct BirthTrackerAppIntentsPackage: AppIntentsPackage' "$APP_ENTRY_FILE" \
+  || fail "BirthTrackerApp should define a host AppIntentsPackage"
+grep -Fq '[BirthTrackerWidgetIntentsAppIntentsPackage.self]' "$APP_ENTRY_FILE" \
+  || fail "BirthTrackerApp host package should include BirthTrackerWidgetIntents"
+grep -q '^struct BirthTrackerWidgetExtensionAppIntentsPackage: AppIntentsPackage' "$BUNDLE_FILE" \
+  || fail "BirthTrackerWidget should define a host AppIntentsPackage"
+grep -Fq '[BirthTrackerWidgetIntentsAppIntentsPackage.self]' "$BUNDLE_FILE" \
+  || fail "BirthTrackerWidget host package should include BirthTrackerWidgetIntents"
 ```
 
 检查旧文件位置不存在、使用 Intent 的五个 Widget 文件显式导入新 module，并把 Toggle Intent 的本地化断言改为读取 `$TOGGLE_INTENT_FILE`。
@@ -229,24 +235,27 @@ Widget extension dependencies 改为：
         product: BirthTrackerWidgetIntents
 ```
 
-- [ ] **Step 2: 在 App 入口保留 AppIntents package**
+- [ ] **Step 2: 在 App 与 Widget extension 注册 AppIntents package**
 
 修改 `BirthTrackerApp.swift`：
 
 ```swift
 import App
+import AppIntents
 import BirthTrackerWidgetIntents
 import DesignSystem
 import SwiftUI
+
+struct BirthTrackerAppIntentsPackage: AppIntentsPackage {
+  static var includedPackages: [any AppIntentsPackage.Type] {
+    [BirthTrackerWidgetIntentsAppIntentsPackage.self]
+  }
+}
 
 @main
 struct BirthTrackerApp: App {
   @AppStorage(AppSettingsKey.appearanceMode)
   private var appearanceMode = AppearanceMode.system.rawValue
-
-  init() {
-    _ = BirthTrackerWidgetIntentsAppIntentsPackage.self
-  }
 
   var body: some Scene {
     WindowGroup {
@@ -256,6 +265,8 @@ struct BirthTrackerApp: App {
   }
 }
 ```
+
+同时在 `BirthTrackerWidgetBundle.swift` 声明 `BirthTrackerWidgetExtensionAppIntentsPackage`，其 `includedPackages` 同样返回 `[BirthTrackerWidgetIntentsAppIntentsPackage.self]`。
 
 - [ ] **Step 3: 运行结构脚本并确认 GREEN**
 
@@ -296,6 +307,7 @@ git commit -m "refactor: split widget intents module"
 - 跨 App 与 Widget extension 使用的 `WidgetConfigurationIntent`、交互式 `AppIntent` 和 `AppIntentsPackage` 位于 `BirthTrackerPackage/Sources/BirthTrackerWidgetIntents`。
 - `BirthTrackerWidgets` 只负责 Widget bundle、UI、provider、entry、preview 和 package UI 本地化，并依赖 `BirthTrackerWidgetIntents`。
 - App target 只直接依赖 `BirthTrackerWidgetIntents`；Widget extension 同时依赖 `BirthTrackerWidgets` 与 `BirthTrackerWidgetIntents`。
+- App 与 Widget extension 各自声明宿主 `AppIntentsPackage`，并通过 `includedPackages` 注册 `BirthTrackerWidgetIntentsAppIntentsPackage`。
 ```
 
 - [ ] **Step 2: 重新生成 Xcode 工程**

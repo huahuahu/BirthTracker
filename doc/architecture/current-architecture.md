@@ -38,7 +38,7 @@
 
 - Widget extension 入口位于 `Sources/BirthTrackerWidget`，该目录只保留 `@main` bundle 壳、Info.plist 和 target 本地化资源；具体 Widget 类型、`AppIntentConfiguration`、timeline provider、entry 和 Widget preview 位于 `BirthTrackerPackage/Sources/BirthTrackerWidgets`。
 - 跨 App 与 Widget extension 使用的 `WidgetConfigurationIntent`、交互式 `AppIntent` 和 `AppIntentsPackage` 位于 `BirthTrackerPackage/Sources/BirthTrackerWidgetIntents`。
-- `BirthTrackerWidgets` 依赖 `BirthTrackerWidgetIntents`；App target 只直接依赖 Intent module，Widget extension 同时直接依赖 Intent 与 Widget UI module。
+- `BirthTrackerWidgets` 依赖 `BirthTrackerWidgetIntents`；App target 只直接依赖 Intent module，Widget extension 同时直接依赖 Intent 与 Widget UI module。App 与 Widget extension 各自通过宿主 `AppIntentsPackage.includedPackages` 注册 framework 中的 `BirthTrackerWidgetIntentsAppIntentsPackage`。
 - 面向 Widget 的 bundle 组合、UI、模型和持久化常量放在 package 模块里，而不是 App-only 或 extension-only 代码里。
 - App 和 Widget 配置使用 `Config/Project.xcconfig` 里的占位符，以及已提交的 entitlement 模板。
 - App 将主 SwiftData 数据库中的人物转换成扁平快照，并写入 App Group 中独立的 Widget SwiftData store；该快照包含有生日和无生日联系人，生日列表 Widget 会过滤没有下一次生日的快照。
