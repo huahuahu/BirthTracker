@@ -46,6 +46,15 @@ Replace the placeholder bundle identifiers, CloudKit container, App Group, and t
 
 For Copilot worktree sessions, add `./scripts/copilot-session-create.sh` as a `session.create` lifecycle script. It copies the ignored local `Config/Project.xcconfig` from the main checkout into new worktrees when missing, falls back to `Config/Project.xcconfig.example`, runs `xcodegen generate`, runs `xcode-build-server config -workspace BirthTracker.xcodeproj/project.xcworkspace -scheme BirthTracker --build_root AIOutput/DerivedData`, builds the generated `buildServer.json` workspace and scheme for testing on the configured iOS Simulator using the same build root, and parses the Xcode result bundle into the xcode-build-server compile cache. The generated `buildServer.json` and compile cache let VS Code SourceKit-LSP resolve Swift build settings so clicking symbols, properties, and types can jump to their definitions.
 
+For Codex Environment worktrees, use the following Setup script. Codex provides the source checkout and new worktree paths through `CODEX_SOURCE_TREE_PATH` and `CODEX_WORKTREE_PATH`:
+
+```sh
+cd "$CODEX_WORKTREE_PATH"
+./scripts/codex-worktree-setup.sh
+```
+
+The Codex entry runs the same complete initialization flow as the Copilot lifecycle entry while keeping the platform-specific environment variables separate. It copies the local Xcode configuration when needed, runs XcodeGen, generates `buildServer.json`, performs the Simulator `build-for-testing`, and generates the xcode-build-server compile cache. Output is written to `AIOutput/codex-worktree-setup.log`. Missing tools, invalid paths, or incomplete generation fail the Setup script instead of leaving a partially initialized worktree.
+
 Debug builds default to local SwiftData storage so unsigned simulator tests run reliably. Set `BIRTHTRACKER_STORAGE_MODE=memory`, `local`, or `cloud` to exercise the alternate storage modes.
 
 Release builds use the private CloudKit database configured by `CLOUDKIT_CONTAINER_ID`.
