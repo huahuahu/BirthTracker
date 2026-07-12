@@ -13,6 +13,12 @@ public struct SelectPersonIntent: WidgetConfigurationIntent {
     optionsProvider: WidgetPersonOptionsProvider())
   public var personID: String?
 
+  public static var parameterSummary: some ParameterSummary {
+    Summary {
+      \.$personID
+    }
+  }
+
   public init() {}
 
   public init(personID: UUID?) {

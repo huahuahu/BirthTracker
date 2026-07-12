@@ -4,11 +4,13 @@ import SwiftUI
 import WidgetKit
 
 struct ContactAgeWidget: Widget {
+  let kind: String = BirthTrackerWidgetKind.contactAge
+
   init() {}
 
   var body: some WidgetConfiguration {
     AppIntentConfiguration(
-      kind: BirthTrackerWidgetKind.contactAge,
+      kind: kind,
       intent: SelectPersonIntent.self,
       provider: ContactAgeProvider()
     ) { entry in

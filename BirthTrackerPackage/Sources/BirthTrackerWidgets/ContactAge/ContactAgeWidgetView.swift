@@ -65,6 +65,9 @@ public struct ContactAgeWidgetView: View {
               .foregroundStyle(.secondary)
           }
           .frame(maxWidth: .infinity, alignment: .leading)
+          .id(displayFormat.rawValue)
+          .transition(.push(from: .bottom))
+          .animation(.smooth, value: displayFormat.rawValue)
         }
         .buttonStyle(.plain)
 
