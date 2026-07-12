@@ -87,7 +87,17 @@ hash_text() {
 }
 
 build_server_compile_file_path() {
-  CACHE_ROOT_KEY="$(printf '%s' "$WORKSPACE_PATH" | sed 's#/#-#g')"
+  if ! command -v sed >/dev/null 2>&1; then
+    echo "error: sed is required to compute xcode-build-server cache paths." >&2
+    return 127
+  fi
+
+  if CACHE_ROOT_KEY="$(printf '%s' "$WORKSPACE_PATH" | sed 's#/#-#g')"; then
+    :
+  else
+    CACHE_ROOT_KEY_STATUS=$?
+    return "$CACHE_ROOT_KEY_STATUS"
+  fi
   if BUILD_ROOT_HASH="$(hash_text "$BUILD_ROOT")"; then
     :
   else

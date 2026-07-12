@@ -379,10 +379,72 @@ STUB
   [[ "$STATUS" -eq 74 ]] || fail "md5sum failure should preserve status 74, got $STATUS"
 }
 
+test_propagates_sed_failure() {
+  local tmp main workspace bin
+  tmp="$(mktemp -d)"
+  trap 'rm -rf "$tmp"' RETURN
+
+  main="$tmp/main"
+  workspace="$tmp/workspace"
+  bin="$tmp/bin"
+  setup_error_propagation_fixture "$main" "$workspace" "$bin"
+
+  cat > "$bin/sed" <<'STUB'
+#!/bin/sh
+exit 75
+STUB
+  chmod +x "$bin/sed"
+
+  run_and_capture env \
+    PATH="$bin:$PATH" \
+    HOME="$workspace/home" \
+    COPILOT_TEST_EXPECTED_WORKSPACE="$(cd "$workspace" && pwd -P)" \
+    /bin/bash "$CORE_SCRIPT" \
+    "$(cd "$main" && pwd -P)" \
+    "$(cd "$workspace" && pwd -P)" \
+    "copilot-session-create.log" \
+    "copilot-session-create"
+
+  [[ "$STATUS" -eq 75 ]] || fail "sed failure should preserve status 75, got $STATUS"
+}
+
+test_returns_127_when_sed_is_missing() {
+  local tmp main workspace bin tool tool_path log
+  tmp="$(mktemp -d)"
+  trap 'rm -rf "$tmp"' RETURN
+
+  main="$tmp/main"
+  workspace="$tmp/workspace"
+  bin="$tmp/bin"
+  log="$workspace/AIOutput/copilot-session-create.log"
+  setup_error_propagation_fixture "$main" "$workspace" "$bin"
+
+  for tool in awk cat cp date dirname md5 mkdir plutil rm; do
+    tool_path="$(command -v "$tool")" || fail "test requires $tool"
+    ln -s "$tool_path" "$bin/$tool"
+  done
+
+  run_and_capture env \
+    PATH="$bin" \
+    HOME="$workspace/home" \
+    COPILOT_TEST_EXPECTED_WORKSPACE="$(cd "$workspace" && pwd -P)" \
+    /bin/bash "$CORE_SCRIPT" \
+    "$(cd "$main" && pwd -P)" \
+    "$(cd "$workspace" && pwd -P)" \
+    "copilot-session-create.log" \
+    "copilot-session-create"
+
+  [[ "$STATUS" -eq 127 ]] || fail "missing sed should exit 127, got $STATUS"
+  grep -q "error: sed is required to compute xcode-build-server cache paths." "$log" \
+    || fail "missing sed should write a clear error to the session log"
+}
+
 [[ -x "$CORE_SCRIPT" ]] || fail "scripts/worktree-setup.sh should exist and be executable"
 
 test_skips_when_trigger_is_unset
 test_logs_session_create_output_to_aioutput
+test_returns_127_when_sed_is_missing
+test_propagates_sed_failure
 test_returns_127_when_awk_is_missing
 test_propagates_md5sum_failure
 test_propagates_simulator_id_read_failure
