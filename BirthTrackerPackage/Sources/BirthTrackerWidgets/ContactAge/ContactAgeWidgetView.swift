@@ -54,17 +54,25 @@ public struct ContactAgeWidgetView: View {
         message(WidgetL10n.string(WidgetL10n.noBirthdayRecorded))
       } else if let ageText = ageText(for: snapshot) {
         Button(intent: ToggleContactAgeFormatIntent(personID: snapshot.personID)) {
-          VStack(alignment: .leading, spacing: 4) {
-            Text(ageText)
-              .font(family == .systemSmall ? .title3.bold() : .title.bold())
-              .monospacedDigit()
-              .lineLimit(2)
-              .minimumScaleFactor(0.7)
-            Text(formatLabel)
-              .font(.caption2)
-              .foregroundStyle(.secondary)
+          ZStack(alignment: .topLeading) {
+            VStack(alignment: .leading, spacing: 4) {
+              Text(ageText)
+                .font(family == .systemSmall ? .title3.bold() : .title.bold())
+                .monospacedDigit()
+                .lineLimit(2)
+                .minimumScaleFactor(0.7)
+              Text(formatLabel)
+                .font(.caption2)
+                .foregroundStyle(.secondary)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .id(displayFormat.rawValue)
+            .transition(.push(from: .bottom))
           }
           .frame(maxWidth: .infinity, alignment: .leading)
+          .compositingGroup()
+          .clipped()
+          .animation(.smooth, value: displayFormat.rawValue)
         }
         .buttonStyle(.plain)
 

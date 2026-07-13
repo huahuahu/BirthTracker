@@ -4,11 +4,13 @@ import SwiftUI
 import WidgetKit
 
 struct UpcomingBirthdaysWidget: Widget {
+  let kind: String = BirthTrackerWidgetKind.upcomingBirthdays
+
   init() {}
 
   var body: some WidgetConfiguration {
     AppIntentConfiguration(
-      kind: BirthTrackerWidgetKind.upcomingBirthdays,
+      kind: kind,
       intent: SelectPersonIntent.self,
       provider: UpcomingBirthdaysProvider()
     ) { entry in
