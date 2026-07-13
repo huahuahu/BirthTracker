@@ -70,6 +70,7 @@ public struct ContactAgeWidgetView: View {
             .transition(.push(from: .bottom))
           }
           .frame(maxWidth: .infinity, alignment: .leading)
+          .compositingGroup()
           .clipped()
           .animation(.smooth, value: displayFormat.rawValue)
         }
