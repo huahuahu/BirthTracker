@@ -78,6 +78,8 @@ targets:
     dependencies:
       - target: BirthTracker
       - package: BirthTrackerPackage
+        product: BirthTrackerWidgets
+      - package: BirthTrackerPackage
         product: Features
       - package: BirthTrackerPackage
         product: Logging

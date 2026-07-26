@@ -274,6 +274,11 @@ grep -q 'product: BirthTrackerWidgetIntents' <<<"$widget_target_block" \
 if grep -q 'product: Logging' <<<"$widget_target_block"; then
   fail "Widget extension should not directly depend on Logging"
 fi
+
+tests_target_block="$(awk '/^  BirthTrackerTests:$/,/^schemes:/' "$PROJECT_FILE")"
+grep -q 'product: BirthTrackerWidgets' <<<"$tests_target_block" \
+  || fail "BirthTrackerTests should depend on BirthTrackerWidgets when compiling widget tests"
+
 grep -q '^import BirthTrackerWidgetIntents$' "$APP_ENTRY_FILE" \
   || fail "BirthTrackerApp should import BirthTrackerWidgetIntents"
 
