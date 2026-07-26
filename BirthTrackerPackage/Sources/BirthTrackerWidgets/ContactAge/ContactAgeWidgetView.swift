@@ -3,11 +3,13 @@ import Models
 import Persistence
 import SFSafeSymbols
 import SwiftUI
-import WidgetKit
 
 public struct ContactAgeWidgetView: View {
-  @Environment(\.widgetFamily)
-  private var family
+  @Environment(\.accessibilityReduceMotion)
+  private var reduceMotion
+
+  @Environment(\.locale)
+  private var locale
 
   private let date: Date
   private let snapshot: WidgetPersonSnapshot?
@@ -28,10 +30,7 @@ public struct ContactAgeWidgetView: View {
   }
 
   public var body: some View {
-    VStack(alignment: .leading, spacing: 8) {
-      Label(WidgetL10n.contactAge, systemImage: SFSymbol.clock.rawValue)
-        .font(.headline)
-
+    Group {
       if selectedPersonUnavailable {
         message(WidgetL10n.string(WidgetL10n.selectedPersonUnavailable))
       } else if let snapshot {
@@ -45,46 +44,45 @@ public struct ContactAgeWidgetView: View {
 
   @ViewBuilder
   private func snapshotContent(_ snapshot: WidgetPersonSnapshot) -> some View {
-    VStack(alignment: .leading, spacing: 6) {
-      Text(snapshot.displayName)
-        .font(.subheadline.weight(.semibold))
-        .lineLimit(1)
+    VStack(alignment: .leading, spacing: 10) {
+      Label {
+        Text(snapshot.displayName)
+      } icon: {
+        Image(systemSymbol: .clock)
+      }
+      .font(.headline)
+      .lineLimit(1)
 
       if snapshot.nextBirthdayDate == nil {
         message(WidgetL10n.string(WidgetL10n.noBirthdayRecorded))
       } else if let ageText = ageText(for: snapshot) {
         Button(intent: ToggleContactAgeFormatIntent(personID: snapshot.personID)) {
-          ZStack(alignment: .topLeading) {
-            VStack(alignment: .leading, spacing: 4) {
-              Text(ageText)
-                .font(family == .systemSmall ? .title3.bold() : .title.bold())
-                .monospacedDigit()
-                .lineLimit(2)
-                .minimumScaleFactor(0.7)
-              Text(formatLabel)
-                .font(.caption2)
-                .foregroundStyle(.secondary)
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .id(displayFormat.rawValue)
-            .transition(.push(from: .bottom))
+          ZStack(alignment: .leading) {
+            Text(ageText)
+              .font(.title3.bold())
+              .monospacedDigit()
+              .lineLimit(2)
+              .minimumScaleFactor(0.7)
+              .id(displayFormat.rawValue)
+              .transition(reduceMotion ? .opacity : .push(from: .bottom))
           }
-          .frame(maxWidth: .infinity, alignment: .leading)
+          .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
           .compositingGroup()
           .clipped()
-          .animation(.smooth, value: displayFormat.rawValue)
+          .animation(reduceMotion ? nil : .smooth, value: displayFormat.rawValue)
         }
         .buttonStyle(.plain)
+        .accessibilityLabel(ageText)
+        .accessibilityHint(WidgetL10n.contactAgeTapToSwitch)
 
-        if family == .systemMedium {
-          if let days = snapshot.daysUntilNextBirthday {
-            Text(WidgetL10n.daysUntilBirthday(days))
-              .font(.caption)
-              .foregroundStyle(.secondary)
-          }
-          Text(WidgetL10n.contactAgeTapToSwitch)
-            .font(.caption2)
+        HStack {
+          Text(WidgetL10n.contactAgeSinceBirth(locale: locale))
+            .font(.caption)
             .foregroundStyle(.secondary)
+
+          Spacer()
+
+          ContactAgeFormatIndicator(displayFormat: displayFormat)
         }
       } else {
         message(WidgetL10n.string(WidgetL10n.contactAgeNeedsBirthYear))
@@ -97,24 +95,14 @@ public struct ContactAgeWidgetView: View {
 
     return durationFormatter.string(
       for: metrics,
-      displayFormat: displayFormat)
+      displayFormat: displayFormat,
+      locale: locale)
   }
 
   private func contactAgeMetrics(for snapshot: WidgetPersonSnapshot) -> ContactAgeSnapshotMetrics? {
     ContactAgeSnapshotMetrics.make(
       snapshot: snapshot,
       referenceDate: date)
-  }
-
-  private var formatLabel: LocalizedStringResource {
-    switch displayFormat {
-    case .yearMonthDay:
-      WidgetL10n.ageFormatYearMonthDay
-    case .monthDay:
-      WidgetL10n.ageFormatMonthDay
-    case .day:
-      WidgetL10n.ageFormatDay
-    }
   }
 
   private func message(_ text: String) -> some View {

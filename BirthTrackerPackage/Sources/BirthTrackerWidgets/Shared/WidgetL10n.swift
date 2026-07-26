@@ -63,4 +63,8 @@ enum WidgetL10n {
         bundle: .atURL(Bundle.module.bundleURL)))
     return String.localizedStringWithFormat(format, days)
   }
+
+  static func contactAgeSinceBirth(locale: Locale = .current) -> String {
+    String(localized: "Since birth", bundle: .module, locale: locale)
+  }
 }
