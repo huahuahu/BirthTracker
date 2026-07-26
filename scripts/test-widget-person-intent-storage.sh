@@ -223,13 +223,23 @@ expected_widget_keys = {
     "widget.contact.age.format.month.day",
     "widget.contact.age.format.total.days",
 }
-if set(widget_strings) != expected_widget_keys:
-    missing = sorted(expected_widget_keys - set(widget_strings))
-    unexpected = sorted(set(widget_strings) - expected_widget_keys)
+new_widget_strings = {
+    "Since birth": {"en": "Since birth", "zh-Hans": "出生至今"},
+}
+all_expected_widget_keys = expected_widget_keys | set(new_widget_strings)
+if set(widget_strings) != all_expected_widget_keys:
+    missing = sorted(all_expected_widget_keys - set(widget_strings))
+    unexpected = sorted(set(widget_strings) - all_expected_widget_keys)
     raise SystemExit(f"Widget UI source keys changed: missing={missing}, unexpected={unexpected}")
 for key in sorted(expected_widget_keys):
     for locale in ("en", "zh-Hans"):
         expected_value = localized_value(base_strings, key, locale)
+        actual_value = localized_value(widget_strings, key, locale)
+        if actual_value != expected_value:
+            raise SystemExit(
+                f"Widget UI {key!r} {locale} changed: expected {expected_value!r}, got {actual_value!r}")
+for key, localized_values in new_widget_strings.items():
+    for locale, expected_value in localized_values.items():
         actual_value = localized_value(widget_strings, key, locale)
         if actual_value != expected_value:
             raise SystemExit(
@@ -264,6 +274,11 @@ grep -q 'product: BirthTrackerWidgetIntents' <<<"$widget_target_block" \
 if grep -q 'product: Logging' <<<"$widget_target_block"; then
   fail "Widget extension should not directly depend on Logging"
 fi
+
+tests_target_block="$(awk '/^  BirthTrackerTests:$/,/^schemes:/' "$PROJECT_FILE")"
+grep -q 'product: BirthTrackerWidgets' <<<"$tests_target_block" \
+  || fail "BirthTrackerTests should depend on BirthTrackerWidgets when compiling widget tests"
+
 grep -q '^import BirthTrackerWidgetIntents$' "$APP_ENTRY_FILE" \
   || fail "BirthTrackerApp should import BirthTrackerWidgetIntents"
 

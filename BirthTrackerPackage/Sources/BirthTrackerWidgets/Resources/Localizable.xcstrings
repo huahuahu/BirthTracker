@@ -145,6 +145,22 @@
         }
       }
     },
+    "Since birth" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Since birth"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "出生至今"
+          }
+        }
+      }
+    },
     "Tap to switch format" : {
       "localizations" : {
         "en" : {

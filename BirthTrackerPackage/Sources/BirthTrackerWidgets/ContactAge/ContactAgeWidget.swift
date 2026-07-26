@@ -24,6 +24,6 @@ struct ContactAgeWidget: Widget {
     }
     .configurationDisplayName(WidgetL10n.contactAge)
     .description(WidgetL10n.contactAgeDescription)
-    .supportedFamilies([.systemSmall, .systemMedium])
+    .supportedFamilies([.systemSmall])
   }
 }
