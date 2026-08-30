@@ -16,7 +16,9 @@
 
 | ID | 标题 | 状态 | 文件 |
 | --- | --- | --- | --- |
-| REQ-0001 | 设置 | Accepted | `REQ-0001-settings.md` |
+| REQ-0001 | 设置 | Shipped | `REQ-0001-settings.md` |
+| REQ-0002 | 联系人与生日时间线 | Shipped | `REQ-0002-people-and-timeline.md` |
+| REQ-0003 | 生日 Widgets | Shipped | `REQ-0003-birthday-widgets.md` |
 
 ## Backlog
 
@@ -33,5 +35,7 @@
 
 - 实现产品功能前先读这个索引。
 - `Accepted` 和 `In Progress` 的需求优先级高于 backlog 想法。
+- 实现新能力时以 `Accepted` 和 `In Progress` 为输入；修改现有行为前也要阅读对应的 `Shipped` 需求，确认当前产品边界。
 - 不要把 `Draft` 或 `Proposed` 状态的需求当作已经确认或实现的行为。
 - 如果实现时发现产品语义不清，把问题补到对应需求的 `开放问题` 区域。
+- `doc/history/` 中的设计和计划用于追溯，不代表当前需求状态；必须回到本索引和实际实现确认当前行为。

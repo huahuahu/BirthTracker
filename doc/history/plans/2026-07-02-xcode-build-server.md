@@ -1,5 +1,8 @@
 # Xcode Build Server Implementation Plan
 
+> [!WARNING]
+> 本文档是归档实施计划，不是当前执行指令。其中的路径、命令和 Superpowers skills 可能已经失效；使用前请先阅读[历史资料说明](../README.md)。
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** 在 Copilot worktree session 创建脚本中自动生成 `buildServer.json`，让 VS Code 的 SourceKit-LSP 可以点击 Swift 符号、属性和类型跳到定义。

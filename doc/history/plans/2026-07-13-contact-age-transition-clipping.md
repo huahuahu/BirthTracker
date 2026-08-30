@@ -1,5 +1,8 @@
 # 联系人年龄 Widget 切换动画裁剪实施计划
 
+> [!WARNING]
+> 本文档是归档实施计划，不是当前执行指令。其中的路径、命令和 Superpowers skills 可能已经失效；使用前请先阅读[历史资料说明](../README.md)。
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** 保留联系人年龄格式切换时旧内容向上退出、新内容从下进入的动画，同时阻止过渡内容越界覆盖联系人姓名或其他相邻内容。

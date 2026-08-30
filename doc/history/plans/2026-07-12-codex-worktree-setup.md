@@ -1,5 +1,8 @@
 # Codex worktree 自动初始化实施计划
 
+> [!WARNING]
+> 本文档是归档实施计划，不是当前执行指令。其中的路径、命令和 Superpowers skills 可能已经失效；使用前请先阅读[历史资料说明](../README.md)。
+
 > **面向执行代理：** 必须使用 `superpowers:subagent-driven-development`（推荐）或 `superpowers:executing-plans`，按任务逐项执行本计划。各步骤使用 checkbox（`- [ ]`）跟踪。
 
 **目标：** 为 Codex Environment 新增独立 worktree setup 入口，并让它与 Copilot session 共享完整的 XcodeGen、build server、Simulator 构建和 compile cache 初始化逻辑。

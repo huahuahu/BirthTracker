@@ -1,5 +1,8 @@
 # Logging Swift Package Implementation Plan
 
+> [!WARNING]
+> 本文档是归档实施计划，不是当前执行指令。其中的路径、命令和 Superpowers skills 可能已经失效；使用前请先阅读[历史资料说明](../README.md)。
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** 在现有 `BirthTrackerPackage` 中新增统一 Logging 模块，支持多日志类型、默认 private 动态值、可测试 sink，并迁移现有 OSLog 调用点。

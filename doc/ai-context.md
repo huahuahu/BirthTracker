@@ -32,8 +32,11 @@ make fix
 
 ## 文档工作流
 
+- `doc/` 是唯一的活跃文档根目录；不要再为新工作创建并行的 `docs/` 文档树。
 - 一个重要产品能力对应一个 `doc/requirements/REQ-xxxx-name.md` 文件。
 - 还没成型的小想法先放进 `doc/requirements/backlog.md`。
 - 需求文档描述用户或产品想要什么，不提前写过细的实现方案。
 - 如果实现改变了系统结构，同步更新 `doc/architecture/current-architecture.md`。
 - 以后遇到重要技术选择时，可在 `doc/decisions/` 下新增 ADR 记录原因。
+- 已完成、被替代或尚未进入正式需求的设计与实施资料放在 `doc/history/`；其中的旧路径、命令和工具要求只是历史记录，不是当前执行指令。
+- 功能实现并验证后，更新对应需求状态和当前架构；历史设计稿不能成为 Shipped 行为的唯一真源。
