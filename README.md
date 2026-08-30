@@ -6,14 +6,22 @@ BirthTracker is a SwiftUI iOS app for tracking birthdays of people you care abou
 
 Reusable code is organized with Swift Package Manager modules:
 
-- `Sources/App`: app scene composition and dependency wiring.
-- `Sources/Features`: SwiftUI screens and user flows.
-- `Sources/Models`: SwiftData models and shared domain types.
-- `Sources/Persistence`: SwiftData container setup, App Group access, and widget persistence constants.
-- `Sources/DesignSystem`: reusable UI-adjacent settings and selection helpers.
-- `Sources/TestingSupport`: fixtures and in-memory persistence helpers for tests and debug data.
+- `BirthTrackerPackage/Sources/App`: app scene composition and dependency wiring.
+- `BirthTrackerPackage/Sources/Features`: SwiftUI screens and user flows.
+- `BirthTrackerPackage/Sources/Models`: SwiftData models and shared domain types.
+- `BirthTrackerPackage/Sources/Persistence`: SwiftData container setup, App Group access, and widget persistence.
+- `BirthTrackerPackage/Sources/DesignSystem`: reusable UI-adjacent settings and selection helpers.
+- `BirthTrackerPackage/Sources/Localization`: localized resources and typed lookup APIs.
+- `BirthTrackerPackage/Sources/Logging`: logging facade, values, privacy, and sinks.
+- `BirthTrackerPackage/Sources/BirthTrackerWidgetIntents`: intents shared by the app and Widget extension.
+- `BirthTrackerPackage/Sources/BirthTrackerWidgets`: concrete Widgets, providers, views, and previews.
+- `BirthTrackerPackage/Sources/TestingSupport`: fixtures and in-memory persistence helpers for tests and debug data.
 
-The `BirthTrackerApp` and `BirthTrackerWidget` folders contain only target-specific entry points and plist files.
+The `Sources/BirthTrackerApp` and `Sources/BirthTrackerWidget` folders contain only target-specific entry points, resources, and plist files.
+
+## Documentation
+
+[`doc/00-index.md`](doc/00-index.md) is the entry point for current product requirements, architecture, and documentation workflow. Historical designs and implementation plans live under `doc/history/`; they are retained for traceability and are not current requirements or executable instructions.
 
 ## Development
 

@@ -1,5 +1,8 @@
 # Widget Intents 独立模块实施计划
 
+> [!WARNING]
+> 本文档是归档实施计划，不是当前执行指令。其中的路径、命令和 Superpowers skills 可能已经失效；使用前请先阅读[历史资料说明](../README.md)。
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** 将 AppIntent 从 `BirthTrackerWidgets` 拆到独立的 `BirthTrackerWidgetIntents` SwiftPM product，使 App 不再链接 Widget UI module，同时保持 metadata、本地化和 Widget 编辑行为完整。

@@ -1,5 +1,8 @@
 # Widget 完整迁移到 Swift Package Implementation Plan
 
+> [!WARNING]
+> 本文档是归档实施计划，不是当前执行指令。其中的路径、命令和 Superpowers skills 可能已经失效；使用前请先阅读[历史资料说明](../README.md)。
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** 把两个 Widget 的实现、preview 和 UI 本地化完整迁入现有 `BirthTrackerWidgets` SwiftPM target，让 XcodeGen 的 Widget extension target 只管理一个 `@main` 壳和系统要求的三个资源文件。

@@ -1,5 +1,8 @@
 # Contact Age Widget Implementation Plan
 
+> [!WARNING]
+> 本文档是归档实施计划，不是当前执行指令。其中的路径、命令和 Superpowers skills 可能已经失效；使用前请先阅读[历史资料说明](../README.md)。
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** 新增一个联系人年龄 Widget，显示所选联系人当前年龄，并允许用户在 Widget 内点按切换“年/月/日”和“总天数”格式。

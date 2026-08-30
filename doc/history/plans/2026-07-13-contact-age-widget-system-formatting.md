@@ -1,5 +1,8 @@
 # 联系人出生时长系统格式化调整 Implementation Plan
 
+> [!WARNING]
+> 本文档是归档实施计划，不是当前执行指令。其中的路径、命令和 Superpowers skills 可能已经失效；使用前请先阅读[历史资料说明](../README.md)。
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** 保留联系人出生时长小组件的三种点击切换粒度，同时把实际时间文本交给系统 `DateComponentsFormatter` 生成。

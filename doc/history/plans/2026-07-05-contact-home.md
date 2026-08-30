@@ -1,5 +1,8 @@
 # Contact Home Implementation Plan
 
+> [!WARNING]
+> 本文档是归档实施计划，不是当前执行指令。其中的路径、命令和 Superpowers skills 可能已经失效；使用前请先阅读[历史资料说明](../README.md)。
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Build a contact detail homepage with editable draft-based form flow and shared birthday-summary data for App and Widget use.

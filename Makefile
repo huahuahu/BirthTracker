@@ -5,6 +5,7 @@ check:
 	./scripts/test-codex-worktree-setup.sh
 	./scripts/test-cleanup-merged-pr-worktree-on-archive.sh
 	./scripts/test-widget-person-intent-storage.sh
+	./scripts/test-documentation-layout.sh
 	./scripts/lint.sh
 
 test-scripts:
@@ -12,6 +13,7 @@ test-scripts:
 	./scripts/test-codex-worktree-setup.sh
 	./scripts/test-cleanup-merged-pr-worktree-on-archive.sh
 	./scripts/test-widget-person-intent-storage.sh
+	./scripts/test-documentation-layout.sh
 
 fix:
 	./scripts/format.sh

@@ -1,5 +1,8 @@
 # 调试存储重置 Implementation Plan
 
+> [!WARNING]
+> 本文档是归档实施计划，不是当前执行指令。其中的路径、命令和 Superpowers skills 可能已经失效；使用前请先阅读[历史资料说明](../README.md)。
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** 让 Settings 调试页的数据库存储切换重启后生效，并为 memory、local、CloudKit 都提供“重置测试数据”能力，同时把相关代码放入两级 Debug/Storage 子目录。
