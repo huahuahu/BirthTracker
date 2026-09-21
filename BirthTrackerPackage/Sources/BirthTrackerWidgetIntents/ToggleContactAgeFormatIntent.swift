@@ -1,39 +1,60 @@
 import AppIntents
 import Foundation
+import Logging
+import Models
 import Persistence
-import WidgetKit
 
 enum ToggleContactAgeFormatIntentError: LocalizedError {
-  case invalidPersonID(String)
+  case invalidConfiguredFormat(String)
 
   var errorDescription: String? {
     switch self {
-    case .invalidPersonID(let value):
-      "Invalid person ID for contact age format toggle: \(value)"
+    case .invalidConfiguredFormat(let value):
+      "Invalid configured contact age format: \(value)"
     }
   }
 }
 
 public struct ToggleContactAgeFormatIntent: AppIntent {
-  public static let title = LocalizedStringResource("Toggle Age Format", table: "Intents", bundle: .main)
+  public static let title = LocalizedStringResource(
+    "Toggle Age Format",
+    table: "Intents")
+  public static let isDiscoverable = false
 
-  @Parameter(title: LocalizedStringResource("Person ID", table: "Intents", bundle: .main))
-  public var personID: String
+  @Parameter(title: LocalizedStringResource("Widget ID", table: "Intents"))
+  public var stateID: String
+
+  @Parameter(title: LocalizedStringResource("Age Format", table: "Intents"))
+  public var configuredFormat: String
 
   public init() {}
 
-  public init(personID: UUID) {
-    self.personID = personID.uuidString
+  public init(
+    stateID: String,
+    configuredFormat: ContactAgeDisplayFormat
+  ) {
+    self.stateID = stateID
+    self.configuredFormat = configuredFormat.rawValue
   }
 
   public func perform() async throws -> some IntentResult {
-    guard let personID = UUID(uuidString: personID) else {
-      throw ToggleContactAgeFormatIntentError.invalidPersonID(personID)
+    let rawConfiguredFormat = configuredFormat
+    guard let configuredFormat = ContactAgeDisplayFormat(rawValue: rawConfiguredFormat) else {
+      throw ToggleContactAgeFormatIntentError.invalidConfiguredFormat(rawConfiguredFormat)
     }
 
     let store = try ContactAgeFormatPreferenceStore.appGroup()
-    store.toggleFormat(for: personID)
-    WidgetCenter.shared.reloadTimelines(ofKind: BirthTrackerWidgetKind.contactAge)
+    let selectedFormat = try store.toggleFormat(
+      for: stateID,
+      configuredFormat: configuredFormat)
+    BirthLogger.widget.info(
+      "Toggled contact age format.",
+      tags: [.persistence],
+      values: [
+        .private(stateID),
+        .public("configured-format=\(configuredFormat.rawValue)"),
+        .public("selected-format=\(selectedFormat.rawValue)"),
+      ])
     return .result()
   }
 }

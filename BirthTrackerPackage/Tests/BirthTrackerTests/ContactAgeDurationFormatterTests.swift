@@ -1,6 +1,5 @@
 import Foundation
 import Models
-import Persistence
 import Testing
 
 @testable import BirthTrackerWidgets
@@ -37,5 +36,18 @@ struct ContactAgeDurationFormatterTests {
   func sinceBirthUsesWidgetLocalizationCatalog() {
     #expect(
       WidgetL10n.contactAgeSinceBirth(locale: Locale(identifier: "en")) == "Since birth")
+  }
+
+  @Test(
+    "Calendar captions name the resolved calendar without configuration wording",
+    arguments: [
+      (BirthdayCalendarKind.gregorian, "Gregorian"),
+      (.chinese, "Chinese"),
+      (.buddhist, "Buddhist"),
+      (.hebrew, "Hebrew"),
+      (.islamicUmmAlQura, "Islamic"),
+    ])
+  func resolvedCalendarCaption(calendar: BirthdayCalendarKind, expected: String) {
+    #expect(WidgetL10n.calendarName(calendar, locale: Locale(identifier: "en")) == expected)
   }
 }

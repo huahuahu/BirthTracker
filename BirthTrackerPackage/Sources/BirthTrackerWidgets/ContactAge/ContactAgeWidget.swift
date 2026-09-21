@@ -17,6 +17,9 @@ struct ContactAgeWidget: Widget {
       ContactAgeWidgetView(
         date: entry.date,
         snapshot: entry.snapshot,
+        displayCalendarKind: entry.displayCalendarKind,
+        stateID: entry.stateID,
+        configuredDisplayFormat: entry.configuredDisplayFormat,
         displayFormat: entry.displayFormat,
         selectedPersonUnavailable: entry.selectedPersonUnavailable
       )

@@ -21,30 +21,39 @@ struct ContactAgeProvider: AppIntentTimelineProvider {
         calendarKind: .gregorian,
         generatedAt: .now,
         sortIndex: 0),
+      displayCalendarKind: .gregorian,
+      stateID: nil,
+      configuredDisplayFormat: .yearMonthDay,
       displayFormat: .yearMonthDay,
       selectedPersonUnavailable: false)
   }
 
   func snapshot(for configuration: SelectPersonIntent, in context: Context) async -> ContactAgeEntry {
-    loadEntry(for: configuration.selectedPersonID)
+    loadEntry(for: configuration)
   }
 
   func timeline(for configuration: SelectPersonIntent, in context: Context) async -> Timeline<ContactAgeEntry> {
     let entryDate = Date.now
-    let entry = loadEntry(for: configuration.selectedPersonID, date: entryDate)
+    let entry = loadEntry(for: configuration, date: entryDate)
     let refreshDate = nextRefreshDate(after: entryDate)
     return Timeline(entries: [entry], policy: .after(refreshDate))
   }
 
   private func loadEntry(
-    for selectedPersonID: UUID?,
+    for configuration: SelectPersonIntent,
     date: Date = .now
   ) -> ContactAgeEntry {
+    let selectedPersonID = configuration.selectedPersonID
+    let configuredDisplayFormat = configuration.resolvedAgeDisplayFormat
+    let stateID = configuration.contactAgeStateID
     guard let selectedPersonID else {
       return ContactAgeEntry(
         date: date,
         snapshot: nil,
-        displayFormat: .yearMonthDay,
+        displayCalendarKind: nil,
+        stateID: nil,
+        configuredDisplayFormat: configuredDisplayFormat,
+        displayFormat: configuredDisplayFormat,
         selectedPersonUnavailable: false)
     }
 
@@ -53,15 +62,34 @@ struct ContactAgeProvider: AppIntentTimelineProvider {
         return ContactAgeEntry(
           date: date,
           snapshot: nil,
-          displayFormat: .yearMonthDay,
+          displayCalendarKind: nil,
+          stateID: stateID,
+          configuredDisplayFormat: configuredDisplayFormat,
+          displayFormat: configuredDisplayFormat,
           selectedPersonUnavailable: true)
       }
 
-      let formatStore = try ContactAgeFormatPreferenceStore.appGroup()
+      let displayFormat =
+        try stateID.map {
+          try ContactAgeFormatPreferenceStore.appGroup().format(
+            for: $0,
+            configuredFormat: configuredDisplayFormat)
+        } ?? configuredDisplayFormat
+      BirthLogger.widget.info(
+        "Loaded contact age format.",
+        tags: [.persistence],
+        values: [
+          .private(stateID ?? "none"),
+          .public("configured-format=\(configuredDisplayFormat.rawValue)"),
+          .public("selected-format=\(displayFormat.rawValue)"),
+        ])
       return ContactAgeEntry(
         date: date,
         snapshot: snapshot,
-        displayFormat: formatStore.format(for: selectedPersonID),
+        displayCalendarKind: configuration.resolvedDisplayCalendar.resolve(following: snapshot.calendarKind),
+        stateID: stateID,
+        configuredDisplayFormat: configuredDisplayFormat,
+        displayFormat: displayFormat,
         selectedPersonUnavailable: false)
     } catch {
       BirthLogger.widget.error(
@@ -70,7 +98,10 @@ struct ContactAgeProvider: AppIntentTimelineProvider {
       return ContactAgeEntry(
         date: date,
         snapshot: nil,
-        displayFormat: .yearMonthDay,
+        displayCalendarKind: nil,
+        stateID: stateID,
+        configuredDisplayFormat: configuredDisplayFormat,
+        displayFormat: configuredDisplayFormat,
         selectedPersonUnavailable: false)
     }
   }

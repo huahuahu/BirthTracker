@@ -15,6 +15,7 @@
 - `requirements/REQ-0001-settings.md` - 设置页需求。
 - `requirements/REQ-0002-people-and-timeline.md` - 联系人与生日时间线需求。
 - `requirements/REQ-0003-birthday-widgets.md` - 即将生日与联系人年龄 Widgets 需求。
+- `requirements/REQ-0004-widget-calendar-selection.md` - Widget 实例级显示日历选择需求。
 - `requirements/TEMPLATE.md` - 新需求文档模板。
 
 ## 架构

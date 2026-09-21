@@ -19,6 +19,7 @@
 | REQ-0001 | 设置 | Shipped | `REQ-0001-settings.md` |
 | REQ-0002 | 联系人与生日时间线 | Shipped | `REQ-0002-people-and-timeline.md` |
 | REQ-0003 | 生日 Widgets | Shipped | `REQ-0003-birthday-widgets.md` |
+| REQ-0004 | Widget 显示日历选择 | Shipped | `REQ-0004-widget-calendar-selection.md` |
 
 ## Backlog
 

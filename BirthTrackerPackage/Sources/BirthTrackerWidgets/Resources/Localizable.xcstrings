@@ -33,6 +33,26 @@
         }
       }
     },
+    "Buddhist" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : { "state" : "translated", "value" : "Buddhist" }
+        },
+        "zh-Hans" : {
+          "stringUnit" : { "state" : "translated", "value" : "佛历" }
+        }
+      }
+    },
+    "Chinese" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : { "state" : "translated", "value" : "Chinese" }
+        },
+        "zh-Hans" : {
+          "stringUnit" : { "state" : "translated", "value" : "农历" }
+        }
+      }
+    },
     "Choose a person to show their age." : {
       "localizations" : {
         "en" : {
@@ -62,6 +82,36 @@
             "state" : "translated",
             "value" : "联系人年龄"
           }
+        }
+      }
+    },
+    "Gregorian" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : { "state" : "translated", "value" : "Gregorian" }
+        },
+        "zh-Hans" : {
+          "stringUnit" : { "state" : "translated", "value" : "公历" }
+        }
+      }
+    },
+    "Hebrew" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : { "state" : "translated", "value" : "Hebrew" }
+        },
+        "zh-Hans" : {
+          "stringUnit" : { "state" : "translated", "value" : "希伯来历" }
+        }
+      }
+    },
+    "Islamic" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : { "state" : "translated", "value" : "Islamic" }
+        },
+        "zh-Hans" : {
+          "stringUnit" : { "state" : "translated", "value" : "伊斯兰历" }
         }
       }
     },
