@@ -1,3 +1,4 @@
+import BirthTrackerWidgetIntents
 import Models
 import SFSafeSymbols
 import SwiftUI
@@ -7,14 +8,20 @@ public struct UpcomingBirthdaysWidgetView: View {
   @Environment(\.widgetFamily)
   private var family
 
+  @Environment(\.locale)
+  private var locale
+
   private let birthdays: [UpcomingBirthday]
+  private let displayCalendar: WidgetDisplayCalendar
   private let selectedPersonUnavailable: Bool
 
   public init(
     birthdays: [UpcomingBirthday],
+    displayCalendar: WidgetDisplayCalendar,
     selectedPersonUnavailable: Bool
   ) {
     self.birthdays = birthdays
+    self.displayCalendar = displayCalendar
     self.selectedPersonUnavailable = selectedPersonUnavailable
   }
 
@@ -37,9 +44,14 @@ public struct UpcomingBirthdaysWidgetView: View {
             Text(birthday.personName)
               .font(.subheadline.weight(.semibold))
               .lineLimit(1)
-            Text(birthday.date, format: .dateTime.month(.abbreviated).day())
-              .font(.caption)
-              .foregroundStyle(.secondary)
+            Text(
+              UpcomingBirthdayDateFormatter.string(
+                for: birthday.date,
+                calendarKind: displayCalendar.resolve(following: birthday.calendarKind),
+                locale: locale)
+            )
+            .font(.caption)
+            .foregroundStyle(.secondary)
             if let duration = birthday.birthDuration {
               Text(WidgetL10n.birthDuration(duration.years, duration.months, duration.days))
                 .font(.caption2)

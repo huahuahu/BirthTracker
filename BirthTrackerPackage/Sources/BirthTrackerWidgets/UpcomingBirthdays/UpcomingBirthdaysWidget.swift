@@ -11,11 +11,12 @@ struct UpcomingBirthdaysWidget: Widget {
   var body: some WidgetConfiguration {
     AppIntentConfiguration(
       kind: kind,
-      intent: SelectPersonIntent.self,
+      intent: SelectUpcomingBirthdaysIntent.self,
       provider: UpcomingBirthdaysProvider()
     ) { entry in
       UpcomingBirthdaysWidgetView(
         birthdays: entry.birthdays,
+        displayCalendar: entry.displayCalendar,
         selectedPersonUnavailable: entry.selectedPersonUnavailable
       )
       .containerBackground(.background, for: .widget)

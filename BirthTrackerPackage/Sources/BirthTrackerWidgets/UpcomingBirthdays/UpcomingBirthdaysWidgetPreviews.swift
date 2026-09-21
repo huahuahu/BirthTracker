@@ -1,3 +1,4 @@
+import BirthTrackerWidgetIntents
 import Models
 import SwiftUI
 import WidgetKit
@@ -33,6 +34,7 @@ import WidgetKit
         birthDuration: PersonBirthdaySummary.BirthDuration(years: 0, months: 8, days: 12),
         daysUntilNextBirthday: 30),
     ],
+    displayCalendar: .followContact,
     selectedPersonUnavailable: false)
 }
 
@@ -51,5 +53,6 @@ import WidgetKit
         birthDuration: PersonBirthdaySummary.BirthDuration(years: 2, months: 0, days: 0),
         daysUntilNextBirthday: 30)
     ],
+    displayCalendar: .followContact,
     selectedPersonUnavailable: false)
 }

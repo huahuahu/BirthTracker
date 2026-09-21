@@ -1,6 +1,5 @@
 import BirthTrackerWidgetIntents
 import Models
-import Persistence
 import SFSafeSymbols
 import SwiftUI
 
@@ -13,6 +12,9 @@ public struct ContactAgeWidgetView: View {
 
   private let date: Date
   private let snapshot: WidgetPersonSnapshot?
+  private let displayCalendarKind: BirthdayCalendarKind?
+  private let stateID: String?
+  private let configuredDisplayFormat: ContactAgeDisplayFormat
   private let displayFormat: ContactAgeDisplayFormat
   private let selectedPersonUnavailable: Bool
   private let durationFormatter = ContactAgeDurationFormatter()
@@ -20,11 +22,17 @@ public struct ContactAgeWidgetView: View {
   public init(
     date: Date,
     snapshot: WidgetPersonSnapshot?,
+    displayCalendarKind: BirthdayCalendarKind?,
+    stateID: String?,
+    configuredDisplayFormat: ContactAgeDisplayFormat,
     displayFormat: ContactAgeDisplayFormat,
     selectedPersonUnavailable: Bool
   ) {
     self.date = date
     self.snapshot = snapshot
+    self.displayCalendarKind = displayCalendarKind
+    self.stateID = stateID
+    self.configuredDisplayFormat = configuredDisplayFormat
     self.displayFormat = displayFormat
     self.selectedPersonUnavailable = selectedPersonUnavailable
   }
@@ -44,7 +52,30 @@ public struct ContactAgeWidgetView: View {
 
   @ViewBuilder
   private func snapshotContent(_ snapshot: WidgetPersonSnapshot) -> some View {
-    VStack(alignment: .leading, spacing: 10) {
+    let ageText = ageText(for: snapshot)
+    if snapshot.nextBirthdayDate != nil, let ageText, let stateID {
+      Button(
+        intent: ToggleContactAgeFormatIntent(
+          stateID: stateID,
+          configuredFormat: configuredDisplayFormat)
+      ) {
+        snapshotLayout(snapshot, ageText: ageText)
+          .contentShape(Rectangle())
+      }
+      .buttonStyle(.plain)
+      .accessibilityLabel(Text(verbatim: snapshot.displayName))
+      .accessibilityValue(
+        Text(verbatim: "\(ageText), \(WidgetL10n.contactAgeSinceBirth(locale: locale)), \(calendarName(for: snapshot))")
+      )
+      .accessibilityHint(WidgetL10n.contactAgeTapToSwitch)
+      .accessibilityIdentifier("contactAge.toggleFormat")
+    } else {
+      snapshotLayout(snapshot, ageText: ageText)
+    }
+  }
+
+  private func snapshotLayout(_ snapshot: WidgetPersonSnapshot, ageText: String?) -> some View {
+    VStack(alignment: .leading, spacing: 8) {
       Label {
         Text(snapshot.displayName)
       } icon: {
@@ -55,39 +86,46 @@ public struct ContactAgeWidgetView: View {
 
       if snapshot.nextBirthdayDate == nil {
         message(WidgetL10n.string(WidgetL10n.noBirthdayRecorded))
-      } else if let ageText = ageText(for: snapshot) {
-        Button(intent: ToggleContactAgeFormatIntent(personID: snapshot.personID)) {
-          ZStack(alignment: .leading) {
-            Text(ageText)
-              .font(.title3.bold())
-              .monospacedDigit()
-              .lineLimit(2)
-              .minimumScaleFactor(0.7)
-              .id(displayFormat.rawValue)
-              .transition(reduceMotion ? .opacity : .push(from: .bottom))
+      } else if let ageText {
+        ageValue(ageText)
+
+        HStack(alignment: .bottom, spacing: 8) {
+          VStack(alignment: .leading, spacing: 2) {
+            Text(WidgetL10n.contactAgeSinceBirth(locale: locale))
+            Text(calendarName(for: snapshot))
+              .accessibilityIdentifier("contactAge.calendar")
           }
-          .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
-          .compositingGroup()
-          .clipped()
-          .animation(reduceMotion ? nil : .smooth, value: displayFormat.rawValue)
-        }
-        .buttonStyle(.plain)
-        .accessibilityLabel(ageText)
-        .accessibilityHint(WidgetL10n.contactAgeTapToSwitch)
+          .font(.caption)
+          .foregroundStyle(.secondary)
+          .lineLimit(1)
+          .minimumScaleFactor(0.85)
 
-        HStack {
-          Text(WidgetL10n.contactAgeSinceBirth(locale: locale))
-            .font(.caption)
-            .foregroundStyle(.secondary)
-
-          Spacer()
+          Spacer(minLength: 0)
 
           ContactAgeFormatIndicator(displayFormat: displayFormat)
+            .padding(.bottom, 4)
         }
       } else {
         message(WidgetL10n.string(WidgetL10n.contactAgeNeedsBirthYear))
       }
     }
+    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+  }
+
+  private func ageValue(_ ageText: String) -> some View {
+    ZStack(alignment: .leading) {
+      Text(ageText)
+        .font(.title3.bold())
+        .monospacedDigit()
+        .lineLimit(2)
+        .minimumScaleFactor(0.7)
+        .id(displayFormat.rawValue)
+        .transition(reduceMotion ? .opacity : .push(from: .bottom))
+    }
+    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
+    .compositingGroup()
+    .clipped()
+    .animation(reduceMotion ? nil : .smooth, value: displayFormat.rawValue)
   }
 
   private func ageText(for snapshot: WidgetPersonSnapshot) -> String? {
@@ -99,10 +137,15 @@ public struct ContactAgeWidgetView: View {
       locale: locale)
   }
 
+  private func calendarName(for snapshot: WidgetPersonSnapshot) -> String {
+    WidgetL10n.calendarName(displayCalendarKind ?? snapshot.calendarKind, locale: locale)
+  }
+
   private func contactAgeMetrics(for snapshot: WidgetPersonSnapshot) -> ContactAgeSnapshotMetrics? {
     ContactAgeSnapshotMetrics.make(
       snapshot: snapshot,
-      referenceDate: date)
+      referenceDate: date,
+      calendarKind: displayCalendarKind)
   }
 
   private func message(_ text: String) -> some View {

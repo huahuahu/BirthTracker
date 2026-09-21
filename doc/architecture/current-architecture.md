@@ -51,18 +51,20 @@
 ## Widgets
 
 - 当前提供两个 Widget：即将生日 Widget 支持 `systemSmall` 和 `systemMedium`，联系人年龄 Widget 仅支持 `systemSmall`。历史单人生日倒计时圆环设计尚未实现。
-- 两个 Widget 都使用 `SelectPersonIntent`。即将生日 Widget 未选择联系人时展示最近生日列表，选择后只展示对应人物；联系人年龄 Widget 未选择联系人时提示选择人物。
+- 联系人年龄 Widget 继续使用既有的 `SelectPersonIntent`，即将生日 Widget 使用 `SelectUpcomingBirthdaysIntent`；两者的 `parameterSummary` 都只显示联系人、显示日历两项。显示日历支持跟随联系人以及五种显式日历，默认跟随联系人；跨进程参数传递使用稳定的 raw `String` 标识并在 Widget 侧解析成固定选项，避免系统反序列化枚举值时退回默认项。联系人年龄的所选联系人 raw value 同时携带不可见的实例 token，配置界面仍只显示联系人名称。配置不会写回联系人、设置页或 Widget 快照。
+- `SelectPersonIntent.ageDisplayFormat` 仅作为隐藏的旧配置兼容字段保留，避免升级时重置既有格式及点按覆盖值；不再出现在配置界面，新实例以“年/月/日”起始，后续格式只由点按改变。
+- 即将生日 Widget 未选择联系人时展示最近生日列表，选择后只展示对应人物。下一次生日的绝对日期和排序始终来自按联系人原始生日历法生成的快照；显示日历只控制日期格式化，跟随联系人时多人列表可以逐人采用不同历法。
+- 联系人年龄 Widget 未选择联系人时提示选择人物；存在完整出生日期时，年、月、日按实例选择的显示日历重新计算，总天数不随显示日历改变。页脚以两行短文案显示“出生至今”和实际解析出的日历名，右侧保留三状态圆点；日历名称与计算使用同一个 `displayCalendarKind`，并包含在 VoiceOver 读出的内容中。
 - 已选择的人物被删除或不可用时显示明确状态，不自动替换为其他人物；生日或出生年份不足时显示对应空状态。
 - Widget extension 入口位于 `Sources/BirthTrackerWidget`，该目录只保留 `@main` bundle 壳、Info.plist 和 target 本地化资源；具体 Widget 类型、`AppIntentConfiguration`、timeline provider、entry 和 Widget preview 位于 `BirthTrackerPackage/Sources/BirthTrackerWidgets`。
-- 跨 App 与 Widget extension 使用的 `WidgetConfigurationIntent`、交互式 `AppIntent` 和 `AppIntentsPackage` 位于 `BirthTrackerPackage/Sources/BirthTrackerWidgetIntents`。
+- 跨 App 与 Widget extension 使用的 `WidgetConfigurationIntent` 和 `AppIntentsPackage` 位于 `BirthTrackerPackage/Sources/BirthTrackerWidgetIntents`。
 - `BirthTrackerWidgets` 依赖 `BirthTrackerWidgetIntents`；App target 只直接依赖 Intent module，Widget extension 同时直接依赖 Intent 与 Widget UI module。App 与 Widget extension 各自通过宿主 `AppIntentsPackage.includedPackages` 注册 framework 中的 `BirthTrackerWidgetIntentsAppIntentsPackage`。
 - 面向 Widget 的 bundle 组合、UI、模型和持久化常量放在 package 模块里，而不是 App-only 或 extension-only 代码里。
 - App 和 Widget 配置使用 `Config/Project.xcconfig` 里的占位符，以及已提交的 entitlement 模板。
 - App 将主 SwiftData 数据库中的人物转换成扁平快照，并写入 App Group 中独立的 Widget SwiftData store；该快照包含有生日和无生日联系人，生日列表 Widget 会过滤没有下一次生日的快照。
 - App 和 Widget 通过 `PersonBirthdaySummary` 共享“已经出生多久”“已经出生总天数”“距离下次生日”等生日摘要语义；Widget 仍只读取扁平快照字段，不复用 App 的 SwiftUI 详情页。
 - Widget extension 使用 `AppIntentConfiguration` 支持每个小组件实例选择一个联系人。
-- 联系人年龄 Widget 使用交互式 AppIntent 在年/月/日、月/日、日三种显示格式间轮换，格式偏好按联系人 ID 保存在 App Group `UserDefaults` 中；同一联系人对应的多个年龄 Widget 会共享该格式。
-- 联系人年龄格式切换使用三状态指示；开启“减弱动态效果”时取消位移动画。
+- 联系人年龄 Widget 点按整个内容区域（年龄文字、三状态指示及内容内空白）会通过交互式 Intent 按实例 token 在 App Group 中保存当前显示格式，Intent 完成后由 WidgetKit 刷新发起交互的实例，不主动刷新同 kind 的全部 timelines；同一联系人可以在多个实例中停留于不同格式，日历配置变更不改变已有 token。三状态指示始终反映当前生效格式。升级前只保存联系人 UUID 的旧实例继续兼容，并以联系人、显示日历和旧初始格式组合作为临时状态键；旧实例需重新选择一次联系人以获得独立 token。token 在联系人选项中生成并随选择保存，不在配置的无参初始化中生成；重新选择联系人会开始新的交互状态。
 - Widget store 是派生缓存，不启用 CloudKit，不替代主数据库。
 
 ## 开发工作流

@@ -1,63 +1,144 @@
+import BirthTrackerWidgetIntents
 import Foundation
+import Models
 import Persistence
 import Testing
 
 @Suite("Contact age format preference store")
 struct ContactAgeFormatPreferenceStoreTests {
-  @Test("Store returns year month day by default")
-  func storeReturnsYearMonthDayByDefault() throws {
+  @Test("Restored widget configurations keep cycling without affecting identical widgets")
+  func restoredConfigurationsKeepIndependentState() throws {
     let fixture = try PreferenceStoreFixture()
+    defer { fixture.defaults.removePersistentDomain(forName: fixture.suiteName) }
+    let personID = UUID()
+    let first = SelectPersonIntent(personID: personID)
+    let second = SelectPersonIntent(personID: personID)
+    let secondStateID = try #require(second.contactAgeStateID)
 
-    #expect(fixture.store.format(for: UUID()) == .yearMonthDay)
+    for expectedFormat: ContactAgeDisplayFormat in [.monthDay, .day, .yearMonthDay] {
+      let restored = SelectPersonIntent()
+      restored.personID = first.personID
+      let stateID = try #require(restored.contactAgeStateID)
+      try fixture.store.toggleFormat(for: stateID, configuredFormat: .yearMonthDay)
+
+      let reloaded = SelectPersonIntent()
+      reloaded.personID = first.personID
+      let reloadedStateID = try #require(reloaded.contactAgeStateID)
+      let reopenedStore = ContactAgeFormatPreferenceStore(userDefaults: fixture.defaults)
+
+      #expect(reopenedStore.format(for: reloadedStateID, configuredFormat: .yearMonthDay) == expectedFormat)
+      #expect(reopenedStore.format(for: secondStateID, configuredFormat: .yearMonthDay) == .yearMonthDay)
+    }
   }
 
-  @Test("Store persists formats per contact")
-  func storePersistsFormatsPerContact() throws {
+  @Test("Configured format is the default")
+  func configuredFormatIsTheDefault() throws {
     let fixture = try PreferenceStoreFixture()
-    let firstPersonID = UUID()
-    let secondPersonID = UUID()
 
-    fixture.store.setFormat(.day, for: firstPersonID)
+    #expect(
+      fixture.store.format(
+        for: "widget-a",
+        configuredFormat: .monthDay
+      ) == .monthDay)
+  }
 
-    #expect(fixture.store.format(for: firstPersonID) == .day)
-    #expect(fixture.store.format(for: secondPersonID) == .yearMonthDay)
+  @Test("Identical widget configurations keep independent tap state")
+  func identicalWidgetConfigurationsKeepIndependentTapState() throws {
+    let fixture = try PreferenceStoreFixture()
+
+    #expect(
+      try fixture.store.toggleFormat(
+        for: "widget-a",
+        configuredFormat: .yearMonthDay
+      ) == .monthDay)
+    #expect(
+      fixture.store.format(
+        for: "widget-a",
+        configuredFormat: .yearMonthDay
+      ) == .monthDay)
+    #expect(
+      fixture.store.format(
+        for: "widget-b",
+        configuredFormat: .yearMonthDay
+      ) == .yearMonthDay)
   }
 
   @Test("Store cycles through all contact age formats")
   func storeCyclesThroughAllContactAgeFormats() throws {
     let fixture = try PreferenceStoreFixture()
-    let personID = UUID()
+    let stateID = "widget-a"
 
-    #expect(fixture.store.toggleFormat(for: personID) == .monthDay)
-    #expect(fixture.store.format(for: personID) == .monthDay)
-    #expect(fixture.store.toggleFormat(for: personID) == .day)
-    #expect(fixture.store.format(for: personID) == .day)
-    #expect(fixture.store.toggleFormat(for: personID) == .yearMonthDay)
-    #expect(fixture.store.format(for: personID) == .yearMonthDay)
+    #expect(
+      try fixture.store.toggleFormat(
+        for: stateID,
+        configuredFormat: .yearMonthDay
+      ) == .monthDay)
+    #expect(
+      try fixture.store.toggleFormat(
+        for: stateID,
+        configuredFormat: .yearMonthDay
+      ) == .day)
+    #expect(
+      try fixture.store.toggleFormat(
+        for: stateID,
+        configuredFormat: .yearMonthDay
+      ) == .yearMonthDay)
   }
 
-  @Test("Store maps legacy format raw values")
-  func storeMapsLegacyFormatRawValues() throws {
+  @Test("Legacy initial format changes do not reset an existing tap selection")
+  func legacyInitialFormatDoesNotResetTapSelection() throws {
     let fixture = try PreferenceStoreFixture()
-    let durationPersonID = UUID()
-    let daysPersonID = UUID()
+    let stateID = "widget-a"
 
-    fixture.defaults.set("durationComponents", forKey: fixture.key(for: durationPersonID))
-    fixture.defaults.set("totalDays", forKey: fixture.key(for: daysPersonID))
+    _ = try fixture.store.toggleFormat(
+      for: stateID,
+      configuredFormat: .yearMonthDay)
 
-    #expect(fixture.store.format(for: durationPersonID) == .yearMonthDay)
-    #expect(fixture.store.format(for: daysPersonID) == .day)
+    #expect(
+      fixture.store.format(
+        for: stateID,
+        configuredFormat: .day
+      ) == .monthDay)
+    #expect(
+      try fixture.store.toggleFormat(
+        for: stateID,
+        configuredFormat: .day
+      ) == .day)
   }
 
-  @Test("Store reset returns a contact to the default format")
-  func storeResetReturnsAContactToTheDefaultFormat() throws {
+  @Test("Removing legacy format configuration and changing calendar retains the selected format")
+  func removingLegacyFormatKeepsSelection() throws {
     let fixture = try PreferenceStoreFixture()
-    let personID = UUID()
+    defer { fixture.defaults.removePersistentDomain(forName: fixture.suiteName) }
+    let legacy = SelectPersonIntent(personID: UUID(), ageDisplayFormat: .monthDay)
+    let stateID = try #require(legacy.contactAgeStateID)
+    try fixture.store.toggleFormat(for: stateID, configuredFormat: legacy.resolvedAgeDisplayFormat)
 
-    fixture.store.setFormat(.day, for: personID)
-    fixture.store.resetFormat(for: personID)
+    let restored = SelectPersonIntent()
+    restored.personID = legacy.personID
+    restored.displayCalendar = WidgetDisplayCalendar.islamicUmmAlQura.rawValue
+    let restoredStateID = try #require(restored.contactAgeStateID)
 
-    #expect(fixture.store.format(for: personID) == .yearMonthDay)
+    #expect(restoredStateID == stateID)
+    #expect(restored.resolvedAgeDisplayFormat == .yearMonthDay)
+    #expect(fixture.store.format(for: restoredStateID, configuredFormat: restored.resolvedAgeDisplayFormat) == .day)
+  }
+
+  @Test("Reset returns the widget to its configured format")
+  func resetReturnsWidgetToItsConfiguredFormat() throws {
+    let fixture = try PreferenceStoreFixture()
+    let stateID = "widget-a"
+
+    _ = try fixture.store.toggleFormat(
+      for: stateID,
+      configuredFormat: .monthDay)
+    fixture.store.resetFormat(for: stateID)
+
+    #expect(
+      fixture.store.format(
+        for: stateID,
+        configuredFormat: .monthDay
+      ) == .monthDay)
   }
 }
 
@@ -71,9 +152,5 @@ private struct PreferenceStoreFixture {
     defaults = try #require(UserDefaults(suiteName: suiteName))
     defaults.removePersistentDomain(forName: suiteName)
     store = ContactAgeFormatPreferenceStore(userDefaults: defaults)
-  }
-
-  func key(for personID: UUID) -> String {
-    "contactAge.displayFormat.\(personID.uuidString)"
   }
 }

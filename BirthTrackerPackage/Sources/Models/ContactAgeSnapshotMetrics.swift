@@ -44,7 +44,17 @@ public struct ContactAgeSnapshotMetrics: Equatable, Sendable {
     }
 
     let durationComponents = calendar.dateComponents([.year, .month, .day], from: birthStart, to: referenceStart)
-    let totalDays = calendar.dateComponents([.day], from: birthStart, to: referenceStart).day ?? 0
+
+    var absoluteDayCalendar = Calendar(identifier: .gregorian)
+    absoluteDayCalendar.timeZone = .autoupdatingCurrent
+    let absoluteBirthStart = absoluteDayCalendar.startOfDay(for: birthDate)
+    let absoluteReferenceStart = absoluteDayCalendar.startOfDay(for: referenceDate)
+    let totalDays =
+      absoluteDayCalendar.dateComponents(
+        [.day],
+        from: absoluteBirthStart,
+        to: absoluteReferenceStart
+      ).day ?? 0
 
     return ContactAgeSnapshotMetrics(
       birthDuration: PersonBirthdaySummary.BirthDuration(
@@ -56,16 +66,20 @@ public struct ContactAgeSnapshotMetrics: Equatable, Sendable {
 
   public static func make(
     snapshot: WidgetPersonSnapshot,
-    referenceDate: Date
+    referenceDate: Date,
+    calendarKind: BirthdayCalendarKind? = nil
   ) -> ContactAgeSnapshotMetrics? {
+    let resolvedCalendarKind = calendarKind ?? snapshot.calendarKind
+
     if let birthDate = snapshot.birthDate {
       return make(
         birthDate: birthDate,
-        calendarKind: snapshot.calendarKind,
+        calendarKind: resolvedCalendarKind,
         referenceDate: referenceDate)
     }
 
     guard snapshot.schemaVersion < WidgetSnapshotSchema.currentVersion else { return nil }
+    guard resolvedCalendarKind == snapshot.calendarKind else { return nil }
     guard let birthDuration = snapshot.birthDuration else { return nil }
     guard let totalBirthDays = snapshot.totalBirthDays else { return nil }
 

@@ -1,4 +1,5 @@
 import Foundation
+import Models
 
 enum WidgetL10n {
   static let ageFormatDay = LocalizedStringResource(
@@ -66,5 +67,20 @@ enum WidgetL10n {
 
   static func contactAgeSinceBirth(locale: Locale = .current) -> String {
     String(localized: "Since birth", bundle: .module, locale: locale)
+  }
+
+  static func calendarName(_ calendar: BirthdayCalendarKind, locale: Locale = .current) -> String {
+    switch calendar {
+    case .gregorian:
+      String(localized: "Gregorian", bundle: .module, locale: locale)
+    case .chinese:
+      String(localized: "Chinese", bundle: .module, locale: locale)
+    case .buddhist:
+      String(localized: "Buddhist", bundle: .module, locale: locale)
+    case .hebrew:
+      String(localized: "Hebrew", bundle: .module, locale: locale)
+    case .islamicUmmAlQura:
+      String(localized: "Islamic", bundle: .module, locale: locale)
+    }
   }
 }

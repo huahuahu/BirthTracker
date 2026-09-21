@@ -68,7 +68,7 @@ let package = Package(
     ),
     .target(
       name: "BirthTrackerWidgetIntents",
-      dependencies: ["Logging", "Persistence"],
+      dependencies: ["Logging", "Models", "Persistence"],
       path: "Sources/BirthTrackerWidgetIntents"
     ),
     .target(
@@ -79,7 +79,7 @@ let package = Package(
     ),
     .testTarget(
       name: "BirthTrackerPackageTests",
-      dependencies: ["BirthTrackerWidgets", "Features", "Logging", "Models", "Persistence", "TestingSupport"],
+      dependencies: ["BirthTrackerWidgetIntents", "BirthTrackerWidgets", "Features", "Logging", "Models", "Persistence", "TestingSupport"],
       path: "Tests/BirthTrackerTests"
     ),
   ]

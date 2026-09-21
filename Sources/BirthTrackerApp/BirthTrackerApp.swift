@@ -11,7 +11,7 @@ struct BirthTrackerApp: App {
   init() {
     _ = BirthTrackerWidgetIntentsAppIntentsPackage.self
     _ = SelectPersonIntent.self
-    _ = ToggleContactAgeFormatIntent.self
+    _ = SelectUpcomingBirthdaysIntent.self
   }
 
   var body: some Scene {
