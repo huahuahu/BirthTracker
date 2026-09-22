@@ -129,23 +129,18 @@ public struct ContactAgeWidgetView: View {
   }
 
   private func ageText(for snapshot: WidgetPersonSnapshot) -> String? {
-    guard let metrics = contactAgeMetrics(for: snapshot) else { return nil }
+    guard let birthDate = snapshot.birthDate else { return nil }
 
     return durationFormatter.string(
-      for: metrics,
+      from: birthDate,
+      to: date,
+      calendarKind: displayCalendarKind ?? snapshot.calendarKind,
       displayFormat: displayFormat,
       locale: locale)
   }
 
   private func calendarName(for snapshot: WidgetPersonSnapshot) -> String {
     WidgetL10n.calendarName(displayCalendarKind ?? snapshot.calendarKind, locale: locale)
-  }
-
-  private func contactAgeMetrics(for snapshot: WidgetPersonSnapshot) -> ContactAgeSnapshotMetrics? {
-    ContactAgeSnapshotMetrics.make(
-      snapshot: snapshot,
-      referenceDate: date,
-      calendarKind: displayCalendarKind)
   }
 
   private func message(_ text: String) -> some View {
