@@ -3,44 +3,28 @@ import Models
 
 struct ContactAgeDurationFormatter {
   func string(
-    for metrics: ContactAgeSnapshotMetrics,
+    from birthDate: Date,
+    to referenceDate: Date,
+    calendarKind: BirthdayCalendarKind,
     displayFormat: ContactAgeDisplayFormat,
     locale: Locale = .autoupdatingCurrent
   ) -> String? {
+    var calendar = calendarKind.calendar
+    calendar.locale = locale
+    let birthStart = calendar.startOfDay(for: birthDate)
+    let referenceStart = calendar.startOfDay(for: referenceDate)
+
+    let formatter = DateComponentsFormatter()
+    formatter.calendar = calendar
+    formatter.unitsStyle = .full
     switch displayFormat {
     case .yearMonthDay:
-      return string(
-        from: DateComponents(
-          year: metrics.birthDuration.years,
-          month: metrics.birthDuration.months,
-          day: metrics.birthDuration.days),
-        allowedUnits: [.year, .month, .day],
-        locale: locale)
+      formatter.allowedUnits = [.year, .month, .day]
     case .monthDay:
-      let monthDay = metrics.totalBirthMonthsAndDays
-      return string(
-        from: DateComponents(month: monthDay.months, day: monthDay.days),
-        allowedUnits: [.month, .day],
-        locale: locale)
+      formatter.allowedUnits = [.month, .day]
     case .day:
-      return string(
-        from: DateComponents(day: metrics.totalBirthDays),
-        allowedUnits: [.day],
-        locale: locale)
+      formatter.allowedUnits = [.day]
     }
-  }
-
-  private func string(
-    from components: DateComponents,
-    allowedUnits: NSCalendar.Unit,
-    locale: Locale
-  ) -> String? {
-    let formatter = DateComponentsFormatter()
-    var calendar = Calendar.autoupdatingCurrent
-    calendar.locale = locale
-    formatter.calendar = calendar
-    formatter.allowedUnits = allowedUnits
-    formatter.unitsStyle = .full
-    return formatter.string(from: components)
+    return formatter.string(from: min(birthStart, referenceStart), to: referenceStart)
   }
 }

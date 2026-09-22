@@ -54,7 +54,7 @@
 - 联系人年龄 Widget 继续使用既有的 `SelectPersonIntent`，即将生日 Widget 使用 `SelectUpcomingBirthdaysIntent`；两者的 `parameterSummary` 都只显示联系人、显示日历两项。显示日历支持跟随联系人以及五种显式日历，默认跟随联系人；跨进程参数传递使用稳定的 raw `String` 标识并在 Widget 侧解析成固定选项，避免系统反序列化枚举值时退回默认项。联系人年龄的所选联系人 raw value 同时携带不可见的实例 token，配置界面仍只显示联系人名称。配置不会写回联系人、设置页或 Widget 快照。
 - `SelectPersonIntent.ageDisplayFormat` 仅作为隐藏的旧配置兼容字段保留，避免升级时重置既有格式及点按覆盖值；不再出现在配置界面，新实例以“年/月/日”起始，后续格式只由点按改变。
 - 即将生日 Widget 未选择联系人时展示最近生日列表，选择后只展示对应人物。下一次生日的绝对日期和排序始终来自按联系人原始生日历法生成的快照；显示日历只控制日期格式化，跟随联系人时多人列表可以逐人采用不同历法。
-- 联系人年龄 Widget 未选择联系人时提示选择人物；存在完整出生日期时，年、月、日按实例选择的显示日历重新计算，总天数不随显示日历改变。页脚以两行短文案显示“出生至今”和实际解析出的日历名，右侧保留三状态圆点；日历名称与计算使用同一个 `displayCalendarKind`，并包含在 VoiceOver 读出的内容中。
+- 联系人年龄 Widget 未选择联系人时提示选择人物；存在完整出生日期时，年、月、日按实例选择的显示日历重新计算，总天数不随显示日历改变。年龄文案由 `ContactAgeDurationFormatter` 按显示粒度设置 `allowedUnits`，直接从出生日期与时间线日期生成；总月数包括闰月，不从年数换算，也不回退到旧快照的预计算时长。页脚以两行短文案显示“出生至今”和实际解析出的日历名，右侧保留三状态圆点；日历名称与计算使用同一个 `displayCalendarKind`，并包含在 VoiceOver 读出的内容中。
 - 已选择的人物被删除或不可用时显示明确状态，不自动替换为其他人物；生日或出生年份不足时显示对应空状态。
 - Widget extension 入口位于 `Sources/BirthTrackerWidget`，该目录只保留 `@main` bundle 壳、Info.plist 和 target 本地化资源；具体 Widget 类型、`AppIntentConfiguration`、timeline provider、entry 和 Widget preview 位于 `BirthTrackerPackage/Sources/BirthTrackerWidgets`。
 - 跨 App 与 Widget extension 使用的 `WidgetConfigurationIntent` 和 `AppIntentsPackage` 位于 `BirthTrackerPackage/Sources/BirthTrackerWidgetIntents`。
